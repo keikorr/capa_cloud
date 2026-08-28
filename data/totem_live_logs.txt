@@ -1,0 +1,1303 @@
+[2026-08-20T13:33:58.710Z] [CPX-001-SP] [CieloPinpad] Teste de streaming de telemetria em tempo real [OK]
+[2026-08-20T13:40:46.338Z] [CPX-001-SP] [System] Totem conectado ao WebSocket da Capaxero Cloud.
+[2026-08-20T13:40:50.882Z] [CPX-001-SP] [WebUI] Navegação UI -> Tela: modes
+[2026-08-20T13:41:02.830Z] [CPX-001-SP] [WebUI] Navegação UI -> Tela: home
+[2026-08-20T13:41:11.023Z] [CPX-001-SP] [WebUI] Navegação UI -> Tela: modes
+[2026-08-20T13:41:12.215Z] [CPX-001-SP] [WebUI] Plano selecionado: inter (R$ 17, 420s)
+[2026-08-20T13:41:12.229Z] [CPX-001-SP] [WebUI] Navegação UI -> Tela: payment
+[2026-08-20T13:41:13.955Z] [CPX-001-SP] [WebUI] Iniciando checkout Cielo Real: CREDIT
+[2026-08-20T13:41:13.967Z] [CPX-001-SP] [WebUI] Cielo Conecta — ativando Pinpad PPC930: CIELO_CREDITO (R$ 17.00)
+[2026-08-20T13:41:24.626Z] [CPX-001-SP] [WebUI] Pagamento cancelado pelo usuário no pop-up.
+[2026-08-20T13:41:26.307Z] [CPX-001-SP] [WebUI] Iniciando checkout Cielo Real: DEBIT
+[2026-08-20T13:41:26.317Z] [CPX-001-SP] [WebUI] Cielo Conecta — ativando Pinpad PPC930: CIELO_DEBITO (R$ 17.00)
+[2026-08-20T13:41:32.564Z] [CPX-001-SP] [WebUI] Pagamento cancelado pelo usuário no pop-up.
+[2026-08-20T13:42:38.889Z] [CPX-001-SP] [WebUI] Iniciando checkout Cielo Real: CREDIT
+[2026-08-20T13:42:38.896Z] [CPX-001-SP] [WebUI] Cielo Conecta — ativando Pinpad PPC930: CIELO_CREDITO (R$ 17.00)
+[2026-08-20T13:42:46.560Z] [CPX-001-SP] [WebUI] Pagamento cancelado pelo usuário no pop-up.
+[2026-08-20T13:42:47.664Z] [CPX-001-SP] [WebUI] Iniciando checkout Cielo Real: DEBIT
+[2026-08-20T13:42:47.677Z] [CPX-001-SP] [WebUI] Cielo Conecta — ativando Pinpad PPC930: CIELO_DEBITO (R$ 17.00)
+[2026-08-20T13:42:52.450Z] [CPX-001-SP] [WebUI] Pagamento cancelado pelo usuário no pop-up.
+[2026-08-20T13:44:14.006Z] [CPX-001-SP] [WebUI] Navegação UI -> Tela: home
+[2026-08-20T13:44:14.506Z] [CPX-001-SP] [WebUI] Navegação UI -> Tela: home
+[2026-08-20T13:44:15.435Z] [CPX-001-SP] [WebUI] Navegação UI -> Tela: modes
+[2026-08-20T13:44:29.178Z] [CPX-001-SP] [WebUI] Plano selecionado: inter (R$ 17, 420s)
+[2026-08-20T13:44:29.189Z] [CPX-001-SP] [WebUI] Navegação UI -> Tela: payment
+[2026-08-20T13:44:30.774Z] [CPX-001-SP] [WebUI] Iniciando checkout Cielo Real: CREDIT
+[2026-08-20T13:44:30.782Z] [CPX-001-SP] [WebUI] Cielo Conecta — ativando Pinpad PPC930: CIELO_CREDITO (R$ 17.00)
+[2026-08-20T13:44:42.860Z] [CPX-001-SP] [WebUI] Pagamento cancelado pelo usuário no pop-up.
+[2026-08-20T13:44:46.707Z] [CPX-001-SP] [WebUI] Iniciando checkout Cielo Real: DEBIT
+[2026-08-20T13:44:46.716Z] [CPX-001-SP] [WebUI] Cielo Conecta — ativando Pinpad PPC930: CIELO_DEBITO (R$ 17.00)
+[2026-08-20T13:44:58.414Z] [CPX-001-SP] [WebUI] Pagamento cancelado pelo usuário no pop-up.
+[2026-08-20T13:47:07.656Z] [CPX-001-SP] [System] Totem conectado ao WebSocket da Capaxero Cloud.
+[2026-08-20T13:49:16.680Z] [CPX-001-SP] [System] Totem conectado ao WebSocket da Capaxero Cloud.
+[2026-08-20T13:51:25.676Z] [CPX-001-SP] [System] Totem conectado ao WebSocket da Capaxero Cloud.
+[2026-08-20T13:52:28.038Z] [CPX-001-SP] [WebUI] Iniciando checkout Cielo Real: CREDIT
+[2026-08-20T13:52:28.049Z] [CPX-001-SP] [WebUI] Cielo Conecta — ativando Pinpad PPC930: CIELO_CREDITO (R$ 17.00)
+[2026-08-20T13:56:06.502Z] [CPX-001-SP] [System] Totem conectado ao WebSocket da Capaxero Cloud.
+[2026-08-20T13:56:23.200Z] [CPX-001-SP] [WebUI] Navegação UI -> Tela: modes
+[2026-08-20T13:56:24.685Z] [CPX-001-SP] [WebUI] Plano selecionado: inter (R$ 17, 420s)
+[2026-08-20T13:56:24.697Z] [CPX-001-SP] [WebUI] Navegação UI -> Tela: payment
+[2026-08-20T13:56:25.916Z] [CPX-001-SP] [WebUI] Iniciando checkout Cielo Real: CREDIT
+[2026-08-20T13:56:25.930Z] [CPX-001-SP] [WebUI] Cielo Conecta — ativando Pinpad PPC930: CIELO_CREDITO (R$ 17.00)
+[2026-08-20T13:56:26.021Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] Dispositivos USB detectados no barramento: 5
+[2026-08-20T13:56:26.023Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #1 [Dispositivo USB] VID:PID=0x2C7C:0x0125 | Permissao=CONCEDIDA
+[2026-08-20T13:56:26.031Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #2 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x0525:0xA4AC | Permissao=CONCEDIDA
+[2026-08-20T13:56:26.033Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #3 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T13:56:26.034Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T13:56:26.036Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x1753:0xC902 | Permissao=CONCEDIDA
+[2026-08-20T13:56:26.039Z] [CPX-001-SP] [CieloPinpad] >>> INICIANDO COBRANCA NO PINPAD: credit | R$ 17.0 (1700 cents)
+[2026-08-20T13:56:26.263Z] [CPX-001-SP] [CieloPinpad] Pinpad ainda nao inicializado. Executando OPEN agora...
+[2026-08-20T13:56:26.273Z] [CPX-001-SP] [CieloPinpad] startPayment: Comando OPEN retornou RetCode=10
+[2026-08-20T13:56:26.350Z] [CPX-001-SP] [CieloPinpad] Disparando GETCARD no Gertec PPC930...
+[2026-08-20T13:56:26.358Z] [CPX-001-SP] [CieloPinpad] GETCARD disparado com status inicial: 15
+[2026-08-20T13:56:26.390Z] [CPX-001-SP] [WebUI] Cielo Conecta [WAITING_CARD] APROXIME OU INSIRA O CARTAO
+[2026-08-20T13:56:26.414Z] [CPX-001-SP] [CieloPinpad] GETCARD finalizado -> RetCode=10 | Msg: 
+[2026-08-20T13:56:26.421Z] [CPX-001-SP] [CieloPinpad] Falha no Pinpad: RetCode=10 | Msg: 
+[2026-08-20T13:56:26.435Z] [CPX-001-SP] [WebUI] Cielo Conecta [ERROR] FALHA NO CARTAO (10)
+[2026-08-20T13:56:31.267Z] [CPX-001-SP] [WebUI] Cielo Conecta — ativando Pinpad PPC930: CIELO_CREDITO (R$ 17.00)
+[2026-08-20T13:56:31.379Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] Dispositivos USB detectados no barramento: 5
+[2026-08-20T13:56:31.388Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #1 [Dispositivo USB] VID:PID=0x2C7C:0x0125 | Permissao=CONCEDIDA
+[2026-08-20T13:56:31.390Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #2 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x0525:0xA4AC | Permissao=CONCEDIDA
+[2026-08-20T13:56:31.474Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #3 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T13:56:31.475Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T13:56:31.477Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x1753:0xC902 | Permissao=CONCEDIDA
+[2026-08-20T13:56:31.478Z] [CPX-001-SP] [CieloPinpad] >>> INICIANDO COBRANCA NO PINPAD: credit | R$ 17.0 (1700 cents)
+[2026-08-20T13:56:31.479Z] [CPX-001-SP] [CieloPinpad] Pinpad ainda nao inicializado. Executando OPEN agora...
+[2026-08-20T13:56:31.573Z] [CPX-001-SP] [CieloPinpad] startPayment: Comando OPEN retornou RetCode=10
+[2026-08-20T13:56:31.595Z] [CPX-001-SP] [CieloPinpad] Disparando GETCARD no Gertec PPC930...
+[2026-08-20T13:56:31.596Z] [CPX-001-SP] [CieloPinpad] GETCARD disparado com status inicial: 15
+[2026-08-20T13:56:31.605Z] [CPX-001-SP] [WebUI] Cielo Conecta [WAITING_CARD] APROXIME OU INSIRA O CARTAO
+[2026-08-20T13:56:31.609Z] [CPX-001-SP] [CieloPinpad] GETCARD finalizado -> RetCode=10 | Msg: 
+[2026-08-20T13:56:31.610Z] [CPX-001-SP] [CieloPinpad] Falha no Pinpad: RetCode=10 | Msg: 
+[2026-08-20T13:56:31.619Z] [CPX-001-SP] [WebUI] Cielo Conecta [ERROR] FALHA NO CARTAO (10)
+[2026-08-20T13:56:33.679Z] [CPX-001-SP] [WebUI] Pagamento cancelado pelo usuário no pop-up.
+[2026-08-20T13:56:33.717Z] [CPX-001-SP] [CieloPinpad] Abortando operacao do Pinpad...
+[2026-08-20T13:56:34.676Z] [CPX-001-SP] [WebUI] Iniciando checkout Cielo Real: DEBIT
+[2026-08-20T13:56:34.686Z] [CPX-001-SP] [WebUI] Cielo Conecta — ativando Pinpad PPC930: CIELO_DEBITO (R$ 17.00)
+[2026-08-20T13:56:34.778Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] Dispositivos USB detectados no barramento: 5
+[2026-08-20T13:56:34.779Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #1 [Dispositivo USB] VID:PID=0x2C7C:0x0125 | Permissao=CONCEDIDA
+[2026-08-20T13:56:34.780Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #2 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x0525:0xA4AC | Permissao=CONCEDIDA
+[2026-08-20T13:56:34.781Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #3 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T13:56:34.782Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T13:56:34.783Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x1753:0xC902 | Permissao=CONCEDIDA
+[2026-08-20T13:56:34.909Z] [CPX-001-SP] [CieloPinpad] >>> INICIANDO COBRANCA NO PINPAD: debit | R$ 17.0 (1700 cents)
+[2026-08-20T13:56:34.986Z] [CPX-001-SP] [CieloPinpad] Pinpad ainda nao inicializado. Executando OPEN agora...
+[2026-08-20T13:56:34.988Z] [CPX-001-SP] [CieloPinpad] startPayment: Comando OPEN retornou RetCode=10
+[2026-08-20T13:56:34.996Z] [CPX-001-SP] [CieloPinpad] Disparando GETCARD no Gertec PPC930...
+[2026-08-20T13:56:34.997Z] [CPX-001-SP] [CieloPinpad] GETCARD disparado com status inicial: 15
+[2026-08-20T13:56:35.019Z] [CPX-001-SP] [WebUI] Cielo Conecta [WAITING_CARD] APROXIME OU INSIRA O CARTAO
+[2026-08-20T13:56:35.033Z] [CPX-001-SP] [CieloPinpad] GETCARD finalizado -> RetCode=10 | Msg: 
+[2026-08-20T13:56:35.035Z] [CPX-001-SP] [CieloPinpad] Falha no Pinpad: RetCode=10 | Msg: 
+[2026-08-20T13:56:35.052Z] [CPX-001-SP] [WebUI] Cielo Conecta [ERROR] FALHA NO CARTAO (10)
+[2026-08-20T13:56:37.006Z] [CPX-001-SP] [WebUI] Pagamento cancelado pelo usuário no pop-up.
+[2026-08-20T13:56:37.034Z] [CPX-001-SP] [CieloPinpad] Abortando operacao do Pinpad...
+[2026-08-20T13:58:09.013Z] [CPX-001-SP] [WebUI] Navegação UI -> Tela: home
+[2026-08-20T13:58:10.135Z] [CPX-001-SP] [WebUI] Navegação UI -> Tela: modes
+[2026-08-20T13:58:11.078Z] [CPX-001-SP] [WebUI] Plano selecionado: inter (R$ 17, 420s)
+[2026-08-20T13:58:11.089Z] [CPX-001-SP] [WebUI] Navegação UI -> Tela: payment
+[2026-08-20T13:58:12.227Z] [CPX-001-SP] [WebUI] Iniciando checkout Cielo Real: CREDIT
+[2026-08-20T13:58:12.236Z] [CPX-001-SP] [WebUI] Cielo Conecta — ativando Pinpad PPC930: CIELO_CREDITO (R$ 17.00)
+[2026-08-20T13:58:12.288Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] Dispositivos USB detectados no barramento: 5
+[2026-08-20T13:58:12.290Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #1 [Dispositivo USB] VID:PID=0x2C7C:0x0125 | Permissao=CONCEDIDA
+[2026-08-20T13:58:12.304Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #2 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x1753:0xC902 | Permissao=CONCEDIDA
+[2026-08-20T13:58:12.307Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #3 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x0525:0xA4AC | Permissao=CONCEDIDA
+[2026-08-20T13:58:12.503Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T13:58:12.568Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T13:58:12.569Z] [CPX-001-SP] [CieloPinpad] >>> INICIANDO COBRANCA NO PINPAD: credit | R$ 17.0 (1700 cents)
+[2026-08-20T13:58:12.575Z] [CPX-001-SP] [CieloPinpad] Pinpad ainda nao inicializado. Executando OPEN agora...
+[2026-08-20T13:58:12.625Z] [CPX-001-SP] [CieloPinpad] startPayment: Comando OPEN retornou RetCode=10
+[2026-08-20T13:58:12.626Z] [CPX-001-SP] [CieloPinpad] Disparando GETCARD no Gertec PPC930...
+[2026-08-20T13:58:12.628Z] [CPX-001-SP] [CieloPinpad] GETCARD disparado com status inicial: 15
+[2026-08-20T13:58:12.668Z] [CPX-001-SP] [WebUI] Cielo Conecta [WAITING_CARD] APROXIME OU INSIRA O CARTAO
+[2026-08-20T13:58:12.681Z] [CPX-001-SP] [CieloPinpad] GETCARD finalizado -> RetCode=10 | Msg: 
+[2026-08-20T13:58:12.694Z] [CPX-001-SP] [CieloPinpad] Falha no Pinpad: RetCode=10 | Msg: 
+[2026-08-20T13:58:12.727Z] [CPX-001-SP] [WebUI] Cielo Conecta [ERROR] FALHA NO CARTAO (10)
+[2026-08-20T13:58:14.659Z] [CPX-001-SP] [WebUI] Pagamento cancelado pelo usuário no pop-up.
+[2026-08-20T13:58:14.703Z] [CPX-001-SP] [CieloPinpad] Abortando operacao do Pinpad...
+[2026-08-20T13:58:16.020Z] [CPX-001-SP] [WebUI] Iniciando checkout Cielo Real: DEBIT
+[2026-08-20T13:58:16.027Z] [CPX-001-SP] [WebUI] Cielo Conecta — ativando Pinpad PPC930: CIELO_DEBITO (R$ 17.00)
+[2026-08-20T13:58:16.070Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] Dispositivos USB detectados no barramento: 5
+[2026-08-20T13:58:16.071Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #1 [Dispositivo USB] VID:PID=0x2C7C:0x0125 | Permissao=CONCEDIDA
+[2026-08-20T13:58:16.072Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #2 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x1753:0xC902 | Permissao=CONCEDIDA
+[2026-08-20T13:58:16.073Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #3 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x0525:0xA4AC | Permissao=CONCEDIDA
+[2026-08-20T13:58:16.114Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T13:58:16.232Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T13:58:16.240Z] [CPX-001-SP] [CieloPinpad] >>> INICIANDO COBRANCA NO PINPAD: debit | R$ 17.0 (1700 cents)
+[2026-08-20T13:58:16.332Z] [CPX-001-SP] [CieloPinpad] Pinpad ainda nao inicializado. Executando OPEN agora...
+[2026-08-20T13:58:16.337Z] [CPX-001-SP] [CieloPinpad] startPayment: Comando OPEN retornou RetCode=10
+[2026-08-20T13:58:16.354Z] [CPX-001-SP] [CieloPinpad] Disparando GETCARD no Gertec PPC930...
+[2026-08-20T13:58:16.358Z] [CPX-001-SP] [CieloPinpad] GETCARD disparado com status inicial: 15
+[2026-08-20T13:58:16.380Z] [CPX-001-SP] [WebUI] Cielo Conecta [WAITING_CARD] APROXIME OU INSIRA O CARTAO
+[2026-08-20T13:58:16.386Z] [CPX-001-SP] [CieloPinpad] GETCARD finalizado -> RetCode=10 | Msg: 
+[2026-08-20T13:58:16.388Z] [CPX-001-SP] [CieloPinpad] Falha no Pinpad: RetCode=10 | Msg: 
+[2026-08-20T13:58:16.418Z] [CPX-001-SP] [WebUI] Cielo Conecta [ERROR] FALHA NO CARTAO (10)
+[2026-08-20T13:58:18.410Z] [CPX-001-SP] [WebUI] Pagamento cancelado pelo usuário no pop-up.
+[2026-08-20T13:58:18.457Z] [CPX-001-SP] [CieloPinpad] Abortando operacao do Pinpad...
+[2026-08-20T14:00:27.674Z] [CPX-001-SP] [System] Totem conectado ao WebSocket da Capaxero Cloud.
+[2026-08-20T14:02:37.017Z] [CPX-001-SP] [System] Totem conectado ao WebSocket da Capaxero Cloud.
+[2026-08-20T14:03:33.521Z] [CPX-001-SP] [System] Totem conectado ao WebSocket da Capaxero Cloud.
+[2026-08-20T14:03:36.321Z] [CPX-001-SP] [WebUI] Navegação UI -> Tela: modes
+[2026-08-20T14:03:41.061Z] [CPX-001-SP] [WebUI] Navegação UI -> Tela: home
+[2026-08-20T14:03:42.172Z] [CPX-001-SP] [WebUI] Navegação UI -> Tela: modes
+[2026-08-20T14:03:42.749Z] [CPX-001-SP] [WebUI] Plano selecionado: inter (R$ 17, 420s)
+[2026-08-20T14:03:42.766Z] [CPX-001-SP] [WebUI] Navegação UI -> Tela: payment
+[2026-08-20T14:03:43.872Z] [CPX-001-SP] [WebUI] Iniciando checkout Cielo Real: CREDIT
+[2026-08-20T14:03:43.885Z] [CPX-001-SP] [WebUI] Cielo Conecta — ativando Pinpad PPC930: CIELO_CREDITO (R$ 17.00)
+[2026-08-20T14:03:44.005Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] Dispositivos USB detectados no barramento: 5
+[2026-08-20T14:03:44.008Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #1 [Dispositivo USB] VID:PID=0x2C7C:0x0125 | Permissao=CONCEDIDA
+[2026-08-20T14:03:44.013Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #2 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:03:44.015Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #3 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x1753:0xC902 | Permissao=CONCEDIDA
+[2026-08-20T14:03:44.018Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x0525:0xA4AC | Permissao=CONCEDIDA
+[2026-08-20T14:03:44.019Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:03:44.021Z] [CPX-001-SP] [CieloPinpad] >>> INICIANDO COBRANCA NO PINPAD: credit | R$ 17.0 (1700 cents)
+[2026-08-20T14:03:44.023Z] [CPX-001-SP] [CieloPinpad] Pinpad ainda nao inicializado. Executando sequencia completa INIT -> OPEN agora...
+[2026-08-20T14:03:44.196Z] [CPX-001-SP] [CieloPinpad] startPayment: execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:03:44.261Z] [CPX-001-SP] [CieloPinpad] startPayment: Comando OPEN retornou RetCode=10
+[2026-08-20T14:03:44.281Z] [CPX-001-SP] [CieloPinpad] Disparando GETCARD no Gertec PPC930 (appType=01, amount=1700)...
+[2026-08-20T14:03:44.287Z] [CPX-001-SP] [CieloPinpad] GETCARD disparado com status inicial: 15
+[2026-08-20T14:03:44.302Z] [CPX-001-SP] [WebUI] Cielo Conecta [WAITING_CARD] APROXIME OU INSIRA O CARTAO
+[2026-08-20T14:03:44.305Z] [CPX-001-SP] [CieloPinpad] GETCARD finalizado -> RetCode=10 | Msg: 
+[2026-08-20T14:03:44.306Z] [CPX-001-SP] [CieloPinpad] Falha no Pinpad: RetCode=10 | Msg: 
+[2026-08-20T14:03:44.313Z] [CPX-001-SP] [WebUI] Cielo Conecta [ERROR] FALHA NO CARTAO (10)
+[2026-08-20T14:03:46.320Z] [CPX-001-SP] [WebUI] Cielo Conecta — ativando Pinpad PPC930: CIELO_CREDITO (R$ 17.00)
+[2026-08-20T14:03:46.376Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] Dispositivos USB detectados no barramento: 5
+[2026-08-20T14:03:46.386Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #1 [Dispositivo USB] VID:PID=0x2C7C:0x0125 | Permissao=CONCEDIDA
+[2026-08-20T14:03:46.467Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #2 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:03:46.529Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #3 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x1753:0xC902 | Permissao=CONCEDIDA
+[2026-08-20T14:03:46.531Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x0525:0xA4AC | Permissao=CONCEDIDA
+[2026-08-20T14:03:46.532Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:03:46.533Z] [CPX-001-SP] [CieloPinpad] >>> INICIANDO COBRANCA NO PINPAD: credit | R$ 17.0 (1700 cents)
+[2026-08-20T14:03:46.538Z] [CPX-001-SP] [CieloPinpad] Pinpad ainda nao inicializado. Executando sequencia completa INIT -> OPEN agora...
+[2026-08-20T14:03:46.542Z] [CPX-001-SP] [CieloPinpad] startPayment: execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:03:46.543Z] [CPX-001-SP] [CieloPinpad] startPayment: Comando OPEN retornou RetCode=10
+[2026-08-20T14:03:46.599Z] [CPX-001-SP] [CieloPinpad] Disparando GETCARD no Gertec PPC930 (appType=01, amount=1700)...
+[2026-08-20T14:03:46.604Z] [CPX-001-SP] [CieloPinpad] GETCARD disparado com status inicial: 15
+[2026-08-20T14:03:46.618Z] [CPX-001-SP] [WebUI] Cielo Conecta [WAITING_CARD] APROXIME OU INSIRA O CARTAO
+[2026-08-20T14:03:46.635Z] [CPX-001-SP] [CieloPinpad] GETCARD finalizado -> RetCode=10 | Msg: 
+[2026-08-20T14:03:46.636Z] [CPX-001-SP] [CieloPinpad] Falha no Pinpad: RetCode=10 | Msg: 
+[2026-08-20T14:03:46.664Z] [CPX-001-SP] [WebUI] Cielo Conecta [ERROR] FALHA NO CARTAO (10)
+[2026-08-20T14:03:47.785Z] [CPX-001-SP] [WebUI] Pagamento cancelado pelo usuário no pop-up.
+[2026-08-20T14:03:47.857Z] [CPX-001-SP] [CieloPinpad] Abortando operacao do Pinpad...
+[2026-08-20T14:03:48.572Z] [CPX-001-SP] [WebUI] Iniciando checkout Cielo Real: DEBIT
+[2026-08-20T14:03:48.579Z] [CPX-001-SP] [WebUI] Cielo Conecta — ativando Pinpad PPC930: CIELO_DEBITO (R$ 17.00)
+[2026-08-20T14:03:48.654Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] Dispositivos USB detectados no barramento: 5
+[2026-08-20T14:03:48.680Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #1 [Dispositivo USB] VID:PID=0x2C7C:0x0125 | Permissao=CONCEDIDA
+[2026-08-20T14:03:48.681Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #2 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:03:48.682Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #3 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x1753:0xC902 | Permissao=CONCEDIDA
+[2026-08-20T14:03:48.684Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x0525:0xA4AC | Permissao=CONCEDIDA
+[2026-08-20T14:03:48.822Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:03:48.891Z] [CPX-001-SP] [CieloPinpad] >>> INICIANDO COBRANCA NO PINPAD: debit | R$ 17.0 (1700 cents)
+[2026-08-20T14:03:48.894Z] [CPX-001-SP] [CieloPinpad] Pinpad ainda nao inicializado. Executando sequencia completa INIT -> OPEN agora...
+[2026-08-20T14:03:48.900Z] [CPX-001-SP] [CieloPinpad] startPayment: execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:03:48.907Z] [CPX-001-SP] [CieloPinpad] startPayment: Comando OPEN retornou RetCode=10
+[2026-08-20T14:03:48.908Z] [CPX-001-SP] [CieloPinpad] Disparando GETCARD no Gertec PPC930 (appType=02, amount=1700)...
+[2026-08-20T14:03:48.909Z] [CPX-001-SP] [CieloPinpad] GETCARD disparado com status inicial: 15
+[2026-08-20T14:03:48.921Z] [CPX-001-SP] [WebUI] Cielo Conecta [WAITING_CARD] APROXIME OU INSIRA O CARTAO
+[2026-08-20T14:03:48.926Z] [CPX-001-SP] [CieloPinpad] GETCARD finalizado -> RetCode=10 | Msg: 
+[2026-08-20T14:03:48.927Z] [CPX-001-SP] [CieloPinpad] Falha no Pinpad: RetCode=10 | Msg: 
+[2026-08-20T14:03:48.953Z] [CPX-001-SP] [WebUI] Cielo Conecta [ERROR] FALHA NO CARTAO (10)
+[2026-08-20T14:03:50.261Z] [CPX-001-SP] [WebUI] Cielo Conecta — ativando Pinpad PPC930: CIELO_DEBITO (R$ 17.00)
+[2026-08-20T14:03:50.350Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] Dispositivos USB detectados no barramento: 5
+[2026-08-20T14:03:50.352Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #1 [Dispositivo USB] VID:PID=0x2C7C:0x0125 | Permissao=CONCEDIDA
+[2026-08-20T14:03:50.356Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #2 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:03:50.357Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #3 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x1753:0xC902 | Permissao=CONCEDIDA
+[2026-08-20T14:03:50.388Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x0525:0xA4AC | Permissao=CONCEDIDA
+[2026-08-20T14:03:50.435Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:03:50.499Z] [CPX-001-SP] [CieloPinpad] >>> INICIANDO COBRANCA NO PINPAD: debit | R$ 17.0 (1700 cents)
+[2026-08-20T14:03:50.512Z] [CPX-001-SP] [CieloPinpad] Pinpad ainda nao inicializado. Executando sequencia completa INIT -> OPEN agora...
+[2026-08-20T14:03:50.517Z] [CPX-001-SP] [CieloPinpad] startPayment: execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:03:50.518Z] [CPX-001-SP] [CieloPinpad] startPayment: Comando OPEN retornou RetCode=10
+[2026-08-20T14:03:50.569Z] [CPX-001-SP] [CieloPinpad] Disparando GETCARD no Gertec PPC930 (appType=02, amount=1700)...
+[2026-08-20T14:03:50.572Z] [CPX-001-SP] [CieloPinpad] GETCARD disparado com status inicial: 15
+[2026-08-20T14:03:50.591Z] [CPX-001-SP] [WebUI] Cielo Conecta [WAITING_CARD] APROXIME OU INSIRA O CARTAO
+[2026-08-20T14:03:50.595Z] [CPX-001-SP] [CieloPinpad] GETCARD finalizado -> RetCode=10 | Msg: 
+[2026-08-20T14:03:50.597Z] [CPX-001-SP] [CieloPinpad] Falha no Pinpad: RetCode=10 | Msg: 
+[2026-08-20T14:03:50.610Z] [CPX-001-SP] [WebUI] Cielo Conecta [ERROR] FALHA NO CARTAO (10)
+[2026-08-20T14:03:51.565Z] [CPX-001-SP] [WebUI] Pagamento cancelado pelo usuário no pop-up.
+[2026-08-20T14:03:51.607Z] [CPX-001-SP] [CieloPinpad] Abortando operacao do Pinpad...
+[2026-08-20T14:03:52.325Z] [CPX-001-SP] [WebUI] Navegação UI -> Tela: modes
+[2026-08-20T14:03:53.007Z] [CPX-001-SP] [WebUI] Navegação UI -> Tela: home
+[2026-08-20T14:04:41.894Z] [CPX-001-SP] [WebUI] Navegação UI -> Tela: modes
+[2026-08-20T14:04:42.917Z] [CPX-001-SP] [WebUI] Plano selecionado: inter (R$ 17, 420s)
+[2026-08-20T14:04:42.927Z] [CPX-001-SP] [WebUI] Navegação UI -> Tela: payment
+[2026-08-20T14:04:45.178Z] [CPX-001-SP] [WebUI] Iniciando checkout Cielo Real: CREDIT
+[2026-08-20T14:04:45.186Z] [CPX-001-SP] [WebUI] Cielo Conecta — ativando Pinpad PPC930: CIELO_CREDITO (R$ 17.00)
+[2026-08-20T14:04:45.233Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] Dispositivos USB detectados no barramento: 5
+[2026-08-20T14:04:45.235Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #1 [Dispositivo USB] VID:PID=0x2C7C:0x0125 | Permissao=CONCEDIDA
+[2026-08-20T14:04:45.255Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #2 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x1753:0xC902 | Permissao=CONCEDIDA
+[2026-08-20T14:04:45.267Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #3 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:04:45.269Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x0525:0xA4AC | Permissao=CONCEDIDA
+[2026-08-20T14:04:45.270Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:04:45.442Z] [CPX-001-SP] [CieloPinpad] >>> INICIANDO COBRANCA NO PINPAD: credit | R$ 17.0 (1700 cents)
+[2026-08-20T14:04:45.494Z] [CPX-001-SP] [CieloPinpad] Pinpad ainda nao inicializado. Executando sequencia completa INIT -> OPEN agora...
+[2026-08-20T14:04:45.495Z] [CPX-001-SP] [CieloPinpad] startPayment: execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:04:45.496Z] [CPX-001-SP] [CieloPinpad] startPayment: Comando OPEN retornou RetCode=10
+[2026-08-20T14:04:45.497Z] [CPX-001-SP] [CieloPinpad] Disparando GETCARD no Gertec PPC930 (appType=01, amount=1700)...
+[2026-08-20T14:04:45.499Z] [CPX-001-SP] [CieloPinpad] GETCARD disparado com status inicial: 15
+[2026-08-20T14:04:45.517Z] [CPX-001-SP] [WebUI] Cielo Conecta [WAITING_CARD] APROXIME OU INSIRA O CARTAO
+[2026-08-20T14:04:45.522Z] [CPX-001-SP] [CieloPinpad] GETCARD finalizado -> RetCode=10 | Msg: 
+[2026-08-20T14:04:45.523Z] [CPX-001-SP] [CieloPinpad] Falha no Pinpad: RetCode=10 | Msg: 
+[2026-08-20T14:04:45.537Z] [CPX-001-SP] [WebUI] Cielo Conecta [ERROR] FALHA NO CARTAO (10)
+[2026-08-20T14:04:55.185Z] [CPX-001-SP] [WebUI] Cielo Conecta — ativando Pinpad PPC930: CIELO_CREDITO (R$ 17.00)
+[2026-08-20T14:04:55.247Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] Dispositivos USB detectados no barramento: 5
+[2026-08-20T14:04:55.260Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #1 [Dispositivo USB] VID:PID=0x2C7C:0x0125 | Permissao=CONCEDIDA
+[2026-08-20T14:04:55.392Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #2 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x1753:0xC902 | Permissao=CONCEDIDA
+[2026-08-20T14:04:55.437Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #3 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:04:55.439Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x0525:0xA4AC | Permissao=CONCEDIDA
+[2026-08-20T14:04:55.440Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:04:55.441Z] [CPX-001-SP] [CieloPinpad] >>> INICIANDO COBRANCA NO PINPAD: credit | R$ 17.0 (1700 cents)
+[2026-08-20T14:04:55.443Z] [CPX-001-SP] [CieloPinpad] Pinpad ainda nao inicializado. Executando sequencia completa INIT -> OPEN agora...
+[2026-08-20T14:04:55.444Z] [CPX-001-SP] [CieloPinpad] startPayment: execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:04:55.446Z] [CPX-001-SP] [CieloPinpad] startPayment: Comando OPEN retornou RetCode=10
+[2026-08-20T14:04:55.449Z] [CPX-001-SP] [CieloPinpad] Disparando GETCARD no Gertec PPC930 (appType=01, amount=1700)...
+[2026-08-20T14:04:55.452Z] [CPX-001-SP] [CieloPinpad] GETCARD disparado com status inicial: 15
+[2026-08-20T14:04:55.466Z] [CPX-001-SP] [WebUI] Cielo Conecta [WAITING_CARD] APROXIME OU INSIRA O CARTAO
+[2026-08-20T14:04:55.468Z] [CPX-001-SP] [CieloPinpad] GETCARD finalizado -> RetCode=10 | Msg: 
+[2026-08-20T14:04:55.479Z] [CPX-001-SP] [CieloPinpad] Falha no Pinpad: RetCode=10 | Msg: 
+[2026-08-20T14:04:55.489Z] [CPX-001-SP] [WebUI] Cielo Conecta [ERROR] FALHA NO CARTAO (10)
+[2026-08-20T14:04:56.783Z] [CPX-001-SP] [WebUI] Pagamento cancelado pelo usuário no pop-up.
+[2026-08-20T14:04:56.819Z] [CPX-001-SP] [CieloPinpad] Abortando operacao do Pinpad...
+[2026-08-20T14:04:57.593Z] [CPX-001-SP] [WebUI] Iniciando checkout Cielo Real: DEBIT
+[2026-08-20T14:04:57.601Z] [CPX-001-SP] [WebUI] Cielo Conecta — ativando Pinpad PPC930: CIELO_DEBITO (R$ 17.00)
+[2026-08-20T14:04:57.652Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] Dispositivos USB detectados no barramento: 5
+[2026-08-20T14:04:57.654Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #1 [Dispositivo USB] VID:PID=0x2C7C:0x0125 | Permissao=CONCEDIDA
+[2026-08-20T14:04:57.656Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #2 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x1753:0xC902 | Permissao=CONCEDIDA
+[2026-08-20T14:04:57.693Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #3 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:04:57.850Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x0525:0xA4AC | Permissao=CONCEDIDA
+[2026-08-20T14:04:57.900Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:04:57.903Z] [CPX-001-SP] [CieloPinpad] >>> INICIANDO COBRANCA NO PINPAD: debit | R$ 17.0 (1700 cents)
+[2026-08-20T14:04:57.905Z] [CPX-001-SP] [CieloPinpad] Pinpad ainda nao inicializado. Executando sequencia completa INIT -> OPEN agora...
+[2026-08-20T14:04:57.910Z] [CPX-001-SP] [CieloPinpad] startPayment: execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:04:57.911Z] [CPX-001-SP] [CieloPinpad] startPayment: Comando OPEN retornou RetCode=10
+[2026-08-20T14:04:57.913Z] [CPX-001-SP] [CieloPinpad] Disparando GETCARD no Gertec PPC930 (appType=02, amount=1700)...
+[2026-08-20T14:04:57.914Z] [CPX-001-SP] [CieloPinpad] GETCARD disparado com status inicial: 15
+[2026-08-20T14:04:57.934Z] [CPX-001-SP] [WebUI] Cielo Conecta [WAITING_CARD] APROXIME OU INSIRA O CARTAO
+[2026-08-20T14:04:57.937Z] [CPX-001-SP] [CieloPinpad] GETCARD finalizado -> RetCode=10 | Msg: 
+[2026-08-20T14:04:57.938Z] [CPX-001-SP] [CieloPinpad] Falha no Pinpad: RetCode=10 | Msg: 
+[2026-08-20T14:04:57.946Z] [CPX-001-SP] [WebUI] Cielo Conecta [ERROR] FALHA NO CARTAO (10)
+[2026-08-20T14:04:59.610Z] [CPX-001-SP] [WebUI] Cielo Conecta — ativando Pinpad PPC930: CIELO_DEBITO (R$ 17.00)
+[2026-08-20T14:04:59.746Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] Dispositivos USB detectados no barramento: 5
+[2026-08-20T14:04:59.754Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #1 [Dispositivo USB] VID:PID=0x2C7C:0x0125 | Permissao=CONCEDIDA
+[2026-08-20T14:04:59.756Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #2 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x1753:0xC902 | Permissao=CONCEDIDA
+[2026-08-20T14:04:59.758Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #3 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:04:59.874Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x0525:0xA4AC | Permissao=CONCEDIDA
+[2026-08-20T14:04:59.876Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:04:59.877Z] [CPX-001-SP] [CieloPinpad] >>> INICIANDO COBRANCA NO PINPAD: debit | R$ 17.0 (1700 cents)
+[2026-08-20T14:04:59.878Z] [CPX-001-SP] [CieloPinpad] Pinpad ainda nao inicializado. Executando sequencia completa INIT -> OPEN agora...
+[2026-08-20T14:04:59.879Z] [CPX-001-SP] [CieloPinpad] startPayment: execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:04:59.881Z] [CPX-001-SP] [CieloPinpad] startPayment: Comando OPEN retornou RetCode=10
+[2026-08-20T14:04:59.887Z] [CPX-001-SP] [CieloPinpad] Disparando GETCARD no Gertec PPC930 (appType=02, amount=1700)...
+[2026-08-20T14:04:59.889Z] [CPX-001-SP] [CieloPinpad] GETCARD disparado com status inicial: 15
+[2026-08-20T14:04:59.910Z] [CPX-001-SP] [WebUI] Cielo Conecta [WAITING_CARD] APROXIME OU INSIRA O CARTAO
+[2026-08-20T14:04:59.949Z] [CPX-001-SP] [CieloPinpad] GETCARD finalizado -> RetCode=10 | Msg: 
+[2026-08-20T14:04:59.971Z] [CPX-001-SP] [CieloPinpad] Falha no Pinpad: RetCode=10 | Msg: 
+[2026-08-20T14:04:59.996Z] [CPX-001-SP] [WebUI] Cielo Conecta [ERROR] FALHA NO CARTAO (10)
+[2026-08-20T14:05:01.112Z] [CPX-001-SP] [WebUI] Pagamento cancelado pelo usuário no pop-up.
+[2026-08-20T14:05:01.145Z] [CPX-001-SP] [CieloPinpad] Abortando operacao do Pinpad...
+[2026-08-20T14:07:10.477Z] [CPX-001-SP] [System] Totem conectado ao WebSocket da Capaxero Cloud.
+[2026-08-20T14:09:19.656Z] [CPX-001-SP] [System] Totem conectado ao WebSocket da Capaxero Cloud.
+[2026-08-20T14:11:28.746Z] [CPX-001-SP] [System] Totem conectado ao WebSocket da Capaxero Cloud.
+[2026-08-20T14:13:38.170Z] [CPX-001-SP] [System] Totem conectado ao WebSocket da Capaxero Cloud.
+[2026-08-20T14:15:47.180Z] [CPX-001-SP] [System] Totem conectado ao WebSocket da Capaxero Cloud.
+[2026-08-20T14:16:55.108Z] [CPX-001-SP] [CieloPinpad]       [PROBE] RX retornou: 1 bytes [Byte0=0x04]
+[2026-08-20T14:16:55.323Z] [CPX-001-SP] [CieloPinpad]       Interface #0 (ID=0, Class=3, Endpoints=1)
+[2026-08-20T14:16:55.045Z] [CPX-001-SP] [CieloPinpad]       [PROBE] TX CAN retornou: 1 bytes
+[2026-08-20T14:16:55.213Z] [CPX-001-SP] [CieloPinpad]    -> [PROBE] Nome: /dev/bus/usb/003/002 | Interfaces: 1
+[2026-08-20T14:16:55.164Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #3 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x0525:0xA4AC | Permissao=CONCEDIDA
+[2026-08-20T14:16:55.357Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x83, Type=3 (2=Bulk), Dir=128
+[2026-08-20T14:16:55.389Z] [CPX-001-SP] [CieloPinpad]       [PROBE] openDevice OK! FD=63
+[2026-08-20T14:16:56.903Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:16:56.938Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:16:57.053Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:16:57.171Z] [CPX-001-SP] [CieloPinpad]    -> setParam: COMM=USB (0), COMPANY=capaxero (0), LICENSE=5D49... (0)
+[2026-08-20T14:16:57.239Z] [CPX-001-SP] [CieloPinpad] 4/4 [INIT] Enviando comando OPEN (1) para o Pinpad Gertec PPC930...
+[2026-08-20T14:16:57.268Z] [CPX-001-SP] [CieloPinpad] >>> [INIT] PPConecta OPEN Finalizado com RetCode: 10
+[2026-08-20T14:16:57.323Z] [CPX-001-SP] [CieloPinpad] [AVISO] Falha no comando OPEN do Pinpad: OPEN retornou 10
+[2026-08-20T14:17:00.578Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:17:00.582Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:17:00.586Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:17:00.589Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:17:02.613Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:17:02.626Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:17:02.651Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:17:02.661Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:17:02.684Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:17:02.711Z] [CPX-001-SP] [CieloPinpad]    -> setParam: COMM=USB (0), COMPANY=capaxero (0), LICENSE=5D49... (0)
+[2026-08-20T14:17:02.779Z] [CPX-001-SP] [CieloPinpad] 4/4 [INIT] Enviando comando OPEN (1) para o Pinpad Gertec PPC930...
+[2026-08-20T14:17:02.784Z] [CPX-001-SP] [CieloPinpad] >>> [INIT] PPConecta OPEN Finalizado com RetCode: 10
+[2026-08-20T14:17:02.816Z] [CPX-001-SP] [CieloPinpad] [AVISO] Falha no comando OPEN do Pinpad: OPEN retornou 10
+[2026-08-20T14:17:03.376Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #0 -> OK
+[2026-08-20T14:17:03.665Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:17:03.846Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:17:03.892Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:17:03.920Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:17:03.969Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:17:03.996Z] [CPX-001-SP] [CieloPinpad]    -> setParam: COMM=USB (0), COMPANY=capaxero (0), LICENSE=5D49... (0)
+[2026-08-20T14:17:04.061Z] [CPX-001-SP] [CieloPinpad] 4/4 [INIT] Enviando comando OPEN (1) para o Pinpad Gertec PPC930...
+[2026-08-20T14:17:04.116Z] [CPX-001-SP] [CieloPinpad] >>> [INIT] PPConecta OPEN Finalizado com RetCode: 10
+[2026-08-20T14:17:04.125Z] [CPX-001-SP] [CieloPinpad] [AVISO] Falha no comando OPEN do Pinpad: OPEN retornou 10
+[2026-08-20T14:17:06.368Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #1 -> OK
+[2026-08-20T14:17:06.383Z] [CPX-001-SP] [CieloPinpad]       [PROBE] TX CAN retornou: 1 bytes
+[2026-08-20T14:17:06.379Z] [CPX-001-SP] [CieloPinpad]       [PROBE] Bulk EPs encontrados no IF #1! Enviando teste CAN (0x18)...
+[2026-08-20T14:17:06.386Z] [CPX-001-SP] [CieloPinpad]       [PROBE] RX retornou: 1 bytes [Byte0=0x04]
+[2026-08-20T14:17:06.412Z] [CPX-001-SP] [CieloPinpad]    -> [PROBE] Nome: /dev/bus/usb/003/002 | Interfaces: 1
+[2026-08-20T14:17:06.390Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #3 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x0525:0xA4AC | Permissao=CONCEDIDA
+[2026-08-20T14:17:06.430Z] [CPX-001-SP] [CieloPinpad]       Interface #0 (ID=0, Class=3, Endpoints=1)
+[2026-08-20T14:17:06.488Z] [CPX-001-SP] [CieloPinpad]       [PROBE] openDevice OK! FD=74
+[2026-08-20T14:17:06.473Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x83, Type=3 (2=Bulk), Dir=128
+[2026-08-20T14:17:07.216Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #0 -> OK
+[2026-08-20T14:17:07.666Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:17:07.685Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:17:07.829Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:17:07.862Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:17:07.900Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:17:07.929Z] [CPX-001-SP] [CieloPinpad]    -> setParam: COMM=USB (0), COMPANY=capaxero (0), LICENSE=5D49... (0)
+[2026-08-20T14:17:07.943Z] [CPX-001-SP] [CieloPinpad] 4/4 [INIT] Enviando comando OPEN (1) para o Pinpad Gertec PPC930...
+[2026-08-20T14:17:07.982Z] [CPX-001-SP] [CieloPinpad] >>> [INIT] PPConecta OPEN Finalizado com RetCode: 10
+[2026-08-20T14:17:07.996Z] [CPX-001-SP] [CieloPinpad] [AVISO] Falha no comando OPEN do Pinpad: OPEN retornou 10
+[2026-08-20T14:17:11.651Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x83, Type=3 (2=Bulk), Dir=128
+[2026-08-20T14:17:11.775Z] [CPX-001-SP] [CieloPinpad]       Interface #1 (ID=1, Class=10, Endpoints=2)
+[2026-08-20T14:17:11.791Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x81, Type=2 (2=Bulk), Dir=128
+[2026-08-20T14:17:11.802Z] [CPX-001-SP] [CieloPinpad]          EP #1: Addr=0x2, Type=2 (2=Bulk), Dir=0
+[2026-08-20T14:17:11.836Z] [CPX-001-SP] [CieloPinpad]       [PROBE] openDevice OK! FD=80
+[2026-08-20T14:17:11.854Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #1 -> OK
+[2026-08-20T14:17:11.849Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #0 -> OK
+[2026-08-20T14:17:11.859Z] [CPX-001-SP] [CieloPinpad]       [PROBE] Bulk EPs encontrados no IF #1! Enviando teste CAN (0x18)...
+[2026-08-20T14:17:12.557Z] [CPX-001-SP] [CieloPinpad] >>> [INIT] PPConecta OPEN Finalizado com RetCode: 10
+[2026-08-20T14:17:12.577Z] [CPX-001-SP] [CieloPinpad] [AVISO] Falha no comando OPEN do Pinpad: OPEN retornou 10
+[2026-08-20T14:17:12.590Z] [CPX-001-SP] [CieloPinpad] 1/4 [INIT] Inicializando modulo USB Pinpad para Android 11...
+[2026-08-20T14:17:12.607Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] Dispositivos USB detectados no barramento: 5
+[2026-08-20T14:17:12.617Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #1 [Dispositivo USB] VID:PID=0x2C7C:0x0125 | Permissao=CONCEDIDA
+[2026-08-20T14:17:12.626Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #2 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x1753:0xC902 | Permissao=CONCEDIDA
+[2026-08-20T14:17:16.654Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:17:16.660Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:17:16.675Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:17:16.685Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:17:16.704Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:17:16.724Z] [CPX-001-SP] [CieloPinpad]    -> setParam: COMM=USB (0), COMPANY=capaxero (0), LICENSE=5D49... (0)
+[2026-08-20T14:17:16.805Z] [CPX-001-SP] [CieloPinpad] 4/4 [INIT] Enviando comando OPEN (1) para o Pinpad Gertec PPC930...
+[2026-08-20T14:17:20.843Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:17:20.867Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:17:20.881Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:17:20.875Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:17:20.890Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:17:21.234Z] [CPX-001-SP] [CieloPinpad]       [PROBE] TX CAN retornou: 1 bytes
+[2026-08-20T14:17:21.238Z] [CPX-001-SP] [CieloPinpad]       [PROBE] RX retornou: 1 bytes [Byte0=0x04]
+[2026-08-20T14:17:21.246Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #3 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x0525:0xA4AC | Permissao=CONCEDIDA
+[2026-08-20T14:17:21.256Z] [CPX-001-SP] [CieloPinpad]    -> [PROBE] Nome: /dev/bus/usb/003/002 | Interfaces: 1
+[2026-08-20T14:17:21.283Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x83, Type=3 (2=Bulk), Dir=128
+[2026-08-20T14:17:21.266Z] [CPX-001-SP] [CieloPinpad]       Interface #0 (ID=0, Class=3, Endpoints=1)
+[2026-08-20T14:17:21.287Z] [CPX-001-SP] [CieloPinpad]       [PROBE] openDevice OK! FD=81
+[2026-08-20T14:17:21.622Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #0 -> OK
+[2026-08-20T14:17:21.633Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:17:21.627Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:17:21.641Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:17:22.550Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:17:22.563Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:17:22.593Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:17:22.605Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:17:22.615Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:17:22.620Z] [CPX-001-SP] [CieloPinpad]    -> setParam: COMM=USB (0), COMPANY=capaxero (0), LICENSE=5D49... (0)
+[2026-08-20T14:17:22.880Z] [CPX-001-SP] [CieloPinpad] 4/4 [INIT] Enviando comando OPEN (1) para o Pinpad Gertec PPC930...
+[2026-08-20T14:17:22.887Z] [CPX-001-SP] [CieloPinpad] >>> [INIT] PPConecta OPEN Finalizado com RetCode: 10
+[2026-08-20T14:17:22.892Z] [CPX-001-SP] [CieloPinpad] [AVISO] Falha no comando OPEN do Pinpad: OPEN retornou 10
+[2026-08-20T14:17:22.924Z] [CPX-001-SP] [CieloPinpad] 1/4 [INIT] Inicializando modulo USB Pinpad para Android 11...
+[2026-08-20T14:17:22.954Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] Dispositivos USB detectados no barramento: 5
+[2026-08-20T14:17:22.973Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #1 [Dispositivo USB] VID:PID=0x2C7C:0x0125 | Permissao=CONCEDIDA
+[2026-08-20T14:17:22.977Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #2 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x1753:0xC902 | Permissao=CONCEDIDA
+[2026-08-20T14:17:23.009Z] [CPX-001-SP] [CieloPinpad]    -> [PROBE] Nome: /dev/bus/usb/002/014 | Interfaces: 2
+[2026-08-20T14:17:24.531Z] [CPX-001-SP] [CieloPinpad] [AVISO] Falha no comando OPEN do Pinpad: OPEN retornou 10
+[2026-08-20T14:17:24.554Z] [CPX-001-SP] [CieloPinpad] 1/4 [INIT] Inicializando modulo USB Pinpad para Android 11...
+[2026-08-20T14:17:24.590Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] Dispositivos USB detectados no barramento: 5
+[2026-08-20T14:17:24.616Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #1 [Dispositivo USB] VID:PID=0x2C7C:0x0125 | Permissao=CONCEDIDA
+[2026-08-20T14:17:24.621Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #2 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x1753:0xC902 | Permissao=CONCEDIDA
+[2026-08-20T14:17:24.671Z] [CPX-001-SP] [CieloPinpad]    -> [PROBE] Nome: /dev/bus/usb/002/014 | Interfaces: 2
+[2026-08-20T14:17:24.707Z] [CPX-001-SP] [CieloPinpad]       Interface #0 (ID=0, Class=2, Endpoints=1)
+[2026-08-20T14:17:24.719Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x83, Type=3 (2=Bulk), Dir=128
+[2026-08-20T14:17:27.537Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:17:27.504Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:17:27.552Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:17:27.585Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:17:27.563Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:17:27.605Z] [CPX-001-SP] [CieloPinpad]    -> setParam: COMM=USB (0), COMPANY=capaxero (0), LICENSE=5D49... (0)
+[2026-08-20T14:17:27.639Z] [CPX-001-SP] [CieloPinpad] [AVISO] Falha no comando OPEN do Pinpad: OPEN retornou 10
+[2026-08-20T14:17:27.615Z] [CPX-001-SP] [CieloPinpad] 4/4 [INIT] Enviando comando OPEN (1) para o Pinpad Gertec PPC930...
+[2026-08-20T14:17:27.627Z] [CPX-001-SP] [CieloPinpad] >>> [INIT] PPConecta OPEN Finalizado com RetCode: 10
+[2026-08-20T14:17:33.748Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:17:33.731Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #0 -> OK
+[2026-08-20T14:17:33.760Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:17:33.769Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:17:34.821Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:17:34.830Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:17:34.833Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:17:34.838Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:17:38.374Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:17:38.368Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:17:38.379Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:17:38.401Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:17:38.389Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:17:38.411Z] [CPX-001-SP] [CieloPinpad]    -> setParam: COMM=USB (0), COMPANY=capaxero (0), LICENSE=5D49... (0)
+[2026-08-20T14:17:38.573Z] [CPX-001-SP] [CieloPinpad] [AVISO] Falha no comando OPEN do Pinpad: OPEN retornou 10
+[2026-08-20T14:17:38.419Z] [CPX-001-SP] [CieloPinpad] >>> [INIT] PPConecta OPEN Finalizado com RetCode: 10
+[2026-08-20T14:17:38.415Z] [CPX-001-SP] [CieloPinpad] 4/4 [INIT] Enviando comando OPEN (1) para o Pinpad Gertec PPC930...
+[2026-08-20T14:17:38.641Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] Dispositivos USB detectados no barramento: 5
+[2026-08-20T14:17:38.588Z] [CPX-001-SP] [CieloPinpad] 1/4 [INIT] Inicializando modulo USB Pinpad para Android 11...
+[2026-08-20T14:17:38.672Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #1 [Dispositivo USB] VID:PID=0x2C7C:0x0125 | Permissao=CONCEDIDA
+[2026-08-20T14:17:38.677Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #2 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x1753:0xC902 | Permissao=CONCEDIDA
+[2026-08-20T14:17:38.681Z] [CPX-001-SP] [CieloPinpad]    -> [PROBE] Nome: /dev/bus/usb/002/014 | Interfaces: 2
+[2026-08-20T14:17:38.690Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x83, Type=3 (2=Bulk), Dir=128
+[2026-08-20T14:17:38.686Z] [CPX-001-SP] [CieloPinpad]       Interface #0 (ID=0, Class=2, Endpoints=1)
+[2026-08-20T14:17:39.465Z] [CPX-001-SP] [CieloPinpad] 4/4 [INIT] Enviando comando OPEN (1) para o Pinpad Gertec PPC930...
+[2026-08-20T14:17:39.470Z] [CPX-001-SP] [CieloPinpad] >>> [INIT] PPConecta OPEN Finalizado com RetCode: 10
+[2026-08-20T14:17:39.473Z] [CPX-001-SP] [CieloPinpad] [AVISO] Falha no comando OPEN do Pinpad: OPEN retornou 10
+[2026-08-20T14:17:39.476Z] [CPX-001-SP] [CieloPinpad] 1/4 [INIT] Inicializando modulo USB Pinpad para Android 11...
+[2026-08-20T14:17:39.479Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] Dispositivos USB detectados no barramento: 5
+[2026-08-20T14:17:39.483Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #1 [Dispositivo USB] VID:PID=0x2C7C:0x0125 | Permissao=CONCEDIDA
+[2026-08-20T14:17:39.487Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #2 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x1753:0xC902 | Permissao=CONCEDIDA
+[2026-08-20T14:17:40.919Z] [CPX-001-SP] [CieloPinpad]       [PROBE] openDevice OK! FD=287
+[2026-08-20T14:17:40.928Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #0 -> OK
+[2026-08-20T14:17:42.015Z] [CPX-001-SP] [CieloPinpad] 4/4 [INIT] Enviando comando OPEN (1) para o Pinpad Gertec PPC930...
+[2026-08-20T14:17:42.031Z] [CPX-001-SP] [CieloPinpad] >>> [INIT] PPConecta OPEN Finalizado com RetCode: 10
+[2026-08-20T14:17:42.046Z] [CPX-001-SP] [CieloPinpad] 1/4 [INIT] Inicializando modulo USB Pinpad para Android 11...
+[2026-08-20T14:17:42.042Z] [CPX-001-SP] [CieloPinpad] [AVISO] Falha no comando OPEN do Pinpad: OPEN retornou 10
+[2026-08-20T14:17:42.050Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] Dispositivos USB detectados no barramento: 5
+[2026-08-20T14:17:42.058Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #1 [Dispositivo USB] VID:PID=0x2C7C:0x0125 | Permissao=CONCEDIDA
+[2026-08-20T14:17:42.061Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #2 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x1753:0xC902 | Permissao=CONCEDIDA
+[2026-08-20T14:17:42.064Z] [CPX-001-SP] [CieloPinpad]    -> [PROBE] Nome: /dev/bus/usb/002/014 | Interfaces: 2
+[2026-08-20T14:17:43.014Z] [CPX-001-SP] [CieloPinpad] >>> [INIT] PPConecta OPEN Finalizado com RetCode: 10
+[2026-08-20T14:17:43.047Z] [CPX-001-SP] [CieloPinpad] [AVISO] Falha no comando OPEN do Pinpad: OPEN retornou 10
+[2026-08-20T14:17:43.067Z] [CPX-001-SP] [CieloPinpad] 1/4 [INIT] Inicializando modulo USB Pinpad para Android 11...
+[2026-08-20T14:17:43.114Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] Dispositivos USB detectados no barramento: 5
+[2026-08-20T14:17:43.132Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #1 [Dispositivo USB] VID:PID=0x2C7C:0x0125 | Permissao=CONCEDIDA
+[2026-08-20T14:17:46.416Z] [CPX-001-SP] [CieloPinpad] 4/4 [INIT] Enviando comando OPEN (1) para o Pinpad Gertec PPC930...
+[2026-08-20T14:17:46.423Z] [CPX-001-SP] [CieloPinpad] >>> [INIT] PPConecta OPEN Finalizado com RetCode: 10
+[2026-08-20T14:17:46.432Z] [CPX-001-SP] [CieloPinpad] [AVISO] Falha no comando OPEN do Pinpad: OPEN retornou 10
+[2026-08-20T14:17:46.436Z] [CPX-001-SP] [CieloPinpad] 1/4 [INIT] Inicializando modulo USB Pinpad para Android 11...
+[2026-08-20T14:17:46.447Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] Dispositivos USB detectados no barramento: 5
+[2026-08-20T14:17:51.964Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #0 -> OK
+[2026-08-20T14:17:53.090Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] Dispositivos USB detectados no barramento: 5
+[2026-08-20T14:17:53.211Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #1 [Dispositivo USB] VID:PID=0x2C7C:0x0125 | Permissao=CONCEDIDA
+[2026-08-20T14:17:53.308Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #2 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x1753:0xC902 | Permissao=CONCEDIDA
+[2026-08-20T14:17:53.317Z] [CPX-001-SP] [CieloPinpad]    -> [PROBE] Nome: /dev/bus/usb/002/014 | Interfaces: 2
+[2026-08-20T14:17:53.354Z] [CPX-001-SP] [CieloPinpad]       Interface #0 (ID=0, Class=2, Endpoints=1)
+[2026-08-20T14:17:53.398Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x83, Type=3 (2=Bulk), Dir=128
+[2026-08-20T14:17:53.499Z] [CPX-001-SP] [CieloPinpad]       Interface #1 (ID=1, Class=10, Endpoints=2)
+[2026-08-20T14:17:53.511Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x81, Type=2 (2=Bulk), Dir=128
+[2026-08-20T14:17:53.518Z] [CPX-001-SP] [CieloPinpad]          EP #1: Addr=0x2, Type=2 (2=Bulk), Dir=0
+[2026-08-20T14:17:53.522Z] [CPX-001-SP] [CieloPinpad]       [PROBE] openDevice OK! FD=82
+[2026-08-20T14:17:53.525Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #0 -> OK
+[2026-08-20T14:17:53.542Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #1 -> OK
+[2026-08-20T14:17:53.559Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #3 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x0525:0xA4AC | Permissao=CONCEDIDA
+[2026-08-20T14:17:53.550Z] [CPX-001-SP] [CieloPinpad]       [PROBE] TX CAN retornou: 1 bytes
+[2026-08-20T14:17:53.554Z] [CPX-001-SP] [CieloPinpad]       [PROBE] RX retornou: 1 bytes [Byte0=0x04]
+[2026-08-20T14:17:53.546Z] [CPX-001-SP] [CieloPinpad]       [PROBE] Bulk EPs encontrados no IF #1! Enviando teste CAN (0x18)...
+[2026-08-20T14:17:53.566Z] [CPX-001-SP] [CieloPinpad]    -> [PROBE] Nome: /dev/bus/usb/003/002 | Interfaces: 1
+[2026-08-20T14:17:53.572Z] [CPX-001-SP] [CieloPinpad]       Interface #0 (ID=0, Class=3, Endpoints=1)
+[2026-08-20T14:17:53.794Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #0 -> OK
+[2026-08-20T14:17:53.801Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:17:53.581Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x83, Type=3 (2=Bulk), Dir=128
+[2026-08-20T14:17:53.602Z] [CPX-001-SP] [CieloPinpad]       [PROBE] openDevice OK! FD=155
+[2026-08-20T14:17:53.806Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:17:53.824Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:17:53.845Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:17:53.815Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:17:53.923Z] [CPX-001-SP] [CieloPinpad] >>> [INIT] PPConecta OPEN Finalizado com RetCode: 10
+[2026-08-20T14:17:53.882Z] [CPX-001-SP] [CieloPinpad]    -> setParam: COMM=USB (0), COMPANY=capaxero (0), LICENSE=5D49... (0)
+[2026-08-20T14:17:53.908Z] [CPX-001-SP] [CieloPinpad] 4/4 [INIT] Enviando comando OPEN (1) para o Pinpad Gertec PPC930...
+[2026-08-20T14:17:53.939Z] [CPX-001-SP] [CieloPinpad] 1/4 [INIT] Inicializando modulo USB Pinpad para Android 11...
+[2026-08-20T14:17:53.932Z] [CPX-001-SP] [CieloPinpad] [AVISO] Falha no comando OPEN do Pinpad: OPEN retornou 10
+[2026-08-20T14:17:53.949Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] Dispositivos USB detectados no barramento: 5
+[2026-08-20T14:17:53.994Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #2 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x1753:0xC902 | Permissao=CONCEDIDA
+[2026-08-20T14:17:53.990Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #1 [Dispositivo USB] VID:PID=0x2C7C:0x0125 | Permissao=CONCEDIDA
+[2026-08-20T14:17:54.009Z] [CPX-001-SP] [CieloPinpad]    -> [PROBE] Nome: /dev/bus/usb/002/014 | Interfaces: 2
+[2026-08-20T14:17:54.080Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x83, Type=3 (2=Bulk), Dir=128
+[2026-08-20T14:17:54.028Z] [CPX-001-SP] [CieloPinpad]       Interface #0 (ID=0, Class=2, Endpoints=1)
+[2026-08-20T14:17:54.161Z] [CPX-001-SP] [CieloPinpad]       Interface #1 (ID=1, Class=10, Endpoints=2)
+[2026-08-20T14:17:54.181Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x81, Type=2 (2=Bulk), Dir=128
+[2026-08-20T14:17:54.196Z] [CPX-001-SP] [CieloPinpad]          EP #1: Addr=0x2, Type=2 (2=Bulk), Dir=0
+[2026-08-20T14:17:54.225Z] [CPX-001-SP] [CieloPinpad]       [PROBE] openDevice OK! FD=78
+[2026-08-20T14:17:54.229Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #0 -> OK
+[2026-08-20T14:17:54.238Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #1 -> OK
+[2026-08-20T14:17:54.263Z] [CPX-001-SP] [CieloPinpad]       [PROBE] TX CAN retornou: 1 bytes
+[2026-08-20T14:17:54.276Z] [CPX-001-SP] [CieloPinpad]       [PROBE] RX retornou: 1 bytes [Byte0=0x04]
+[2026-08-20T14:17:54.286Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #3 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x0525:0xA4AC | Permissao=CONCEDIDA
+[2026-08-20T14:17:54.246Z] [CPX-001-SP] [CieloPinpad]       [PROBE] Bulk EPs encontrados no IF #1! Enviando teste CAN (0x18)...
+[2026-08-20T14:17:54.300Z] [CPX-001-SP] [CieloPinpad]    -> [PROBE] Nome: /dev/bus/usb/003/002 | Interfaces: 1
+[2026-08-20T14:17:54.340Z] [CPX-001-SP] [CieloPinpad]       Interface #0 (ID=0, Class=3, Endpoints=1)
+[2026-08-20T14:17:54.415Z] [CPX-001-SP] [CieloPinpad]       [PROBE] openDevice OK! FD=86
+[2026-08-20T14:17:54.392Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x83, Type=3 (2=Bulk), Dir=128
+[2026-08-20T14:17:54.811Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:17:54.735Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #0 -> OK
+[2026-08-20T14:17:54.821Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:17:54.901Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:17:54.839Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:17:54.848Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:17:54.932Z] [CPX-001-SP] [CieloPinpad] 4/4 [INIT] Enviando comando OPEN (1) para o Pinpad Gertec PPC930...
+[2026-08-20T14:17:54.922Z] [CPX-001-SP] [CieloPinpad]    -> setParam: COMM=USB (0), COMPANY=capaxero (0), LICENSE=5D49... (0)
+[2026-08-20T14:17:54.958Z] [CPX-001-SP] [CieloPinpad] >>> [INIT] PPConecta OPEN Finalizado com RetCode: 10
+[2026-08-20T14:17:55.056Z] [CPX-001-SP] [CieloPinpad] 1/4 [INIT] Inicializando modulo USB Pinpad para Android 11...
+[2026-08-20T14:17:55.090Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #1 [Dispositivo USB] VID:PID=0x2C7C:0x0125 | Permissao=CONCEDIDA
+[2026-08-20T14:17:55.080Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] Dispositivos USB detectados no barramento: 5
+[2026-08-20T14:17:55.169Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #2 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x1753:0xC902 | Permissao=CONCEDIDA
+[2026-08-20T14:17:55.046Z] [CPX-001-SP] [CieloPinpad] [AVISO] Falha no comando OPEN do Pinpad: OPEN retornou 10
+[2026-08-20T14:17:55.210Z] [CPX-001-SP] [CieloPinpad]    -> [PROBE] Nome: /dev/bus/usb/002/014 | Interfaces: 2
+[2026-08-20T14:17:55.341Z] [CPX-001-SP] [CieloPinpad]       Interface #1 (ID=1, Class=10, Endpoints=2)
+[2026-08-20T14:17:55.221Z] [CPX-001-SP] [CieloPinpad]       Interface #0 (ID=0, Class=2, Endpoints=1)
+[2026-08-20T14:17:55.353Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x81, Type=2 (2=Bulk), Dir=128
+[2026-08-20T14:17:55.287Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x83, Type=3 (2=Bulk), Dir=128
+[2026-08-20T14:17:55.376Z] [CPX-001-SP] [CieloPinpad]          EP #1: Addr=0x2, Type=2 (2=Bulk), Dir=0
+[2026-08-20T14:17:55.399Z] [CPX-001-SP] [CieloPinpad]       [PROBE] openDevice OK! FD=78
+[2026-08-20T14:17:55.483Z] [CPX-001-SP] [CieloPinpad]       [PROBE] Bulk EPs encontrados no IF #1! Enviando teste CAN (0x18)...
+[2026-08-20T14:17:55.476Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #1 -> OK
+[2026-08-20T14:17:55.413Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #0 -> OK
+[2026-08-20T14:17:55.501Z] [CPX-001-SP] [CieloPinpad]       [PROBE] RX retornou: 1 bytes [Byte0=0x04]
+[2026-08-20T14:17:55.494Z] [CPX-001-SP] [CieloPinpad]       [PROBE] TX CAN retornou: 1 bytes
+[2026-08-20T14:17:55.561Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #3 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x0525:0xA4AC | Permissao=CONCEDIDA
+[2026-08-20T14:17:55.599Z] [CPX-001-SP] [CieloPinpad]    -> [PROBE] Nome: /dev/bus/usb/003/002 | Interfaces: 1
+[2026-08-20T14:17:55.610Z] [CPX-001-SP] [CieloPinpad]       Interface #0 (ID=0, Class=3, Endpoints=1)
+[2026-08-20T14:17:55.644Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x83, Type=3 (2=Bulk), Dir=128
+[2026-08-20T14:17:55.915Z] [CPX-001-SP] [CieloPinpad]       [PROBE] openDevice OK! FD=78
+[2026-08-20T14:17:55.970Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #0 -> OK
+[2026-08-20T14:17:56.034Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:17:56.054Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:17:56.064Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:17:56.050Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:17:56.082Z] [CPX-001-SP] [CieloPinpad]    -> setParam: COMM=USB (0), COMPANY=capaxero (0), LICENSE=5D49... (0)
+[2026-08-20T14:17:56.088Z] [CPX-001-SP] [CieloPinpad] 4/4 [INIT] Enviando comando OPEN (1) para o Pinpad Gertec PPC930...
+[2026-08-20T14:17:56.070Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:17:56.117Z] [CPX-001-SP] [CieloPinpad] [AVISO] Falha no comando OPEN do Pinpad: OPEN retornou 10
+[2026-08-20T14:17:56.092Z] [CPX-001-SP] [CieloPinpad] >>> [INIT] PPConecta OPEN Finalizado com RetCode: 10
+[2026-08-20T14:18:12.742Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:18:12.738Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:18:12.709Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:18:24.461Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:18:24.498Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:18:24.527Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:18:24.566Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:18:24.608Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:18:29.771Z] [CPX-001-SP] [CieloPinpad]       [PROBE] RX retornou: 1 bytes [Byte0=0x04]
+[2026-08-20T14:18:29.893Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #3 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x0525:0xA4AC | Permissao=CONCEDIDA
+[2026-08-20T14:18:29.900Z] [CPX-001-SP] [CieloPinpad]    -> [PROBE] Nome: /dev/bus/usb/003/002 | Interfaces: 1
+[2026-08-20T14:18:29.905Z] [CPX-001-SP] [CieloPinpad]       Interface #0 (ID=0, Class=3, Endpoints=1)
+[2026-08-20T14:18:30.011Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x83, Type=3 (2=Bulk), Dir=128
+[2026-08-20T14:18:30.017Z] [CPX-001-SP] [CieloPinpad]       [PROBE] openDevice OK! FD=82
+[2026-08-20T14:18:30.026Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #0 -> OK
+[2026-08-20T14:18:30.528Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:18:30.546Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:18:30.555Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:18:30.566Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:18:30.577Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:18:30.584Z] [CPX-001-SP] [CieloPinpad]    -> setParam: COMM=USB (0), COMPANY=capaxero (0), LICENSE=5D49... (0)
+[2026-08-20T14:18:30.593Z] [CPX-001-SP] [CieloPinpad] 4/4 [INIT] Enviando comando OPEN (1) para o Pinpad Gertec PPC930...
+[2026-08-20T14:18:30.618Z] [CPX-001-SP] [CieloPinpad] [AVISO] Falha no comando OPEN do Pinpad: OPEN retornou 10
+[2026-08-20T14:18:30.613Z] [CPX-001-SP] [CieloPinpad] >>> [INIT] PPConecta OPEN Finalizado com RetCode: 10
+[2026-08-20T14:18:31.785Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:18:31.853Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:18:31.847Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:18:31.865Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:18:31.871Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:18:31.902Z] [CPX-001-SP] [CieloPinpad]    -> setParam: COMM=USB (0), COMPANY=capaxero (0), LICENSE=5D49... (0)
+[2026-08-20T14:18:32.563Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:18:32.584Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:18:32.596Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:18:32.600Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:18:32.620Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:18:32.638Z] [CPX-001-SP] [CieloPinpad]    -> setParam: COMM=USB (0), COMPANY=capaxero (0), LICENSE=5D49... (0)
+[2026-08-20T14:18:33.347Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:18:33.338Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #0 -> OK
+[2026-08-20T14:18:33.370Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:18:33.366Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:18:34.995Z] [CPX-001-SP] [CieloPinpad]       [PROBE] TX CAN retornou: 1 bytes
+[2026-08-20T14:18:34.979Z] [CPX-001-SP] [CieloPinpad]       [PROBE] Bulk EPs encontrados no IF #1! Enviando teste CAN (0x18)...
+[2026-08-20T14:18:35.034Z] [CPX-001-SP] [CieloPinpad]       [PROBE] RX retornou: 1 bytes [Byte0=0x04]
+[2026-08-20T14:18:35.061Z] [CPX-001-SP] [CieloPinpad]    -> [PROBE] Nome: /dev/bus/usb/003/002 | Interfaces: 1
+[2026-08-20T14:18:35.067Z] [CPX-001-SP] [CieloPinpad]       Interface #0 (ID=0, Class=3, Endpoints=1)
+[2026-08-20T14:18:35.050Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #3 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x0525:0xA4AC | Permissao=CONCEDIDA
+[2026-08-20T14:18:35.076Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x83, Type=3 (2=Bulk), Dir=128
+[2026-08-20T14:18:35.094Z] [CPX-001-SP] [CieloPinpad]       [PROBE] openDevice OK! FD=70
+[2026-08-20T14:18:36.162Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:18:36.187Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:18:36.179Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:18:36.196Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:18:36.216Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:18:36.231Z] [CPX-001-SP] [CieloPinpad]    -> setParam: COMM=USB (0), COMPANY=capaxero (0), LICENSE=5D49... (0)
+[2026-08-20T14:18:36.240Z] [CPX-001-SP] [CieloPinpad] 4/4 [INIT] Enviando comando OPEN (1) para o Pinpad Gertec PPC930...
+[2026-08-20T14:19:05.389Z] [CPX-001-SP] [System] Totem conectado ao WebSocket da Capaxero Cloud.
+[2026-08-20T14:19:06.555Z] [CPX-001-SP] [WebUI] Navegação UI -> Tela: modes
+[2026-08-20T14:19:08.360Z] [CPX-001-SP] [WebUI] Plano selecionado: inter (R$ 17, 420s)
+[2026-08-20T14:19:08.426Z] [CPX-001-SP] [WebUI] Navegação UI -> Tela: payment
+[2026-08-20T14:19:09.908Z] [CPX-001-SP] [WebUI] Iniciando checkout Cielo Real: CREDIT
+[2026-08-20T14:19:09.977Z] [CPX-001-SP] [WebUI] Cielo Conecta — ativando Pinpad PPC930: CIELO_CREDITO (R$ 17.00)
+[2026-08-20T14:19:10.146Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] Dispositivos USB detectados no barramento: 5
+[2026-08-20T14:19:10.152Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #1 [Dispositivo USB] VID:PID=0x2C7C:0x0125 | Permissao=CONCEDIDA
+[2026-08-20T14:19:10.153Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #2 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x1753:0xC902 | Permissao=CONCEDIDA
+[2026-08-20T14:19:10.157Z] [CPX-001-SP] [CieloPinpad]    -> [PROBE] Nome: /dev/bus/usb/002/014 | Interfaces: 2
+[2026-08-20T14:19:10.191Z] [CPX-001-SP] [CieloPinpad]       Interface #0 (ID=0, Class=2, Endpoints=1)
+[2026-08-20T14:19:10.202Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x83, Type=3 (2=Bulk), Dir=128
+[2026-08-20T14:19:10.207Z] [CPX-001-SP] [CieloPinpad]       Interface #1 (ID=1, Class=10, Endpoints=2)
+[2026-08-20T14:19:10.644Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x81, Type=2 (2=Bulk), Dir=128
+[2026-08-20T14:19:10.716Z] [CPX-001-SP] [CieloPinpad]          EP #1: Addr=0x2, Type=2 (2=Bulk), Dir=0
+[2026-08-20T14:19:10.719Z] [CPX-001-SP] [CieloPinpad]       [PROBE] openDevice OK! FD=166
+[2026-08-20T14:19:10.728Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #0 -> OK
+[2026-08-20T14:19:10.738Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #1 -> OK
+[2026-08-20T14:19:10.740Z] [CPX-001-SP] [CieloPinpad]       [PROBE] Bulk EPs encontrados no IF #1! Enviando teste CAN (0x18)...
+[2026-08-20T14:19:10.744Z] [CPX-001-SP] [CieloPinpad]       [PROBE] TX CAN retornou: 1 bytes
+[2026-08-20T14:19:10.749Z] [CPX-001-SP] [CieloPinpad]       [PROBE] RX retornou: 1 bytes [Byte0=0x04]
+[2026-08-20T14:19:10.756Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #3 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x0525:0xA4AC | Permissao=CONCEDIDA
+[2026-08-20T14:19:10.782Z] [CPX-001-SP] [CieloPinpad]    -> [PROBE] Nome: /dev/bus/usb/003/002 | Interfaces: 1
+[2026-08-20T14:19:10.789Z] [CPX-001-SP] [CieloPinpad]       Interface #0 (ID=0, Class=3, Endpoints=1)
+[2026-08-20T14:19:10.794Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x83, Type=3 (2=Bulk), Dir=128
+[2026-08-20T14:19:10.824Z] [CPX-001-SP] [CieloPinpad]       [PROBE] openDevice OK! FD=166
+[2026-08-20T14:19:10.852Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #0 -> OK
+[2026-08-20T14:19:11.089Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:19:11.094Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:19:11.121Z] [CPX-001-SP] [CieloPinpad] >>> INICIANDO COBRANCA NO PINPAD: credit | R$ 17.0 (1700 cents)
+[2026-08-20T14:19:11.174Z] [CPX-001-SP] [CieloPinpad] Pinpad ainda nao inicializado. Executando sequencia completa INIT -> OPEN agora...
+[2026-08-20T14:19:11.342Z] [CPX-001-SP] [CieloPinpad] startPayment: execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:19:11.344Z] [CPX-001-SP] [CieloPinpad] startPayment: Comando OPEN retornou RetCode=10
+[2026-08-20T14:19:11.352Z] [CPX-001-SP] [CieloPinpad] Disparando GETCARD no Gertec PPC930 (appType=01, amount=1700)...
+[2026-08-20T14:19:11.363Z] [CPX-001-SP] [CieloPinpad] GETCARD disparado com status inicial: 15
+[2026-08-20T14:19:11.485Z] [CPX-001-SP] [WebUI] Cielo Conecta [WAITING_CARD] APROXIME OU INSIRA O CARTAO
+[2026-08-20T14:19:11.604Z] [CPX-001-SP] [CieloPinpad] GETCARD finalizado -> RetCode=10 | Msg: 
+[2026-08-20T14:19:11.620Z] [CPX-001-SP] [CieloPinpad] Falha no Pinpad: RetCode=10 | Msg: 
+[2026-08-20T14:19:11.681Z] [CPX-001-SP] [WebUI] Cielo Conecta [ERROR] FALHA NO CARTAO (10)
+[2026-08-20T14:19:11.710Z] [CPX-001-SP] [CieloPinpad] 1/4 [INIT] Inicializando modulo USB Pinpad para Android 11...
+[2026-08-20T14:19:11.724Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] Dispositivos USB detectados no barramento: 5
+[2026-08-20T14:19:11.730Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #1 [Dispositivo USB] VID:PID=0x2C7C:0x0125 | Permissao=CONCEDIDA
+[2026-08-20T14:19:11.753Z] [CPX-001-SP] [CieloPinpad]    -> [PROBE] Nome: /dev/bus/usb/002/014 | Interfaces: 2
+[2026-08-20T14:19:11.743Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #2 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x1753:0xC902 | Permissao=CONCEDIDA
+[2026-08-20T14:19:11.759Z] [CPX-001-SP] [CieloPinpad]       Interface #0 (ID=0, Class=2, Endpoints=1)
+[2026-08-20T14:19:11.765Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x83, Type=3 (2=Bulk), Dir=128
+[2026-08-20T14:19:11.773Z] [CPX-001-SP] [CieloPinpad]       Interface #1 (ID=1, Class=10, Endpoints=2)
+[2026-08-20T14:19:11.787Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x81, Type=2 (2=Bulk), Dir=128
+[2026-08-20T14:19:11.854Z] [CPX-001-SP] [CieloPinpad]          EP #1: Addr=0x2, Type=2 (2=Bulk), Dir=0
+[2026-08-20T14:19:11.879Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #0 -> OK
+[2026-08-20T14:19:11.871Z] [CPX-001-SP] [CieloPinpad]       [PROBE] openDevice OK! FD=150
+[2026-08-20T14:19:11.897Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #1 -> OK
+[2026-08-20T14:19:11.905Z] [CPX-001-SP] [CieloPinpad]       [PROBE] Bulk EPs encontrados no IF #1! Enviando teste CAN (0x18)...
+[2026-08-20T14:19:11.909Z] [CPX-001-SP] [CieloPinpad]       [PROBE] TX CAN retornou: 1 bytes
+[2026-08-20T14:19:11.929Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #3 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x0525:0xA4AC | Permissao=CONCEDIDA
+[2026-08-20T14:19:11.939Z] [CPX-001-SP] [CieloPinpad]       Interface #0 (ID=0, Class=3, Endpoints=1)
+[2026-08-20T14:19:11.916Z] [CPX-001-SP] [CieloPinpad]       [PROBE] RX retornou: 1 bytes [Byte0=0x04]
+[2026-08-20T14:19:11.935Z] [CPX-001-SP] [CieloPinpad]    -> [PROBE] Nome: /dev/bus/usb/003/002 | Interfaces: 1
+[2026-08-20T14:19:11.947Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x83, Type=3 (2=Bulk), Dir=128
+[2026-08-20T14:19:11.970Z] [CPX-001-SP] [CieloPinpad]       [PROBE] openDevice OK! FD=70
+[2026-08-20T14:19:11.976Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #0 -> OK
+[2026-08-20T14:19:11.985Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:19:11.981Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:19:11.991Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:19:11.996Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:19:12.005Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:19:12.012Z] [CPX-001-SP] [CieloPinpad]    -> setParam: COMM=USB (0), COMPANY=capaxero (0), LICENSE=5D49... (0)
+[2026-08-20T14:19:12.023Z] [CPX-001-SP] [CieloPinpad] >>> [INIT] PPConecta OPEN Finalizado com RetCode: 10
+[2026-08-20T14:19:12.133Z] [CPX-001-SP] [CieloPinpad] [AVISO] Falha no comando OPEN do Pinpad: OPEN retornou 10
+[2026-08-20T14:19:12.019Z] [CPX-001-SP] [CieloPinpad] 4/4 [INIT] Enviando comando OPEN (1) para o Pinpad Gertec PPC930...
+[2026-08-20T14:19:15.226Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:19:15.272Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:19:15.278Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:19:15.284Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:19:15.297Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:19:15.320Z] [CPX-001-SP] [CieloPinpad]    -> setParam: COMM=USB (0), COMPANY=capaxero (0), LICENSE=5D49... (0)
+[2026-08-20T14:19:15.355Z] [CPX-001-SP] [CieloPinpad] 4/4 [INIT] Enviando comando OPEN (1) para o Pinpad Gertec PPC930...
+[2026-08-20T14:19:15.422Z] [CPX-001-SP] [CieloPinpad] >>> [INIT] PPConecta OPEN Finalizado com RetCode: 10
+[2026-08-20T14:19:16.055Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #0 -> OK
+[2026-08-20T14:19:16.068Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:19:16.116Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:19:16.109Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:19:16.121Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:19:16.131Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:19:16.145Z] [CPX-001-SP] [CieloPinpad] 4/4 [INIT] Enviando comando OPEN (1) para o Pinpad Gertec PPC930...
+[2026-08-20T14:19:16.149Z] [CPX-001-SP] [CieloPinpad] >>> [INIT] PPConecta OPEN Finalizado com RetCode: 10
+[2026-08-20T14:19:16.139Z] [CPX-001-SP] [CieloPinpad]    -> setParam: COMM=USB (0), COMPANY=capaxero (0), LICENSE=5D49... (0)
+[2026-08-20T14:19:16.153Z] [CPX-001-SP] [CieloPinpad] [AVISO] Falha no comando OPEN do Pinpad: OPEN retornou 10
+[2026-08-20T14:19:18.776Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:19:18.785Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:19:18.797Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:19:18.802Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:19:18.805Z] [CPX-001-SP] [CieloPinpad]    -> setParam: COMM=USB (0), COMPANY=capaxero (0), LICENSE=5D49... (0)
+[2026-08-20T14:19:19.345Z] [CPX-001-SP] [CieloPinpad]       [PROBE] RX retornou: 1 bytes [Byte0=0x04]
+[2026-08-20T14:19:19.395Z] [CPX-001-SP] [CieloPinpad]    -> [PROBE] Nome: /dev/bus/usb/003/002 | Interfaces: 1
+[2026-08-20T14:19:19.407Z] [CPX-001-SP] [CieloPinpad]       Interface #0 (ID=0, Class=3, Endpoints=1)
+[2026-08-20T14:19:19.383Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #3 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x0525:0xA4AC | Permissao=CONCEDIDA
+[2026-08-20T14:19:19.435Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x83, Type=3 (2=Bulk), Dir=128
+[2026-08-20T14:19:19.458Z] [CPX-001-SP] [CieloPinpad]       [PROBE] openDevice OK! FD=166
+[2026-08-20T14:19:19.474Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #0 -> OK
+[2026-08-20T14:19:19.949Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:19:20.084Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:19:20.094Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:19:20.124Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:19:20.138Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:19:20.163Z] [CPX-001-SP] [CieloPinpad]    -> setParam: COMM=USB (0), COMPANY=capaxero (0), LICENSE=5D49... (0)
+[2026-08-20T14:19:23.706Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:19:23.725Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:19:23.719Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:19:23.731Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:19:23.738Z] [CPX-001-SP] [CieloPinpad]    -> setParam: COMM=USB (0), COMPANY=capaxero (0), LICENSE=5D49... (0)
+[2026-08-20T14:19:23.734Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:19:23.754Z] [CPX-001-SP] [CieloPinpad] 4/4 [INIT] Enviando comando OPEN (1) para o Pinpad Gertec PPC930...
+[2026-08-20T14:19:23.759Z] [CPX-001-SP] [CieloPinpad] >>> [INIT] PPConecta OPEN Finalizado com RetCode: 10
+[2026-08-20T14:19:23.771Z] [CPX-001-SP] [CieloPinpad] [AVISO] Falha no comando OPEN do Pinpad: OPEN retornou 10
+[2026-08-20T14:19:26.426Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #0 -> OK
+[2026-08-20T14:19:26.416Z] [CPX-001-SP] [CieloPinpad]       [PROBE] openDevice OK! FD=177
+[2026-08-20T14:19:27.674Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:19:27.713Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:19:27.739Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:19:27.757Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:19:31.227Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:19:31.223Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:19:31.231Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:19:31.235Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:19:31.240Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:19:31.245Z] [CPX-001-SP] [CieloPinpad]    -> setParam: COMM=USB (0), COMPANY=capaxero (0), LICENSE=5D49... (0)
+[2026-08-20T14:19:31.252Z] [CPX-001-SP] [CieloPinpad] 4/4 [INIT] Enviando comando OPEN (1) para o Pinpad Gertec PPC930...
+[2026-08-20T14:19:31.263Z] [CPX-001-SP] [CieloPinpad] [AVISO] Falha no comando OPEN do Pinpad: OPEN retornou 10
+[2026-08-20T14:19:31.257Z] [CPX-001-SP] [CieloPinpad] >>> [INIT] PPConecta OPEN Finalizado com RetCode: 10
+[2026-08-20T14:19:31.965Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:19:31.970Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:19:31.974Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:19:31.979Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:19:31.998Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:19:32.003Z] [CPX-001-SP] [CieloPinpad]    -> setParam: COMM=USB (0), COMPANY=capaxero (0), LICENSE=5D49... (0)
+[2026-08-20T14:19:34.850Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:19:34.872Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:19:34.892Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:19:34.902Z] [CPX-001-SP] [CieloPinpad]    -> setParam: COMM=USB (0), COMPANY=capaxero (0), LICENSE=5D49... (0)
+[2026-08-20T14:19:34.885Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:19:34.896Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:19:40.344Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:19:40.350Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:19:40.360Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:19:40.365Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:19:40.368Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:20:12.769Z] [CPX-001-SP] [WebUI] Navegação UI -> Tela: modes
+[2026-08-20T14:20:13.002Z] [CPX-001-SP] [WebUI] Plano selecionado: basic (R$ 14, 360s)
+[2026-08-20T14:20:13.048Z] [CPX-001-SP] [WebUI] Navegação UI -> Tela: payment
+[2026-08-20T14:20:13.178Z] [CPX-001-SP] [WebUI] Iniciando checkout Cielo Real: PIX
+[2026-08-20T14:20:15.195Z] [CPX-001-SP] [WebUI] Pagamento cancelado pelo usuário no pop-up.
+[2026-08-20T14:20:15.215Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] Dispositivos USB detectados no barramento: 5
+[2026-08-20T14:20:15.262Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #1 [Dispositivo USB] VID:PID=0x2C7C:0x0125 | Permissao=CONCEDIDA
+[2026-08-20T14:20:15.272Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #2 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x1753:0xC902 | Permissao=CONCEDIDA
+[2026-08-20T14:20:15.277Z] [CPX-001-SP] [CieloPinpad]    -> [PROBE] Nome: /dev/bus/usb/002/014 | Interfaces: 2
+[2026-08-20T14:20:15.284Z] [CPX-001-SP] [CieloPinpad]       Interface #0 (ID=0, Class=2, Endpoints=1)
+[2026-08-20T14:20:15.295Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x83, Type=3 (2=Bulk), Dir=128
+[2026-08-20T14:20:15.303Z] [CPX-001-SP] [CieloPinpad]       Interface #1 (ID=1, Class=10, Endpoints=2)
+[2026-08-20T14:20:15.324Z] [CPX-001-SP] [CieloPinpad]          EP #1: Addr=0x2, Type=2 (2=Bulk), Dir=0
+[2026-08-20T14:20:15.315Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x81, Type=2 (2=Bulk), Dir=128
+[2026-08-20T14:20:15.332Z] [CPX-001-SP] [CieloPinpad]       [PROBE] openDevice OK! FD=179
+[2026-08-20T14:20:15.336Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #0 -> OK
+[2026-08-20T14:20:15.357Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #1 -> OK
+[2026-08-20T14:20:15.369Z] [CPX-001-SP] [CieloPinpad]       [PROBE] Bulk EPs encontrados no IF #1! Enviando teste CAN (0x18)...
+[2026-08-20T14:20:15.373Z] [CPX-001-SP] [CieloPinpad]       [PROBE] TX CAN retornou: 1 bytes
+[2026-08-20T14:20:15.395Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #3 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x0525:0xA4AC | Permissao=CONCEDIDA
+[2026-08-20T14:20:15.385Z] [CPX-001-SP] [CieloPinpad]       [PROBE] RX retornou: 1 bytes [Byte0=0x04]
+[2026-08-20T14:20:15.423Z] [CPX-001-SP] [CieloPinpad]       Interface #0 (ID=0, Class=3, Endpoints=1)
+[2026-08-20T14:20:15.408Z] [CPX-001-SP] [CieloPinpad]    -> [PROBE] Nome: /dev/bus/usb/003/002 | Interfaces: 1
+[2026-08-20T14:20:15.432Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x83, Type=3 (2=Bulk), Dir=128
+[2026-08-20T14:20:15.458Z] [CPX-001-SP] [CieloPinpad]       [PROBE] openDevice OK! FD=220
+[2026-08-20T14:20:15.578Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #0 -> OK
+[2026-08-20T14:20:16.156Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:20:16.178Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:20:16.197Z] [CPX-001-SP] [CieloPinpad] >>> INICIANDO COBRANCA NO PINPAD: pix | R$ 14.0 (1400 cents)
+[2026-08-20T14:20:16.216Z] [CPX-001-SP] [CieloPinpad] Pinpad ainda nao inicializado. Executando sequencia completa INIT -> OPEN agora...
+[2026-08-20T14:20:16.235Z] [CPX-001-SP] [CieloPinpad] startPayment: execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:20:16.246Z] [CPX-001-SP] [CieloPinpad] startPayment: Comando OPEN retornou RetCode=10
+[2026-08-20T14:20:16.257Z] [CPX-001-SP] [CieloPinpad] Disparando GETCARD no Gertec PPC930 (appType=02, amount=1400)...
+[2026-08-20T14:20:16.263Z] [CPX-001-SP] [CieloPinpad] GETCARD disparado com status inicial: 15
+[2026-08-20T14:20:16.754Z] [CPX-001-SP] [CieloPinpad] 4/4 [INIT] Enviando comando OPEN (1) para o Pinpad Gertec PPC930...
+[2026-08-20T14:20:16.761Z] [CPX-001-SP] [CieloPinpad] >>> [INIT] PPConecta OPEN Finalizado com RetCode: 10
+[2026-08-20T14:20:16.765Z] [CPX-001-SP] [CieloPinpad] [AVISO] Falha no comando OPEN do Pinpad: OPEN retornou 10
+[2026-08-20T14:20:18.918Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #0 -> OK
+[2026-08-20T14:20:19.491Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:20:19.500Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:20:19.506Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:20:19.513Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:20:19.521Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:20:19.529Z] [CPX-001-SP] [CieloPinpad]    -> setParam: COMM=USB (0), COMPANY=capaxero (0), LICENSE=5D49... (0)
+[2026-08-20T14:20:19.612Z] [CPX-001-SP] [CieloPinpad] 4/4 [INIT] Enviando comando OPEN (1) para o Pinpad Gertec PPC930...
+[2026-08-20T14:20:19.626Z] [CPX-001-SP] [CieloPinpad] [AVISO] Falha no comando OPEN do Pinpad: OPEN retornou 10
+[2026-08-20T14:20:19.618Z] [CPX-001-SP] [CieloPinpad] >>> [INIT] PPConecta OPEN Finalizado com RetCode: 10
+[2026-08-20T14:20:19.724Z] [CPX-001-SP] [CieloPinpad]       [PROBE] openDevice OK! FD=82
+[2026-08-20T14:20:19.763Z] [CPX-001-SP] [CieloPinpad]       [PROBE] Bulk EPs encontrados no IF #1! Enviando teste CAN (0x18)...
+[2026-08-20T14:20:19.734Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #1 -> OK
+[2026-08-20T14:20:19.730Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #0 -> OK
+[2026-08-20T14:20:19.862Z] [CPX-001-SP] [CieloPinpad]       [PROBE] TX CAN retornou: 1 bytes
+[2026-08-20T14:20:20.126Z] [CPX-001-SP] [CieloPinpad]       [PROBE] RX retornou: 1 bytes [Byte0=0x04]
+[2026-08-20T14:20:20.132Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #3 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x0525:0xA4AC | Permissao=CONCEDIDA
+[2026-08-20T14:20:20.136Z] [CPX-001-SP] [CieloPinpad]    -> [PROBE] Nome: /dev/bus/usb/003/002 | Interfaces: 1
+[2026-08-20T14:20:20.140Z] [CPX-001-SP] [CieloPinpad]       Interface #0 (ID=0, Class=3, Endpoints=1)
+[2026-08-20T14:20:20.145Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x83, Type=3 (2=Bulk), Dir=128
+[2026-08-20T14:20:24.429Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #0 -> OK
+[2026-08-20T14:20:24.843Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:20:24.859Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:20:24.895Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:20:24.934Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:20:24.942Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:20:24.953Z] [CPX-001-SP] [CieloPinpad]    -> setParam: COMM=USB (0), COMPANY=capaxero (0), LICENSE=5D49... (0)
+[2026-08-20T14:20:24.972Z] [CPX-001-SP] [CieloPinpad] 4/4 [INIT] Enviando comando OPEN (1) para o Pinpad Gertec PPC930...
+[2026-08-20T14:20:25.007Z] [CPX-001-SP] [CieloPinpad] >>> [INIT] PPConecta OPEN Finalizado com RetCode: 10
+[2026-08-20T14:20:25.123Z] [CPX-001-SP] [CieloPinpad] [AVISO] Falha no comando OPEN do Pinpad: OPEN retornou 10
+[2026-08-20T14:20:30.331Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:20:30.358Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:20:30.349Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:20:30.363Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:20:30.372Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:20:30.402Z] [CPX-001-SP] [CieloPinpad]    -> setParam: COMM=USB (0), COMPANY=capaxero (0), LICENSE=5D49... (0)
+[2026-08-20T14:20:30.552Z] [CPX-001-SP] [CieloPinpad] [AVISO] Falha no comando OPEN do Pinpad: OPEN retornou 10
+[2026-08-20T14:20:30.538Z] [CPX-001-SP] [CieloPinpad] 4/4 [INIT] Enviando comando OPEN (1) para o Pinpad Gertec PPC930...
+[2026-08-20T14:20:30.548Z] [CPX-001-SP] [CieloPinpad] >>> [INIT] PPConecta OPEN Finalizado com RetCode: 10
+[2026-08-20T14:20:41.261Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:20:41.301Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:20:41.308Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:20:41.333Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:20:41.339Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:20:46.709Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:20:46.732Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:20:46.744Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:20:46.783Z] [CPX-001-SP] [CieloPinpad] 4/4 [INIT] Enviando comando OPEN (1) para o Pinpad Gertec PPC930...
+[2026-08-20T14:20:46.754Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:20:46.760Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:20:46.765Z] [CPX-001-SP] [CieloPinpad]    -> setParam: COMM=USB (0), COMPANY=capaxero (0), LICENSE=5D49... (0)
+[2026-08-20T14:20:50.424Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:20:50.416Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:20:50.436Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:20:50.442Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:20:50.446Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:20:51.358Z] [CPX-001-SP] [CieloPinpad] [AVISO] Falha no comando OPEN do Pinpad: OPEN retornou 10
+[2026-08-20T14:20:51.368Z] [CPX-001-SP] [CieloPinpad] 1/4 [INIT] Inicializando modulo USB Pinpad para Android 11...
+[2026-08-20T14:20:51.394Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] Dispositivos USB detectados no barramento: 5
+[2026-08-20T14:20:51.528Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #1 [Dispositivo USB] VID:PID=0x2C7C:0x0125 | Permissao=CONCEDIDA
+[2026-08-20T14:20:51.583Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #2 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x1753:0xC902 | Permissao=CONCEDIDA
+[2026-08-20T14:20:51.617Z] [CPX-001-SP] [CieloPinpad]       Interface #0 (ID=0, Class=2, Endpoints=1)
+[2026-08-20T14:20:51.607Z] [CPX-001-SP] [CieloPinpad]    -> [PROBE] Nome: /dev/bus/usb/002/014 | Interfaces: 2
+[2026-08-20T14:20:51.626Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x83, Type=3 (2=Bulk), Dir=128
+[2026-08-20T14:20:51.633Z] [CPX-001-SP] [CieloPinpad]       Interface #1 (ID=1, Class=10, Endpoints=2)
+[2026-08-20T14:20:51.646Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x81, Type=2 (2=Bulk), Dir=128
+[2026-08-20T14:21:19.076Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:21:18.909Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #0 -> OK
+[2026-08-20T14:21:19.207Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:21:19.049Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:21:19.092Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:21:19.127Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:21:19.287Z] [CPX-001-SP] [CieloPinpad] >>> [INIT] PPConecta OPEN Finalizado com RetCode: 10
+[2026-08-20T14:21:19.236Z] [CPX-001-SP] [CieloPinpad]    -> setParam: COMM=USB (0), COMPANY=capaxero (0), LICENSE=5D49... (0)
+[2026-08-20T14:21:19.262Z] [CPX-001-SP] [CieloPinpad] 4/4 [INIT] Enviando comando OPEN (1) para o Pinpad Gertec PPC930...
+[2026-08-20T14:21:19.345Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] Dispositivos USB detectados no barramento: 5
+[2026-08-20T14:21:19.307Z] [CPX-001-SP] [CieloPinpad] [AVISO] Falha no comando OPEN do Pinpad: OPEN retornou 10
+[2026-08-20T14:21:19.326Z] [CPX-001-SP] [CieloPinpad] 1/4 [INIT] Inicializando modulo USB Pinpad para Android 11...
+[2026-08-20T14:21:19.382Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #1 [Dispositivo USB] VID:PID=0x2C7C:0x0125 | Permissao=CONCEDIDA
+[2026-08-20T14:21:19.393Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #2 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x1753:0xC902 | Permissao=CONCEDIDA
+[2026-08-20T14:21:19.403Z] [CPX-001-SP] [CieloPinpad]       Interface #0 (ID=0, Class=2, Endpoints=1)
+[2026-08-20T14:21:19.398Z] [CPX-001-SP] [CieloPinpad]    -> [PROBE] Nome: /dev/bus/usb/002/014 | Interfaces: 2
+[2026-08-20T14:21:19.415Z] [CPX-001-SP] [CieloPinpad]       Interface #1 (ID=1, Class=10, Endpoints=2)
+[2026-08-20T14:21:19.409Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x83, Type=3 (2=Bulk), Dir=128
+[2026-08-20T14:21:19.422Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x81, Type=2 (2=Bulk), Dir=128
+[2026-08-20T14:21:19.431Z] [CPX-001-SP] [CieloPinpad]          EP #1: Addr=0x2, Type=2 (2=Bulk), Dir=0
+[2026-08-20T14:21:23.251Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:21:23.256Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:21:23.260Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:21:23.265Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:21:23.276Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:21:23.281Z] [CPX-001-SP] [CieloPinpad]    -> setParam: COMM=USB (0), COMPANY=capaxero (0), LICENSE=5D49... (0)
+[2026-08-20T14:21:23.286Z] [CPX-001-SP] [CieloPinpad] 4/4 [INIT] Enviando comando OPEN (1) para o Pinpad Gertec PPC930...
+[2026-08-20T14:21:23.291Z] [CPX-001-SP] [CieloPinpad] >>> [INIT] PPConecta OPEN Finalizado com RetCode: 10
+[2026-08-20T14:21:23.299Z] [CPX-001-SP] [CieloPinpad] [AVISO] Falha no comando OPEN do Pinpad: OPEN retornou 10
+[2026-08-20T14:21:23.342Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #2 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x1753:0xC902 | Permissao=CONCEDIDA
+[2026-08-20T14:21:23.304Z] [CPX-001-SP] [CieloPinpad] 1/4 [INIT] Inicializando modulo USB Pinpad para Android 11...
+[2026-08-20T14:21:23.324Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #1 [Dispositivo USB] VID:PID=0x2C7C:0x0125 | Permissao=CONCEDIDA
+[2026-08-20T14:21:23.363Z] [CPX-001-SP] [CieloPinpad]    -> [PROBE] Nome: /dev/bus/usb/002/014 | Interfaces: 2
+[2026-08-20T14:21:23.309Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] Dispositivos USB detectados no barramento: 5
+[2026-08-20T14:21:30.004Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #0 -> OK
+[2026-08-20T14:21:30.232Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:21:30.259Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:21:30.278Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:21:30.331Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:21:30.349Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:21:30.364Z] [CPX-001-SP] [CieloPinpad]    -> setParam: COMM=USB (0), COMPANY=capaxero (0), LICENSE=5D49... (0)
+[2026-08-20T14:21:33.808Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:21:34.436Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:21:34.403Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:21:34.419Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:21:34.445Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:21:34.491Z] [CPX-001-SP] [CieloPinpad]    -> setParam: COMM=USB (0), COMPANY=capaxero (0), LICENSE=5D49... (0)
+[2026-08-20T14:21:34.500Z] [CPX-001-SP] [CieloPinpad] 4/4 [INIT] Enviando comando OPEN (1) para o Pinpad Gertec PPC930...
+[2026-08-20T14:21:34.513Z] [CPX-001-SP] [CieloPinpad] >>> [INIT] PPConecta OPEN Finalizado com RetCode: 10
+[2026-08-20T14:21:34.529Z] [CPX-001-SP] [CieloPinpad] [AVISO] Falha no comando OPEN do Pinpad: OPEN retornou 10
+[2026-08-20T14:21:34.577Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #2 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x1753:0xC902 | Permissao=CONCEDIDA
+[2026-08-20T14:21:34.555Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] Dispositivos USB detectados no barramento: 5
+[2026-08-20T14:21:34.572Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #1 [Dispositivo USB] VID:PID=0x2C7C:0x0125 | Permissao=CONCEDIDA
+[2026-08-20T14:21:34.542Z] [CPX-001-SP] [CieloPinpad] 1/4 [INIT] Inicializando modulo USB Pinpad para Android 11...
+[2026-08-20T14:21:34.582Z] [CPX-001-SP] [CieloPinpad]    -> [PROBE] Nome: /dev/bus/usb/002/014 | Interfaces: 2
+[2026-08-20T14:21:34.587Z] [CPX-001-SP] [CieloPinpad]       Interface #0 (ID=0, Class=2, Endpoints=1)
+[2026-08-20T14:21:34.599Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x81, Type=2 (2=Bulk), Dir=128
+[2026-08-20T14:21:34.591Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x83, Type=3 (2=Bulk), Dir=128
+[2026-08-20T14:21:34.595Z] [CPX-001-SP] [CieloPinpad]       Interface #1 (ID=1, Class=10, Endpoints=2)
+[2026-08-20T14:21:34.675Z] [CPX-001-SP] [CieloPinpad]          EP #1: Addr=0x2, Type=2 (2=Bulk), Dir=0
+[2026-08-20T14:21:34.693Z] [CPX-001-SP] [CieloPinpad]       [PROBE] openDevice OK! FD=170
+[2026-08-20T14:21:37.671Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #0 -> OK
+[2026-08-20T14:21:38.446Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:21:38.497Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:21:38.474Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:21:38.533Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:21:38.568Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:21:38.605Z] [CPX-001-SP] [CieloPinpad]    -> setParam: COMM=USB (0), COMPANY=capaxero (0), LICENSE=5D49... (0)
+[2026-08-20T14:21:38.634Z] [CPX-001-SP] [CieloPinpad] 4/4 [INIT] Enviando comando OPEN (1) para o Pinpad Gertec PPC930...
+[2026-08-20T14:21:38.645Z] [CPX-001-SP] [CieloPinpad] >>> [INIT] PPConecta OPEN Finalizado com RetCode: 10
+[2026-08-20T14:21:38.649Z] [CPX-001-SP] [CieloPinpad] [AVISO] Falha no comando OPEN do Pinpad: OPEN retornou 10
+[2026-08-20T14:21:38.653Z] [CPX-001-SP] [CieloPinpad] 1/4 [INIT] Inicializando modulo USB Pinpad para Android 11...
+[2026-08-20T14:21:38.785Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] Dispositivos USB detectados no barramento: 5
+[2026-08-20T14:21:38.828Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #1 [Dispositivo USB] VID:PID=0x2C7C:0x0125 | Permissao=CONCEDIDA
+[2026-08-20T14:21:46.570Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #0 -> OK
+[2026-08-20T14:21:46.588Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:21:46.595Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:21:46.818Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:21:46.824Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:21:46.854Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:21:46.957Z] [CPX-001-SP] [CieloPinpad]    -> setParam: COMM=USB (0), COMPANY=capaxero (0), LICENSE=5D49... (0)
+[2026-08-20T14:21:47.044Z] [CPX-001-SP] [CieloPinpad] 4/4 [INIT] Enviando comando OPEN (1) para o Pinpad Gertec PPC930...
+[2026-08-20T14:21:47.050Z] [CPX-001-SP] [CieloPinpad] >>> [INIT] PPConecta OPEN Finalizado com RetCode: 10
+[2026-08-20T14:21:47.054Z] [CPX-001-SP] [CieloPinpad] [AVISO] Falha no comando OPEN do Pinpad: OPEN retornou 10
+[2026-08-20T14:21:47.059Z] [CPX-001-SP] [CieloPinpad] 1/4 [INIT] Inicializando modulo USB Pinpad para Android 11...
+[2026-08-20T14:21:47.082Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #2 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x1753:0xC902 | Permissao=CONCEDIDA
+[2026-08-20T14:21:47.067Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] Dispositivos USB detectados no barramento: 5
+[2026-08-20T14:21:47.078Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #1 [Dispositivo USB] VID:PID=0x2C7C:0x0125 | Permissao=CONCEDIDA
+[2026-08-20T14:21:47.086Z] [CPX-001-SP] [CieloPinpad]    -> [PROBE] Nome: /dev/bus/usb/002/014 | Interfaces: 2
+[2026-08-20T14:21:47.089Z] [CPX-001-SP] [CieloPinpad]       Interface #0 (ID=0, Class=2, Endpoints=1)
+[2026-08-20T14:21:47.095Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x83, Type=3 (2=Bulk), Dir=128
+[2026-08-20T14:21:48.748Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:21:48.754Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:21:48.762Z] [CPX-001-SP] [CieloPinpad]    -> setParam: COMM=USB (0), COMPANY=capaxero (0), LICENSE=5D49... (0)
+[2026-08-20T14:21:48.787Z] [CPX-001-SP] [CieloPinpad] 4/4 [INIT] Enviando comando OPEN (1) para o Pinpad Gertec PPC930...
+[2026-08-20T14:21:48.804Z] [CPX-001-SP] [CieloPinpad] >>> [INIT] PPConecta OPEN Finalizado com RetCode: 10
+[2026-08-20T14:21:48.831Z] [CPX-001-SP] [CieloPinpad] [AVISO] Falha no comando OPEN do Pinpad: OPEN retornou 10
+[2026-08-20T14:21:48.889Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] Dispositivos USB detectados no barramento: 5
+[2026-08-20T14:21:48.881Z] [CPX-001-SP] [CieloPinpad] 1/4 [INIT] Inicializando modulo USB Pinpad para Android 11...
+[2026-08-20T14:21:48.893Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #1 [Dispositivo USB] VID:PID=0x2C7C:0x0125 | Permissao=CONCEDIDA
+[2026-08-20T14:21:48.902Z] [CPX-001-SP] [CieloPinpad]    -> [PROBE] Nome: /dev/bus/usb/002/014 | Interfaces: 2
+[2026-08-20T14:21:48.897Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #2 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x1753:0xC902 | Permissao=CONCEDIDA
+[2026-08-20T14:21:48.913Z] [CPX-001-SP] [CieloPinpad]       Interface #0 (ID=0, Class=2, Endpoints=1)
+[2026-08-20T14:21:48.935Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x81, Type=2 (2=Bulk), Dir=128
+[2026-08-20T14:21:48.929Z] [CPX-001-SP] [CieloPinpad]       Interface #1 (ID=1, Class=10, Endpoints=2)
+[2026-08-20T14:21:48.920Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x83, Type=3 (2=Bulk), Dir=128
+[2026-08-20T14:21:48.944Z] [CPX-001-SP] [CieloPinpad]       [PROBE] openDevice OK! FD=150
+[2026-08-20T14:21:48.950Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #0 -> OK
+[2026-08-20T14:21:48.940Z] [CPX-001-SP] [CieloPinpad]          EP #1: Addr=0x2, Type=2 (2=Bulk), Dir=0
+[2026-08-20T14:21:48.954Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #1 -> OK
+[2026-08-20T14:21:48.957Z] [CPX-001-SP] [CieloPinpad]       [PROBE] Bulk EPs encontrados no IF #1! Enviando teste CAN (0x18)...
+[2026-08-20T14:21:48.961Z] [CPX-001-SP] [CieloPinpad]       [PROBE] TX CAN retornou: 1 bytes
+[2026-08-20T14:21:50.849Z] [CPX-001-SP] [CieloPinpad] 4/4 [INIT] Enviando comando OPEN (1) para o Pinpad Gertec PPC930...
+[2026-08-20T14:21:50.857Z] [CPX-001-SP] [CieloPinpad] >>> [INIT] PPConecta OPEN Finalizado com RetCode: 10
+[2026-08-20T14:21:50.863Z] [CPX-001-SP] [CieloPinpad] [AVISO] Falha no comando OPEN do Pinpad: OPEN retornou 10
+[2026-08-20T14:21:50.878Z] [CPX-001-SP] [CieloPinpad] 1/4 [INIT] Inicializando modulo USB Pinpad para Android 11...
+[2026-08-20T14:21:50.896Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] Dispositivos USB detectados no barramento: 5
+[2026-08-20T14:21:50.921Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #1 [Dispositivo USB] VID:PID=0x2C7C:0x0125 | Permissao=CONCEDIDA
+[2026-08-20T14:21:50.961Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #2 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x1753:0xC902 | Permissao=CONCEDIDA
+[2026-08-20T14:21:50.977Z] [CPX-001-SP] [CieloPinpad]    -> [PROBE] Nome: /dev/bus/usb/002/014 | Interfaces: 2
+[2026-08-20T14:21:53.082Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:21:53.131Z] [CPX-001-SP] [CieloPinpad] 4/4 [INIT] Enviando comando OPEN (1) para o Pinpad Gertec PPC930...
+[2026-08-20T14:21:53.091Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:21:53.106Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:21:53.120Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:21:53.115Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:21:53.124Z] [CPX-001-SP] [CieloPinpad]    -> setParam: COMM=USB (0), COMPANY=capaxero (0), LICENSE=5D49... (0)
+[2026-08-20T14:21:53.153Z] [CPX-001-SP] [CieloPinpad] [AVISO] Falha no comando OPEN do Pinpad: OPEN retornou 10
+[2026-08-20T14:21:53.143Z] [CPX-001-SP] [CieloPinpad] >>> [INIT] PPConecta OPEN Finalizado com RetCode: 10
+[2026-08-20T14:21:53.173Z] [CPX-001-SP] [CieloPinpad] 1/4 [INIT] Inicializando modulo USB Pinpad para Android 11...
+[2026-08-20T14:21:53.187Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #1 [Dispositivo USB] VID:PID=0x2C7C:0x0125 | Permissao=CONCEDIDA
+[2026-08-20T14:21:53.182Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] Dispositivos USB detectados no barramento: 5
+[2026-08-20T14:21:53.194Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #2 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x1753:0xC902 | Permissao=CONCEDIDA
+[2026-08-20T14:21:53.203Z] [CPX-001-SP] [CieloPinpad]    -> [PROBE] Nome: /dev/bus/usb/002/014 | Interfaces: 2
+[2026-08-20T14:21:53.335Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x81, Type=2 (2=Bulk), Dir=128
+[2026-08-20T14:21:53.215Z] [CPX-001-SP] [CieloPinpad]       Interface #0 (ID=0, Class=2, Endpoints=1)
+[2026-08-20T14:21:53.241Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x83, Type=3 (2=Bulk), Dir=128
+[2026-08-20T14:21:53.324Z] [CPX-001-SP] [CieloPinpad]       Interface #1 (ID=1, Class=10, Endpoints=2)
+[2026-08-20T14:21:53.342Z] [CPX-001-SP] [CieloPinpad]          EP #1: Addr=0x2, Type=2 (2=Bulk), Dir=0
+[2026-08-20T14:21:53.491Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #1 -> OK
+[2026-08-20T14:21:53.353Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #0 -> OK
+[2026-08-20T14:21:53.348Z] [CPX-001-SP] [CieloPinpad]       [PROBE] openDevice OK! FD=193
+[2026-08-20T14:21:53.498Z] [CPX-001-SP] [CieloPinpad]       [PROBE] Bulk EPs encontrados no IF #1! Enviando teste CAN (0x18)...
+[2026-08-20T14:21:53.515Z] [CPX-001-SP] [CieloPinpad]       [PROBE] TX CAN retornou: 1 bytes
+[2026-08-20T14:21:53.534Z] [CPX-001-SP] [CieloPinpad]       [PROBE] RX retornou: 1 bytes [Byte0=0x04]
+[2026-08-20T14:21:53.541Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #3 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x0525:0xA4AC | Permissao=CONCEDIDA
+[2026-08-20T14:21:53.544Z] [CPX-001-SP] [CieloPinpad]    -> [PROBE] Nome: /dev/bus/usb/003/002 | Interfaces: 1
+[2026-08-20T14:21:53.549Z] [CPX-001-SP] [CieloPinpad]       Interface #0 (ID=0, Class=3, Endpoints=1)
+[2026-08-20T14:21:53.552Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x83, Type=3 (2=Bulk), Dir=128
+[2026-08-20T14:21:53.556Z] [CPX-001-SP] [CieloPinpad]       [PROBE] openDevice OK! FD=193
+[2026-08-20T14:21:54.185Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #0 -> OK
+[2026-08-20T14:21:54.206Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:21:54.279Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:21:54.352Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:21:54.328Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:21:54.392Z] [CPX-001-SP] [CieloPinpad]    -> setParam: COMM=USB (0), COMPANY=capaxero (0), LICENSE=5D49... (0)
+[2026-08-20T14:21:54.237Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:21:54.428Z] [CPX-001-SP] [CieloPinpad] 4/4 [INIT] Enviando comando OPEN (1) para o Pinpad Gertec PPC930...
+[2026-08-20T14:21:54.454Z] [CPX-001-SP] [CieloPinpad] >>> [INIT] PPConecta OPEN Finalizado com RetCode: 10
+[2026-08-20T14:21:54.460Z] [CPX-001-SP] [CieloPinpad] [AVISO] Falha no comando OPEN do Pinpad: OPEN retornou 10
+[2026-08-20T14:21:54.467Z] [CPX-001-SP] [CieloPinpad] 1/4 [INIT] Inicializando modulo USB Pinpad para Android 11...
+[2026-08-20T14:21:56.963Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:21:57.026Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:21:57.097Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:21:57.049Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:21:57.134Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:21:57.151Z] [CPX-001-SP] [CieloPinpad]    -> setParam: COMM=USB (0), COMPANY=capaxero (0), LICENSE=5D49... (0)
+[2026-08-20T14:21:57.160Z] [CPX-001-SP] [CieloPinpad] 4/4 [INIT] Enviando comando OPEN (1) para o Pinpad Gertec PPC930...
+[2026-08-20T14:21:58.047Z] [CPX-001-SP] [CieloPinpad]       [PROBE] openDevice OK! FD=182
+[2026-08-20T14:21:59.940Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #0 -> OK
+[2026-08-20T14:21:59.976Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:22:00.007Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:22:05.895Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:22:05.900Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:22:16.696Z] [CPX-001-SP] [CieloPinpad]       Interface #0 (ID=0, Class=3, Endpoints=1)
+[2026-08-20T14:22:16.706Z] [CPX-001-SP] [CieloPinpad]       [PROBE] openDevice OK! FD=80
+[2026-08-20T14:22:16.700Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x83, Type=3 (2=Bulk), Dir=128
+[2026-08-20T14:22:16.710Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #0 -> OK
+[2026-08-20T14:22:17.142Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:22:17.155Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:22:17.172Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:22:17.217Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:22:17.249Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:22:17.262Z] [CPX-001-SP] [CieloPinpad]    -> setParam: COMM=USB (0), COMPANY=capaxero (0), LICENSE=5D49... (0)
+[2026-08-20T14:22:17.273Z] [CPX-001-SP] [CieloPinpad] 4/4 [INIT] Enviando comando OPEN (1) para o Pinpad Gertec PPC930...
+[2026-08-20T14:22:17.291Z] [CPX-001-SP] [CieloPinpad] [AVISO] Falha no comando OPEN do Pinpad: OPEN retornou 10
+[2026-08-20T14:22:17.281Z] [CPX-001-SP] [CieloPinpad] >>> [INIT] PPConecta OPEN Finalizado com RetCode: 10
+[2026-08-20T14:22:17.307Z] [CPX-001-SP] [CieloPinpad] 1/4 [INIT] Inicializando modulo USB Pinpad para Android 11...
+[2026-08-20T14:22:17.496Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] Dispositivos USB detectados no barramento: 5
+[2026-08-20T14:22:18.109Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #0 -> OK
+[2026-08-20T14:22:18.129Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:22:18.168Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:22:18.202Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:22:18.239Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:22:18.256Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:22:19.882Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #0 -> OK
+[2026-08-20T14:22:19.945Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:22:19.940Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:22:19.981Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:22:19.964Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:22:19.949Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:22:20.042Z] [CPX-001-SP] [CieloPinpad] 4/4 [INIT] Enviando comando OPEN (1) para o Pinpad Gertec PPC930...
+[2026-08-20T14:22:20.038Z] [CPX-001-SP] [CieloPinpad]    -> setParam: COMM=USB (0), COMPANY=capaxero (0), LICENSE=5D49... (0)
+[2026-08-20T14:22:21.046Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:22:21.061Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:22:21.077Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:22:21.140Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:22:21.245Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:22:23.114Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:22:23.120Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:22:23.130Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:22:23.143Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:22:23.151Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:22:23.186Z] [CPX-001-SP] [CieloPinpad]    -> setParam: COMM=USB (0), COMPANY=capaxero (0), LICENSE=5D49... (0)
+[2026-08-20T14:22:25.551Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:22:25.574Z] [CPX-001-SP] [CieloPinpad]    -> setParam: COMM=USB (0), COMPANY=capaxero (0), LICENSE=5D49... (0)
+[2026-08-20T14:22:25.555Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:22:25.547Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:22:25.567Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:22:25.563Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:22:28.473Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #1 [Dispositivo USB] VID:PID=0x2C7C:0x0125 | Permissao=CONCEDIDA
+[2026-08-20T14:22:28.712Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #2 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x1753:0xC902 | Permissao=CONCEDIDA
+[2026-08-20T14:22:28.723Z] [CPX-001-SP] [CieloPinpad]    -> [PROBE] Nome: /dev/bus/usb/002/014 | Interfaces: 2
+[2026-08-20T14:22:28.727Z] [CPX-001-SP] [CieloPinpad]       Interface #0 (ID=0, Class=2, Endpoints=1)
+[2026-08-20T14:22:28.731Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x83, Type=3 (2=Bulk), Dir=128
+[2026-08-20T14:22:28.740Z] [CPX-001-SP] [CieloPinpad]       Interface #1 (ID=1, Class=10, Endpoints=2)
+[2026-08-20T14:22:28.747Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x81, Type=2 (2=Bulk), Dir=128
+[2026-08-20T14:22:28.774Z] [CPX-001-SP] [CieloPinpad]          EP #1: Addr=0x2, Type=2 (2=Bulk), Dir=0
+[2026-08-20T14:22:28.779Z] [CPX-001-SP] [CieloPinpad]       [PROBE] openDevice OK! FD=73
+[2026-08-20T14:22:28.859Z] [CPX-001-SP] [CieloPinpad]       [PROBE] Bulk EPs encontrados no IF #1! Enviando teste CAN (0x18)...
+[2026-08-20T14:22:28.838Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #1 -> OK
+[2026-08-20T14:22:28.872Z] [CPX-001-SP] [CieloPinpad]       [PROBE] TX CAN retornou: 1 bytes
+[2026-08-20T14:22:28.798Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #0 -> OK
+[2026-08-20T14:22:28.917Z] [CPX-001-SP] [CieloPinpad]       Interface #0 (ID=0, Class=3, Endpoints=1)
+[2026-08-20T14:22:28.899Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #3 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x0525:0xA4AC | Permissao=CONCEDIDA
+[2026-08-20T14:22:28.907Z] [CPX-001-SP] [CieloPinpad]    -> [PROBE] Nome: /dev/bus/usb/003/002 | Interfaces: 1
+[2026-08-20T14:22:28.936Z] [CPX-001-SP] [CieloPinpad]       [PROBE] openDevice OK! FD=73
+[2026-08-20T14:22:28.891Z] [CPX-001-SP] [CieloPinpad]       [PROBE] RX retornou: 1 bytes [Byte0=0x04]
+[2026-08-20T14:22:28.928Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x83, Type=3 (2=Bulk), Dir=128
+[2026-08-20T14:22:39.778Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:22:39.807Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:22:39.812Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:22:39.819Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:22:39.831Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:22:39.856Z] [CPX-001-SP] [CieloPinpad]    -> setParam: COMM=USB (0), COMPANY=capaxero (0), LICENSE=5D49... (0)
+[2026-08-20T14:22:39.862Z] [CPX-001-SP] [CieloPinpad] 4/4 [INIT] Enviando comando OPEN (1) para o Pinpad Gertec PPC930...
+[2026-08-20T14:22:39.870Z] [CPX-001-SP] [CieloPinpad] >>> [INIT] PPConecta OPEN Finalizado com RetCode: 10
+[2026-08-20T14:22:39.880Z] [CPX-001-SP] [CieloPinpad] 1/4 [INIT] Inicializando modulo USB Pinpad para Android 11...
+[2026-08-20T14:22:39.876Z] [CPX-001-SP] [CieloPinpad] [AVISO] Falha no comando OPEN do Pinpad: OPEN retornou 10
+[2026-08-20T14:22:39.901Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #1 [Dispositivo USB] VID:PID=0x2C7C:0x0125 | Permissao=CONCEDIDA
+[2026-08-20T14:22:39.889Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] Dispositivos USB detectados no barramento: 5
+[2026-08-20T14:22:40.756Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #0 -> OK
+[2026-08-20T14:22:40.777Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:22:40.898Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:22:40.911Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:22:40.917Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:22:55.423Z] [CPX-001-SP] [CieloPinpad]       Interface #1 (ID=1, Class=10, Endpoints=2)
+[2026-08-20T14:22:55.434Z] [CPX-001-SP] [CieloPinpad]       [PROBE] openDevice OK! FD=74
+[2026-08-20T14:22:55.431Z] [CPX-001-SP] [CieloPinpad]          EP #1: Addr=0x2, Type=2 (2=Bulk), Dir=0
+[2026-08-20T14:22:55.427Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x81, Type=2 (2=Bulk), Dir=128
+[2026-08-20T14:22:55.440Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #0 -> OK
+[2026-08-20T14:22:55.499Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #1 -> OK
+[2026-08-20T14:22:55.569Z] [CPX-001-SP] [CieloPinpad]       Interface #0 (ID=0, Class=3, Endpoints=1)
+[2026-08-20T14:22:55.505Z] [CPX-001-SP] [CieloPinpad]       [PROBE] Bulk EPs encontrados no IF #1! Enviando teste CAN (0x18)...
+[2026-08-20T14:22:55.543Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #3 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x0525:0xA4AC | Permissao=CONCEDIDA
+[2026-08-20T14:22:55.515Z] [CPX-001-SP] [CieloPinpad]       [PROBE] TX CAN retornou: 1 bytes
+[2026-08-20T14:22:55.525Z] [CPX-001-SP] [CieloPinpad]       [PROBE] RX retornou: 1 bytes [Byte0=0x04]
+[2026-08-20T14:22:55.556Z] [CPX-001-SP] [CieloPinpad]    -> [PROBE] Nome: /dev/bus/usb/003/002 | Interfaces: 1
+[2026-08-20T14:22:55.594Z] [CPX-001-SP] [CieloPinpad]          EP #0: Addr=0x83, Type=3 (2=Bulk), Dir=128
+[2026-08-20T14:22:55.606Z] [CPX-001-SP] [CieloPinpad]       [PROBE] openDevice OK! FD=73
+[2026-08-20T14:22:56.056Z] [CPX-001-SP] [CieloPinpad]       [PROBE] claimInterface #0 -> OK
+[2026-08-20T14:22:56.111Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:22:56.193Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:22:56.276Z] [CPX-001-SP] [CieloPinpad] 2/4 [INIT] Executando PPC_CMD_INIT (0)...
+[2026-08-20T14:22:56.322Z] [CPX-001-SP] [CieloPinpad]    -> PPConecta.execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:22:56.360Z] [CPX-001-SP] [CieloPinpad] 3/4 [INIT] Configurando parametros de Licenca Cielo...
+[2026-08-20T14:22:56.461Z] [CPX-001-SP] [CieloPinpad] 4/4 [INIT] Enviando comando OPEN (1) para o Pinpad Gertec PPC930...
+[2026-08-20T14:22:56.453Z] [CPX-001-SP] [CieloPinpad]    -> setParam: COMM=USB (0), COMPANY=capaxero (0), LICENSE=5D49... (0)
+[2026-08-20T14:22:56.514Z] [CPX-001-SP] [CieloPinpad] >>> [INIT] PPConecta OPEN Finalizado com RetCode: 10
+[2026-08-20T14:22:56.538Z] [CPX-001-SP] [CieloPinpad] [AVISO] Falha no comando OPEN do Pinpad: OPEN retornou 10
+[2026-08-20T14:35:45.513Z] [CPX-001-SP] [System] Totem conectado ao WebSocket da Capaxero Cloud.
+[2026-08-20T14:35:47.936Z] [CPX-001-SP] [WebUI] Navegação UI -> Tela: modes
+[2026-08-20T14:35:49.022Z] [CPX-001-SP] [WebUI] Plano selecionado: inter (R$ 17, 420s)
+[2026-08-20T14:35:49.049Z] [CPX-001-SP] [WebUI] Navegação UI -> Tela: payment
+[2026-08-20T14:35:51.111Z] [CPX-001-SP] [WebUI] Iniciando checkout Cielo Real: CREDIT
+[2026-08-20T14:35:51.122Z] [CPX-001-SP] [WebUI] Cielo Conecta — ativando Pinpad PPC930: CIELO_CREDITO (R$ 17.00)
+[2026-08-20T14:35:51.245Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] Dispositivos USB detectados no barramento: 5
+[2026-08-20T14:35:51.246Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #1 [Dispositivo USB] VID:PID=0x2C7C:0x0125 | Permissao=CONCEDIDA
+[2026-08-20T14:35:51.247Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #2 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x1753:0xC902 | Permissao=CONCEDIDA
+[2026-08-20T14:35:51.248Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #3 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x0525:0xA4AC | Permissao=CONCEDIDA
+[2026-08-20T14:35:51.249Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:35:51.251Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:35:51.252Z] [CPX-001-SP] [CieloPinpad] >>> INICIANDO COBRANCA NO PINPAD: credit | R$ 17.0 (1700 cents)
+[2026-08-20T14:35:51.487Z] [CPX-001-SP] [CieloPinpad] Pinpad ainda nao inicializado. Executando sequencia completa INIT -> OPEN agora...
+[2026-08-20T14:35:51.536Z] [CPX-001-SP] [CieloPinpad] startPayment: execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:35:51.538Z] [CPX-001-SP] [CieloPinpad] startPayment: Comando OPEN retornou RetCode=10
+[2026-08-20T14:35:51.539Z] [CPX-001-SP] [CieloPinpad] Disparando GETCARD no Gertec PPC930 (appType=01, amount=1700)...
+[2026-08-20T14:35:51.540Z] [CPX-001-SP] [CieloPinpad] GETCARD disparado com status inicial: 15
+[2026-08-20T14:35:51.561Z] [CPX-001-SP] [WebUI] Cielo Conecta [WAITING_CARD] APROXIME OU INSIRA O CARTAO
+[2026-08-20T14:35:51.565Z] [CPX-001-SP] [CieloPinpad] GETCARD finalizado -> RetCode=10 | Msg: 
+[2026-08-20T14:35:51.567Z] [CPX-001-SP] [CieloPinpad] Falha no Pinpad: RetCode=10 | Msg: 
+[2026-08-20T14:35:51.579Z] [CPX-001-SP] [WebUI] Cielo Conecta [ERROR] FALHA NO CARTAO (10)
+[2026-08-20T14:38:00.729Z] [CPX-001-SP] [System] Totem conectado ao WebSocket da Capaxero Cloud.
+[2026-08-20T14:40:09.779Z] [CPX-001-SP] [System] Totem conectado ao WebSocket da Capaxero Cloud.
+[2026-08-20T14:42:19.031Z] [CPX-001-SP] [System] Totem conectado ao WebSocket da Capaxero Cloud.
+[2026-08-20T14:44:28.330Z] [CPX-001-SP] [System] Totem conectado ao WebSocket da Capaxero Cloud.
+[2026-08-20T14:46:37.514Z] [CPX-001-SP] [System] Totem conectado ao WebSocket da Capaxero Cloud.
+[2026-08-20T14:48:46.648Z] [CPX-001-SP] [System] Totem conectado ao WebSocket da Capaxero Cloud.
+[2026-08-20T14:50:55.686Z] [CPX-001-SP] [System] Totem conectado ao WebSocket da Capaxero Cloud.
+[2026-08-20T14:53:09.531Z] [CPX-001-SP] [System] Totem conectado ao WebSocket da Capaxero Cloud.
+[2026-08-20T14:53:10.282Z] [CPX-001-SP] [WebUI] Navegação UI -> Tela: modes
+[2026-08-20T14:53:11.962Z] [CPX-001-SP] [WebUI] Plano selecionado: inter (R$ 17, 420s)
+[2026-08-20T14:53:11.972Z] [CPX-001-SP] [WebUI] Navegação UI -> Tela: payment
+[2026-08-20T14:53:13.772Z] [CPX-001-SP] [WebUI] Iniciando checkout Cielo Real: CREDIT
+[2026-08-20T14:53:13.783Z] [CPX-001-SP] [WebUI] Cielo Conecta — ativando Pinpad PPC930: CIELO_CREDITO (R$ 17.00)
+[2026-08-20T14:53:13.902Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] Dispositivos USB detectados no barramento: 5
+[2026-08-20T14:53:13.903Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #1 [Dispositivo USB] VID:PID=0x2C7C:0x0125 | Permissao=CONCEDIDA
+[2026-08-20T14:53:13.904Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #2 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x1753:0xC902 | Permissao=CONCEDIDA
+[2026-08-20T14:53:13.906Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #3 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x0525:0xA4AC | Permissao=CONCEDIDA
+[2026-08-20T14:53:13.907Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:53:13.908Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:53:13.909Z] [CPX-001-SP] [CieloPinpad] >>> INICIANDO COBRANCA NO PINPAD: credit | R$ 17.0 (1700 cents)
+[2026-08-20T14:53:13.910Z] [CPX-001-SP] [CieloPinpad] Pinpad ainda nao inicializado. Executando sequencia completa INIT -> OPEN agora...
+[2026-08-20T14:53:13.912Z] [CPX-001-SP] [CieloPinpad] startPayment: execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:53:13.915Z] [CPX-001-SP] [CieloPinpad] startPayment: Comando OPEN retornou RetCode=10
+[2026-08-20T14:53:14.136Z] [CPX-001-SP] [CieloPinpad] Disparando GETCARD no Gertec PPC930 (appType=01, amount=1700)...
+[2026-08-20T14:53:14.138Z] [CPX-001-SP] [CieloPinpad] GETCARD disparado com status inicial: 15
+[2026-08-20T14:53:14.160Z] [CPX-001-SP] [WebUI] Cielo Conecta [WAITING_CARD] APROXIME OU INSIRA O CARTAO
+[2026-08-20T14:53:14.165Z] [CPX-001-SP] [CieloPinpad] GETCARD finalizado -> RetCode=10 | Msg: 
+[2026-08-20T14:53:14.199Z] [CPX-001-SP] [CieloPinpad] Falha no Pinpad: RetCode=10 | Msg: 
+[2026-08-20T14:53:14.223Z] [CPX-001-SP] [WebUI] Cielo Conecta [ERROR] FALHA NO CARTAO (10)
+[2026-08-20T14:53:17.000Z] [CPX-001-SP] [WebUI] Cielo Conecta — ativando Pinpad PPC930: CIELO_CREDITO (R$ 17.00)
+[2026-08-20T14:53:17.140Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] Dispositivos USB detectados no barramento: 5
+[2026-08-20T14:53:17.148Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #1 [Dispositivo USB] VID:PID=0x2C7C:0x0125 | Permissao=CONCEDIDA
+[2026-08-20T14:53:17.150Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #2 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x1753:0xC902 | Permissao=CONCEDIDA
+[2026-08-20T14:53:17.152Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #3 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x0525:0xA4AC | Permissao=CONCEDIDA
+[2026-08-20T14:53:17.153Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:53:17.154Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:53:17.247Z] [CPX-001-SP] [CieloPinpad] >>> INICIANDO COBRANCA NO PINPAD: credit | R$ 17.0 (1700 cents)
+[2026-08-20T14:53:17.248Z] [CPX-001-SP] [CieloPinpad] Pinpad ainda nao inicializado. Executando sequencia completa INIT -> OPEN agora...
+[2026-08-20T14:53:17.262Z] [CPX-001-SP] [CieloPinpad] startPayment: execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:53:17.263Z] [CPX-001-SP] [CieloPinpad] startPayment: Comando OPEN retornou RetCode=10
+[2026-08-20T14:53:17.264Z] [CPX-001-SP] [CieloPinpad] Disparando GETCARD no Gertec PPC930 (appType=01, amount=1700)...
+[2026-08-20T14:53:17.266Z] [CPX-001-SP] [CieloPinpad] GETCARD disparado com status inicial: 15
+[2026-08-20T14:53:17.277Z] [CPX-001-SP] [WebUI] Cielo Conecta [WAITING_CARD] APROXIME OU INSIRA O CARTAO
+[2026-08-20T14:53:17.344Z] [CPX-001-SP] [CieloPinpad] GETCARD finalizado -> RetCode=10 | Msg: 
+[2026-08-20T14:53:17.349Z] [CPX-001-SP] [CieloPinpad] Falha no Pinpad: RetCode=10 | Msg: 
+[2026-08-20T14:53:17.361Z] [CPX-001-SP] [WebUI] Cielo Conecta [ERROR] FALHA NO CARTAO (10)
+[2026-08-20T14:53:19.233Z] [CPX-001-SP] [WebUI] Pagamento cancelado pelo usuário no pop-up.
+[2026-08-20T14:53:19.282Z] [CPX-001-SP] [CieloPinpad] Abortando operacao do Pinpad...
+[2026-08-20T14:53:25.567Z] [CPX-001-SP] [WebUI] Iniciando checkout Cielo Real: DEBIT
+[2026-08-20T14:53:25.576Z] [CPX-001-SP] [WebUI] Cielo Conecta — ativando Pinpad PPC930: CIELO_DEBITO (R$ 17.00)
+[2026-08-20T14:53:25.671Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] Dispositivos USB detectados no barramento: 5
+[2026-08-20T14:53:25.672Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #1 [Dispositivo USB] VID:PID=0x2C7C:0x0125 | Permissao=CONCEDIDA
+[2026-08-20T14:53:25.674Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #2 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x1753:0xC902 | Permissao=CONCEDIDA
+[2026-08-20T14:53:25.675Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #3 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x0525:0xA4AC | Permissao=CONCEDIDA
+[2026-08-20T14:53:25.676Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:53:25.888Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:53:25.950Z] [CPX-001-SP] [CieloPinpad] >>> INICIANDO COBRANCA NO PINPAD: debit | R$ 17.0 (1700 cents)
+[2026-08-20T14:53:25.964Z] [CPX-001-SP] [CieloPinpad] Pinpad ainda nao inicializado. Executando sequencia completa INIT -> OPEN agora...
+[2026-08-20T14:53:25.966Z] [CPX-001-SP] [CieloPinpad] startPayment: execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:53:25.968Z] [CPX-001-SP] [CieloPinpad] startPayment: Comando OPEN retornou RetCode=10
+[2026-08-20T14:53:25.970Z] [CPX-001-SP] [CieloPinpad] Disparando GETCARD no Gertec PPC930 (appType=02, amount=1700)...
+[2026-08-20T14:53:25.972Z] [CPX-001-SP] [CieloPinpad] GETCARD disparado com status inicial: 15
+[2026-08-20T14:53:25.987Z] [CPX-001-SP] [WebUI] Cielo Conecta [WAITING_CARD] APROXIME OU INSIRA O CARTAO
+[2026-08-20T14:53:26.001Z] [CPX-001-SP] [CieloPinpad] GETCARD finalizado -> RetCode=10 | Msg: 
+[2026-08-20T14:53:26.031Z] [CPX-001-SP] [CieloPinpad] Falha no Pinpad: RetCode=10 | Msg: 
+[2026-08-20T14:53:26.049Z] [CPX-001-SP] [WebUI] Cielo Conecta [ERROR] FALHA NO CARTAO (10)
+[2026-08-20T14:53:27.193Z] [CPX-001-SP] [WebUI] Cielo Conecta — ativando Pinpad PPC930: CIELO_DEBITO (R$ 17.00)
+[2026-08-20T14:53:27.314Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] Dispositivos USB detectados no barramento: 5
+[2026-08-20T14:53:27.336Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #1 [Dispositivo USB] VID:PID=0x2C7C:0x0125 | Permissao=CONCEDIDA
+[2026-08-20T14:53:27.349Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #2 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x1753:0xC902 | Permissao=CONCEDIDA
+[2026-08-20T14:53:27.353Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #3 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x0525:0xA4AC | Permissao=CONCEDIDA
+[2026-08-20T14:53:27.451Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:53:27.456Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:53:27.460Z] [CPX-001-SP] [CieloPinpad] >>> INICIANDO COBRANCA NO PINPAD: debit | R$ 17.0 (1700 cents)
+[2026-08-20T14:53:27.466Z] [CPX-001-SP] [CieloPinpad] Pinpad ainda nao inicializado. Executando sequencia completa INIT -> OPEN agora...
+[2026-08-20T14:53:27.468Z] [CPX-001-SP] [CieloPinpad] startPayment: execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:53:27.471Z] [CPX-001-SP] [CieloPinpad] startPayment: Comando OPEN retornou RetCode=10
+[2026-08-20T14:53:27.550Z] [CPX-001-SP] [CieloPinpad] Disparando GETCARD no Gertec PPC930 (appType=02, amount=1700)...
+[2026-08-20T14:53:27.553Z] [CPX-001-SP] [CieloPinpad] GETCARD disparado com status inicial: 15
+[2026-08-20T14:53:27.565Z] [CPX-001-SP] [WebUI] Cielo Conecta [WAITING_CARD] APROXIME OU INSIRA O CARTAO
+[2026-08-20T14:53:27.569Z] [CPX-001-SP] [CieloPinpad] GETCARD finalizado -> RetCode=10 | Msg: 
+[2026-08-20T14:53:27.574Z] [CPX-001-SP] [CieloPinpad] Falha no Pinpad: RetCode=10 | Msg: 
+[2026-08-20T14:53:27.582Z] [CPX-001-SP] [WebUI] Cielo Conecta [ERROR] FALHA NO CARTAO (10)
+[2026-08-20T14:53:29.013Z] [CPX-001-SP] [WebUI] Pagamento cancelado pelo usuário no pop-up.
+[2026-08-20T14:53:29.073Z] [CPX-001-SP] [CieloPinpad] Abortando operacao do Pinpad...
+[2026-08-20T14:54:22.386Z] [CPX-001-SP] [WebUI] Iniciando checkout Cielo Real: CREDIT
+[2026-08-20T14:54:22.394Z] [CPX-001-SP] [WebUI] Cielo Conecta — ativando Pinpad PPC930: CIELO_CREDITO (R$ 17.00)
+[2026-08-20T14:54:22.444Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] Dispositivos USB detectados no barramento: 5
+[2026-08-20T14:54:22.446Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #1 [Dispositivo USB] VID:PID=0x2C7C:0x0125 | Permissao=CONCEDIDA
+[2026-08-20T14:54:22.448Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #2 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x0525:0xA4AC | Permissao=CONCEDIDA
+[2026-08-20T14:54:22.450Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #3 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x1753:0xC902 | Permissao=CONCEDIDA
+[2026-08-20T14:54:22.458Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:54:22.461Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:54:22.694Z] [CPX-001-SP] [CieloPinpad] >>> INICIANDO COBRANCA NO PINPAD: credit | R$ 17.0 (1700 cents)
+[2026-08-20T14:54:22.709Z] [CPX-001-SP] [CieloPinpad] Pinpad ainda nao inicializado. Executando sequencia completa INIT -> OPEN agora...
+[2026-08-20T14:54:22.758Z] [CPX-001-SP] [CieloPinpad] startPayment: execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:54:22.760Z] [CPX-001-SP] [CieloPinpad] startPayment: Comando OPEN retornou RetCode=10
+[2026-08-20T14:54:22.762Z] [CPX-001-SP] [CieloPinpad] Disparando GETCARD no Gertec PPC930 (appType=01, amount=1700)...
+[2026-08-20T14:54:22.763Z] [CPX-001-SP] [CieloPinpad] GETCARD disparado com status inicial: 15
+[2026-08-20T14:54:22.772Z] [CPX-001-SP] [WebUI] Cielo Conecta [WAITING_CARD] APROXIME OU INSIRA O CARTAO
+[2026-08-20T14:54:22.788Z] [CPX-001-SP] [CieloPinpad] GETCARD finalizado -> RetCode=10 | Msg: 
+[2026-08-20T14:54:22.789Z] [CPX-001-SP] [CieloPinpad] Falha no Pinpad: RetCode=10 | Msg: 
+[2026-08-20T14:54:22.804Z] [CPX-001-SP] [WebUI] Cielo Conecta [ERROR] FALHA NO CARTAO (10)
+[2026-08-20T14:54:25.016Z] [CPX-001-SP] [WebUI] Cielo Conecta — ativando Pinpad PPC930: CIELO_CREDITO (R$ 17.00)
+[2026-08-20T14:54:25.071Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] Dispositivos USB detectados no barramento: 5
+[2026-08-20T14:54:25.076Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #1 [Dispositivo USB] VID:PID=0x2C7C:0x0125 | Permissao=CONCEDIDA
+[2026-08-20T14:54:25.157Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #2 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x0525:0xA4AC | Permissao=CONCEDIDA
+[2026-08-20T14:54:25.201Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #3 [* PINPAD GERTEC PPC930 / PPC920] VID:PID=0x1753:0xC902 | Permissao=CONCEDIDA
+[2026-08-20T14:54:25.202Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #4 [Dispositivo USB] VID:PID=0x0BDA:0x9201 | Permissao=CONCEDIDA
+[2026-08-20T14:54:25.206Z] [CPX-001-SP] [CieloPinpad] [USB-Scanner] #5 [Dispositivo USB] VID:PID=0x222A:0x0001 | Permissao=CONCEDIDA
+[2026-08-20T14:54:25.210Z] [CPX-001-SP] [CieloPinpad] >>> INICIANDO COBRANCA NO PINPAD: credit | R$ 17.0 (1700 cents)
+[2026-08-20T14:54:25.281Z] [CPX-001-SP] [CieloPinpad] Pinpad ainda nao inicializado. Executando sequencia completa INIT -> OPEN agora...
+[2026-08-20T14:54:25.282Z] [CPX-001-SP] [CieloPinpad] startPayment: execCmdNBlk(INIT) retornou: 0
+[2026-08-20T14:54:25.285Z] [CPX-001-SP] [CieloPinpad] startPayment: Comando OPEN retornou RetCode=10
+[2026-08-20T14:54:25.287Z] [CPX-001-SP] [CieloPinpad] Disparando GETCARD no Gertec PPC930 (appType=01, amount=1700)...
+[2026-08-20T14:54:25.289Z] [CPX-001-SP] [CieloPinpad] GETCARD disparado com status inicial: 15
+[2026-08-20T14:54:25.320Z] [CPX-001-SP] [WebUI] Cielo Conecta [WAITING_CARD] APROXIME OU INSIRA O CARTAO
+[2026-08-20T14:54:25.335Z] [CPX-001-SP] [CieloPinpad] GETCARD finalizado -> RetCode=10 | Msg: 
+[2026-08-20T14:54:25.360Z] [CPX-001-SP] [CieloPinpad] Falha no Pinpad: RetCode=10 | Msg: 
+[2026-08-20T14:54:25.375Z] [CPX-001-SP] [WebUI] Cielo Conecta [ERROR] FALHA NO CARTAO (10)
+[2026-08-20T14:54:26.601Z] [CPX-001-SP] [WebUI] Pagamento cancelado pelo usuário no pop-up.
+[2026-08-20T14:54:26.665Z] [CPX-001-SP] [CieloPinpad] Abortando operacao do Pinpad...
+[2026-08-20T14:56:35.916Z] [CPX-001-SP] [System] Totem conectado ao WebSocket da Capaxero Cloud.
+[2026-08-20T14:58:44.940Z] [CPX-001-SP] [System] Totem conectado ao WebSocket da Capaxero Cloud.
+[2026-08-20T15:00:54.145Z] [CPX-001-SP] [System] Totem conectado ao WebSocket da Capaxero Cloud.
+[2026-08-20T15:03:03.456Z] [CPX-001-SP] [System] Totem conectado ao WebSocket da Capaxero Cloud.
+[2026-08-20T15:05:12.743Z] [CPX-001-SP] [System] Totem conectado ao WebSocket da Capaxero Cloud.

@@ -1,0 +1,242 @@
+{
+  "users": [
+    {
+      "id": "USR-CRPADMIN",
+      "username": "CRPADMIN",
+      "email": "jonathan@capaxero.com.br",
+      "password_hash": "97298487cc7784538184dde1bff19c1d:0bc20520e40d97979eb357a5434b1161ecba0149380b455f9d1b81a6a7ff5d3a5384d5f5e1290366e90a51ccf24fc1adb41d68070cd3e6d2d1b1e1cb6f46d9cc",
+      "role": "CRPADMIN",
+      "cnpj": "00.000.000/0001-00",
+      "responsible_name": "Jonathan Silveira",
+      "phone": "(11) 98888-7777",
+      "company_name": "Capaxero Tecnologia",
+      "created_at": "2026-08-24T01:58:57.861Z",
+      "updated_at": "2026-08-25T21:14:48.644Z"
+    },
+    {
+      "id": "USR-MTCAOMP7",
+      "username": "fan",
+      "email": "fan@gmail.com",
+      "password_hash": "b32f8ca3cc5f39d0d6ef646f2b3536ec:bd18b8207728d6aec2db15ef563ed2a46cd1f2af636f25bafffaa905ffd1593bd5a19265948d681be7e23a303238c79f94ea361bda62c975f0ed39ee346ea28e",
+      "role": "OWNER",
+      "cnpj": "08.070.852/0001-67",
+      "responsible_name": "MAGNO",
+      "phone": "73333333333",
+      "company_name": "FAN ENERGY",
+      "created_at": "2026-08-28T01:50:37.364Z"
+    }
+  ],
+  "totems": [
+    {
+      "devno": "CPX-002",
+      "name": "Totem #CPX-002",
+      "location": "Ponto a Cadastrar",
+      "depotno": "DEP-01",
+      "branno": "BR-01",
+      "owner_id": "USR-MTCAOMP7",
+      "owner": "MAGNO",
+      "boxCount": 1,
+      "status": "IDLE",
+      "totalCyclesToday": 6,
+      "revenueToday": 96,
+      "liquidLevelPercent": 100,
+      "fragranceLevelPercent": 100,
+      "temperature": 35,
+      "doorLocked": true,
+      "config": {
+        "basicPrice": 15,
+        "intermediatePrice": 18,
+        "advancedPrice": 22,
+        "basicDurationSec": 360,
+        "intermediateDurationSec": 420,
+        "advancedDurationSec": 480,
+        "isPixEnabled": true,
+        "isCreditEnabled": false,
+        "isDebitEnabled": true,
+        "isCouponsEnabled": false,
+        "modes": {
+          "basica": {
+            "isEnabled": true,
+            "priceInCents": 1500,
+            "uvSeconds": 70,
+            "mistSpraySeconds": 15,
+            "mistSaturationSeconds": 45,
+            "thermalDryingSeconds": 120,
+            "ozoneExhaustSeconds": 115,
+            "fragranceSeconds": 5
+          },
+          "intermediaria": {
+            "isEnabled": true,
+            "priceInCents": 1800,
+            "uvSeconds": 85,
+            "mistSpraySeconds": 20,
+            "mistSaturationSeconds": 45,
+            "thermalDryingSeconds": 150,
+            "ozoneExhaustSeconds": 125,
+            "fragranceSeconds": 5
+          },
+          "avancada": {
+            "isEnabled": true,
+            "priceInCents": 2200,
+            "uvSeconds": 100,
+            "mistSpraySeconds": 25,
+            "mistSaturationSeconds": 45,
+            "thermalDryingSeconds": 180,
+            "ozoneExhaustSeconds": 135,
+            "fragranceSeconds": 5
+          }
+        },
+        "cieloMerchantId": "",
+        "cieloMerchantKey": "",
+        "cleaningVideoUrl": null,
+        "paymentMethods": {
+          "isPixEnabled": true,
+          "isCreditEnabled": false,
+          "isDebitEnabled": true,
+          "isCouponsEnabled": false
+        },
+        "basicEnabled": true,
+        "interEnabled": true,
+        "advEnabled": true
+      },
+      "lastHeartbeat": "2026-08-27T19:02:55.010Z",
+      "currentCycle": {
+        "step": "Totem pronto para uso"
+      }
+    }
+  ],
+  "depots": [],
+  "branches": [],
+  "transactions": [
+    {
+      "id": "TX-922908",
+      "timestamp": "2026-08-27T18:35:23.021Z",
+      "status": "APPROVED",
+      "orderId": "CAPAXERO-SIM-1787855723017",
+      "devno": "CPX-002",
+      "totemName": "Totem #CPX-002",
+      "mode": "Intermediária",
+      "amount": 18,
+      "paymentMethod": "PIX Instantâneo",
+      "nsu": "NSU379288",
+      "authCode": "AUT455151"
+    },
+    {
+      "id": "TX-679994",
+      "timestamp": "2026-08-27T14:07:35.801Z",
+      "status": "APPROVED",
+      "orderId": "CAPAXERO-SIM-1787839655792",
+      "devno": "CPX-002",
+      "totemName": "Totem #CPX-002",
+      "mode": "Intermediária",
+      "amount": 9,
+      "paymentMethod": "PIX Instantâneo",
+      "nsu": "NSU601607",
+      "authCode": "AUT586273"
+    },
+    {
+      "id": "TX-258092",
+      "timestamp": "2026-08-27T13:10:42.447Z",
+      "status": "APPROVED",
+      "orderId": "CAPAXERO-SIM-1787836242437",
+      "devno": "CPX-002",
+      "totemName": "Totem #CPX-002",
+      "mode": "Intermediária",
+      "amount": 18,
+      "paymentMethod": "PIX Instantâneo",
+      "nsu": "NSU553755",
+      "authCode": "AUT106447"
+    },
+    {
+      "id": "TX-358089",
+      "timestamp": "2026-08-26T20:15:51.523Z",
+      "status": "APPROVED",
+      "orderId": "CPX-VOUCHER-1787775351519",
+      "devno": "CPX-002",
+      "totemName": "Totem #CPX-002",
+      "mode": "Básica",
+      "amount": 17,
+      "paymentMethod": "Cupom / Gratuidade",
+      "nsu": "GRATIS",
+      "authCode": "GRATIS-CAPAXERO-100"
+    },
+    {
+      "id": "TX-015842",
+      "timestamp": "2026-08-26T19:36:30.964Z",
+      "status": "APPROVED",
+      "orderId": "CAPAXERO-SIM-1787772990963",
+      "devno": "CPX-002",
+      "totemName": "Totem #CPX-002",
+      "mode": "Intermediária",
+      "amount": 17,
+      "paymentMethod": "PIX Instantâneo",
+      "nsu": "NSU837431",
+      "authCode": "AUT647514"
+    },
+    {
+      "id": "TX-565573",
+      "timestamp": "2026-08-26T19:28:58.603Z",
+      "status": "APPROVED",
+      "orderId": "CAPAXERO-SIM-1787772538593",
+      "devno": "CPX-002",
+      "totemName": "Totem #CPX-002",
+      "mode": "Intermediária",
+      "amount": 17,
+      "paymentMethod": "PIX Instantâneo",
+      "nsu": "NSU903805",
+      "authCode": "AUT658094"
+    }
+  ],
+  "alerts": [],
+  "coupons": [
+    {
+      "code": "PROMO50",
+      "description": "Desconto",
+      "discountPercent": 50,
+      "applicableMode": null,
+      "allowedTotems": null,
+      "maxUsages": 1,
+      "currentUsages": 1,
+      "isUsed": true,
+      "createdAt": "2026-08-26T19:38:18.493Z",
+      "updatedAt": "2026-08-26T19:38:18.493Z",
+      "usedAt": "2026-08-27T14:07:34.139Z",
+      "usedByTotem": "CPX-002"
+    },
+    {
+      "code": "GRATIS-CAPAXERO-100",
+      "description": "Gratuidade Total (100% OFF)",
+      "discountPercent": 100,
+      "applicableMode": null,
+      "isUsed": false,
+      "maxUsages": 1,
+      "currentUsages": 0,
+      "createdAt": "2026-08-27T01:51:31.500Z"
+    },
+    {
+      "code": "DESC20-GERAL",
+      "description": "Desconto 20% em Qualquer Modalidade",
+      "discountPercent": 20,
+      "applicableMode": null,
+      "isUsed": false,
+      "maxUsages": 1,
+      "currentUsages": 0,
+      "createdAt": "2026-08-27T01:51:31.509Z"
+    },
+    {
+      "code": "INTER50-CAPAXERO",
+      "description": "Desconto 50% na Higienização Intermediária",
+      "discountPercent": 50,
+      "applicableMode": "INTERMEDIARIA",
+      "isUsed": false,
+      "maxUsages": 1,
+      "currentUsages": 0,
+      "createdAt": "2026-08-27T01:51:31.509Z"
+    }
+  ],
+  "systemSettings": {
+    "defaultCieloMerchantId": "5e4fc2b8-11e3-4f9c-ab97-fb7baaea405b",
+    "defaultCieloMerchantKey": "FMnlYedXdu5Xoa5n3hczfHh8yAMbYF7logQQ4qPL",
+    "updatedAt": "2026-08-26T16:15:00.000Z"
+  }
+}

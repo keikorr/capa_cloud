@@ -1,0 +1,27 @@
+{
+  "name": "capaxero-cloud",
+  "version": "1.0.0",
+  "description": "Capaxero Cloud — Servidor de Telemetria, Pagamentos Cielo e Dashboard em Tempo Real",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": [
+    "capaxero",
+    "iot",
+    "telemetry",
+    "cielo",
+    "kiosk",
+    "helmet-cleaning"
+  ],
+  "author": "Capaxero Team",
+  "license": "Proprietary",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "multer": "^2.2.0",
+    "qrcode": "^1.5.4",
+    "ws": "^8.18.0"
+  }
+}

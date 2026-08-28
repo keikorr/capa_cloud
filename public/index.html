@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0c0e11">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Painel Capaxero — Estações, Locais, Donos & Dashboard</title>
+  <meta name="description" content="Painel administrativo Capaxero: telemetria em tempo real das estações, gestão de locais, cadastro de donos e dashboard financeiro consolidado.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,600;0,700;0,800;0,900;1,800;1,900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ============================================================
+       TELA DE AUTENTICAÇÃO (LOGIN)
+       ============================================================ -->
+  <div id="auth-screen" class="auth-backdrop">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="auth-brand">
+          <img src="assets/logo-capaxero.jpg" alt="Capaxero" style="height:44px; width:auto; border-radius:6px; display:inline-block; vertical-align:middle; margin-right:8px;">
+          <span class="auth-title">CAPAXERO</span>
+          <span class="auth-sub">CLOUD</span>
+        </div>
+        <p class="auth-tagline">Plataforma Central de Telemetria e Gestão de Totens</p>
+      </div>
+
+      <!-- Formulário de Login -->
+      <form id="form-auth-login" class="auth-form active">
+        <div class="form-group">
+          <label class="field-label">E-mail, CNPJ ou Usuário</label>
+          <input type="text" class="form-control" id="login-identifier" placeholder="Ex: jonathan@capaxero.com.br ou CNPJ" required autofocus autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label class="field-label">Senha de Acesso</label>
+          <input type="password" class="form-control" id="login-password" placeholder="••••••••" required autocomplete="current-password">
+        </div>
+        <div class="auth-error-msg" id="login-error"></div>
+        <button type="submit" class="btn btn-primary auth-submit-btn" id="btn-submit-login">
+          <span>Acessar Painel</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Navbar Principal -->
+  <header class="navbar" id="main-navbar">
+    <div class="brand" style="display:flex; align-items:center; gap:12px;">
+      <img src="assets/logo-capaxero.jpg" alt="Capaxero" style="height:34px; width:auto; border-radius:4px; display:block;">
+    </div>
+
+    <nav class="nav-tabs" role="tablist">
+      <button class="nav-tab-btn active" data-page="estacoes">Estações</button>
+      <button class="nav-tab-btn" data-page="locais">Locais</button>
+      <button class="nav-tab-btn" data-page="dashboard">Dashboard Geral</button>
+      <button class="nav-tab-btn" data-page="coupons" id="tab-coupons">🎟️ Cupons & Vouchers</button>
+      <button class="nav-tab-btn" data-page="cadastros" id="tab-cadastros" style="display:none;">Donos & Cadastros</button>
+    </nav>
+
+    <div class="navbar-search">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8a97a7" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><line x1="16.5" y1="16.5" x2="21" y2="21"></line></svg>
+      <input type="text" id="global-search" placeholder="Pesquisar totem, local, dono ou OM…">
+      <button id="global-search-clear" style="display:none; background:none; border:0; color:#8a97a7; font-size:13px; cursor:pointer; padding:0;">✕</button>
+    </div>
+
+    <div class="profile-wrap">
+      <button class="profile-btn" id="profile-btn">
+        <span class="profile-dot" id="ws-dot"></span>
+        <span class="profile-name" id="user-display-name">Jonathan</span>
+        <span class="profile-role" id="user-display-role">ADMIN</span>
+        <span class="profile-caret">▼</span>
+      </button>
+      <div class="profile-menu" id="profile-menu">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+          <div style="width:44px; height:44px; border-radius:12px; background:#FDCB24; color:#0c0e11; display:flex; align-items:center; justify-content:center; font-family:'Archivo',sans-serif; font-style:italic; font-weight:900; font-size:18px;">JS</div>
+          <div>
+            <div style="font-size:15px; font-weight:700; color:#fff;" id="pm-user-name">Jonathan Silveira</div>
+            <div style="font-size:12px; color:#8a97a7;" id="pm-user-email">jonathan@capaxero.com.br</div>
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;">
+          <div style="padding:12px; border:1px solid rgba(255,255,255,.08); border-radius:11px; background:rgba(255,255,255,.03);">
+            <div style="font-size:10.5px; letter-spacing:.07em; text-transform:uppercase; color:#8a97a7; margin-bottom:5px;">Máquinas ativas</div>
+            <div style="font-family:'JetBrains Mono',monospace; font-size:20px; font-weight:700; color:#00C566;" id="pm-active-totems">18</div>
+          </div>
+          <div style="padding:12px; border:1px solid rgba(255,255,255,.08); border-radius:11px; background:rgba(255,255,255,.03);">
+            <div style="font-size:10.5px; letter-spacing:.07em; text-transform:uppercase; color:#8a97a7; margin-bottom:5px;">Sob gestão</div>
+            <div style="font-family:'JetBrains Mono',monospace; font-size:20px; font-weight:700; color:#7fb2dd;" id="pm-total-totems">22</div>
+          </div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:9px; font-size:12.5px;">
+          <div style="display:flex; justify-content:space-between;"><span style="color:#8a97a7;">Nível de acesso</span><span style="color:#FDCB24; font-weight:700;" id="pm-user-role">🔒 ADMIN — total</span></div>
+          <div style="display:flex; justify-content:space-between;"><span style="color:#8a97a7;">Filiais</span><span style="color:#e7edf4;">SP Centro · Norte · Sul · Campinas</span></div>
+          <div style="display:flex; justify-content:space-between;"><span style="color:#8a97a7;">Locais atendidos</span><span style="font-family:'JetBrains Mono',monospace; color:#e7edf4;" id="pm-locais-count">6</span></div>
+          <div style="display:flex; justify-content:space-between;"><span style="color:#8a97a7;">Alertas em aberto</span><span style="font-family:'JetBrains Mono',monospace; color:#FF9100;" id="pm-alerts-count">4</span></div>
+          <div style="display:flex; justify-content:space-between;"><span style="color:#8a97a7;">Conexão Telemetria</span><span style="font-family:'JetBrains Mono',monospace; color:#00C566;" id="pm-ws-status">ONLINE (WS)</span></div>
+        </div>
+        <div style="height:1px; background:rgba(255,255,255,.09); margin:14px 0;"></div>
+        <button class="pm-link" id="pm-btn-edit-profile" style="width:100%; margin-bottom:8px; display:flex; align-items:center; justify-content:center; gap:8px; background:rgba(253,203,36,0.12); border:1px solid rgba(253,203,36,0.35); color:var(--brand-yellow); font-weight:700; border-radius:9px; padding:9px; font-size:12.5px; cursor:pointer;">
+          ✏️ Editar Meu Perfil (E-mail & Tel)
+        </button>
+        <div style="display:flex; gap:8px;">
+          <a href="simulador.html" target="_blank" style="flex:1; text-align:center; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14); color:#e7edf4; border-radius:9px; padding:9px; font-size:12.5px; font-weight:600; text-decoration:none;">🧪 Simulador</a>
+          <button class="pm-logout" id="pm-logout" style="flex:1; background:rgba(255,61,87,.12); border:1px solid rgba(255,61,87,.4); color:#FF6B7F; border-radius:9px; padding:9px; font-size:12.5px; font-weight:600; cursor:pointer;">Sair</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       PÁGINA 1 — ESTAÇÕES (PAINEL DE ESTAÇÕES)
+       ============================================================ -->
+  <main class="page active" id="page-estacoes">
+    <div class="cpx-fade-up">
+      <div class="page-head">
+        <div>
+          <h1>PAINEL DE ESTAÇÕES</h1>
+          <p id="estacoes-subtitle">Rede de totens de higienização — visão em tempo real</p>
+        </div>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <div class="segmented" id="estacoes-view-toggle">
+            <button data-view="map" class="active" id="btn-view-map">Mapa</button>
+            <button data-view="list" id="btn-view-list">Lista</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4 KPI Cards com barra lateral colorida -->
+      <div class="kpi-grid">
+        <div class="kpi-card" style="--accent: #00C566;">
+          <div class="kpi-label">Faturamento geral · hoje</div>
+          <div class="kpi-value" id="kpi-revenue" style="color: #00C566;">R$ 0,00</div>
+          <div class="kpi-sub" id="kpi-revenue-sub">acumulado hoje</div>
+        </div>
+        <div class="kpi-card" style="--accent: #5587B3;">
+          <div class="kpi-label">Ciclos realizados · hoje</div>
+          <div class="kpi-value" id="kpi-cycles" style="color: #7fb2dd;">0</div>
+          <div class="kpi-sub" id="kpi-cycles-sub">ciclos finalizados</div>
+        </div>
+        <div class="kpi-card" style="--accent: #1B3864;">
+          <div class="kpi-label">Máquinas ativas</div>
+          <div class="kpi-value" id="kpi-totems">0<span style="color:#8a97a7">/0</span> <span style="font-size:13px; color:#8a97a7; font-family: var(--font-body); font-weight:500;">online</span></div>
+          <div class="kpi-sub" style="color:#7fb2dd;">
+            <span style="width:7px; height:7px; border-radius:50%; background:#5587B3; display:inline-block; animation:cpxPulse 1.4s infinite;"></span>
+            <span id="kpi-cleaning-count">0</span> higienizando agora
+          </div>
+        </div>
+        <div class="kpi-card orange" style="--accent: #FF9100;">
+          <div class="kpi-label">Alertas técnicos</div>
+          <div class="kpi-value" id="kpi-alerts" style="color: #FF9100;">0</div>
+          <div class="kpi-sub" id="kpi-alerts-sub" style="color:#FF6B6B;">Nenhum alerta ativo</div>
+        </div>
+      </div>
+
+      <!-- Mapa Interativo da Região Metropolitana · SP -->
+      <div class="map-panel" id="estacoes-map">
+        <div class="map-grid-bg"></div>
+        <div style="position:absolute; left:0; right:0; top:38%; height:2px; background:linear-gradient(90deg,transparent,rgba(85,135,179,.35),transparent);"></div>
+        <div style="position:absolute; top:0; bottom:0; left:58%; width:2px; background:linear-gradient(180deg,transparent,rgba(85,135,179,.28),transparent);"></div>
+        <div class="map-label">REGIÃO METROPOLITANA · SP</div>
+        <div id="estacoes-map-markers"></div>
+        <div class="map-legend">
+          <span><i style="background:#00C566;"></i>Disponível</span>
+          <span><i style="background:#5587B3; animation:cpxPulse 1.4s infinite;"></i>Higienizando</span>
+          <span><i style="background:#FF9100;"></i>Manutenção</span>
+          <span><i style="background:#FF3D57;"></i>Falha</span>
+          <span><i style="background:#5b6675;"></i>Offline</span>
+        </div>
+      </div>
+
+      <!-- Lista / Grupos de Estações por Localidade -->
+      <div id="estacoes-grouped-container"></div>
+    </div>
+  </main>
+
+  <!-- ============================================================
+       PÁGINA 2 — LOCAIS (GESTÃO DE LOCAIS E MÁQUINAS)
+       ============================================================ -->
+  <main class="page" id="page-locais">
+    <div class="cpx-fade-up">
+      <div class="page-head">
+        <div>
+          <h1>GESTÃO DE LOCAIS E MÁQUINAS</h1>
+          <p id="locais-head-subtitle">Pontos de instalação e monitoramento de estações</p>
+        </div>
+        <button class="btn btn-primary admin-only" id="btn-open-new-depot" style="background:#FDCB24; color:#0c0e11; font-weight:700;">+ Novo Local</button>
+      </div>
+
+      <!-- Mapa de Locais -->
+      <div class="map-panel" style="margin-bottom:26px;">
+        <div class="map-grid-bg"></div>
+        <div style="position:absolute; left:0; right:0; top:38%; height:2px; background:linear-gradient(90deg,transparent,rgba(85,135,179,.35),transparent);"></div>
+        <div style="position:absolute; top:0; bottom:0; left:58%; width:2px; background:linear-gradient(180deg,transparent,rgba(85,135,179,.28),transparent);"></div>
+        <div class="map-label">MAPA DE COBERTURA · PONTOS CADASTRADOS</div>
+        <div id="locais-map-markers"></div>
+        <div class="map-legend">
+          <span><i style="background:#00C566;"></i>Disponível</span>
+          <span><i style="background:#5587B3; animation:cpxPulse 1.4s infinite;"></i>Higienizando</span>
+          <span><i style="background:#FF9100;"></i>Manutenção</span>
+          <span><i style="background:#FF3D57;"></i>Falha</span>
+          <span><i style="background:#5b6675;"></i>Offline</span>
+        </div>
+      </div>
+
+      <!-- Tabela de Locais Cadastrados -->
+      <div class="table-card" style="margin-bottom:24px;">
+        <div class="table-card-head">
+          <h2>Locais cadastrados</h2>
+          <span class="count" id="locais-table-count">0 registros</span>
+        </div>
+        <div class="table-scroll">
+          <table class="data-table" id="locais-table">
+            <thead>
+              <tr>
+                <th>Código</th>
+                <th>Nome do local</th>
+                <th>Filial regional</th>
+                <th>Endereço</th>
+                <th>Totem</th>
+                <th>Tráfego</th>
+                <th>Comissão</th>
+                <th>Fat. hoje</th>
+                <th>Status</th>
+                <th class="admin-only" style="text-align:right;">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="locais-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Grid com Realocação e Trocar Dono (Exclusivo ADMIN) -->
+      <div class="two-col admin-only" id="admin-locais-controls" style="margin-bottom:24px;">
+        <div class="panel-card">
+          <h2>Realocar estação</h2>
+          <p>Movimentações registram histórico e exigem confirmação.</p>
+          <div id="realocacoes-list" style="display:flex; flex-direction:column; gap:10px;"></div>
+        </div>
+
+        <div class="panel-card admin-panel-yellow-border" style="background:linear-gradient(160deg, rgba(253,203,36,.09), rgba(27,56,100,.15));">
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
+            <span class="admin-badge">🔒 SOMENTE ADMIN</span>
+          </div>
+          <h2>Trocar dono da máquina</h2>
+          <p class="admin-panel-note" style="margin-bottom:16px;">Ação exclusiva ADMIN — reatribui a titularidade e o repasse de faturamento.</p>
+          <form id="form-quick-transfer-owner">
+            <label class="field-label">Máquina</label>
+            <select class="form-control" id="quick-transfer-totem" style="margin-bottom:12px;"></select>
+            <label class="field-label">Novo dono</label>
+            <select class="form-control" id="quick-transfer-owner" style="margin-bottom:14px;"></select>
+            <button type="submit" class="btn btn-primary" style="width:100%; background:#FDCB24; color:#0c0e11; font-weight:700; padding:11px;">Reatribuir titularidade</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ============================================================
+       PÁGINA 3 — DASHBOARD GERAL
+       ============================================================ -->
+  <main class="page" id="page-dashboard">
+    <div class="cpx-fade-up">
+      <div class="page-head">
+        <div>
+          <h1>DASHBOARD GERAL</h1>
+          <p>Consolidado da rede — <span id="dash-periodo-label" style="color:#FDCB24; font-weight:600;">últimos 7 dias</span></p>
+        </div>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <div class="segmented" id="dash-period-toggle">
+            <button data-period="hoje">Hoje</button>
+            <button data-period="7d" class="active">7 dias</button>
+            <button data-period="30d">30 dias</button>
+            <button data-period="custom">Personalizado</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4 KPI Cards -->
+      <div class="kpi-grid">
+        <div class="kpi-card" style="--accent: #00C566;">
+          <div class="kpi-label">Faturamento total</div>
+          <div class="kpi-value" id="dash-total-revenue" style="color: #00C566;">R$ 0,00</div>
+        </div>
+        <div class="kpi-card" style="--accent: #5587B3;">
+          <div class="kpi-label">Ciclos totais</div>
+          <div class="kpi-value" id="dash-total-cycles" style="color: #7fb2dd;">0</div>
+        </div>
+        <div class="kpi-card" style="--accent: #1B3864;">
+          <div class="kpi-label">Máquinas ativas</div>
+          <div class="kpi-value" id="dash-active-totems-count" style="color: #fff;">0<span style="color:#8a97a7">/0</span></div>
+        </div>
+        <div class="kpi-card orange" style="--accent: #FF9100;">
+          <div class="kpi-label">OMs abertas</div>
+          <div class="kpi-value" id="dash-open-oms-count" style="color: #FF9100;">0</div>
+        </div>
+      </div>
+
+      <!-- Gráfico Histórico de Faturamento & Ranking por Máquina -->
+      <div style="display:grid; grid-template-columns: 1.35fr 1fr; gap:18px; margin-bottom:18px;">
+        <div class="chart-card">
+          <div class="chart-head">
+            <h2>Histórico de faturamento</h2>
+            <span class="total" id="dash-chart-period-total">R$ 32.725,00 no período</span>
+          </div>
+          <div class="chart-flex">
+            <div class="chart-y-axis" id="dash-chart-y-axis">
+              <span>5.120</span>
+              <span>4.610</span>
+              <span>4.120</span>
+              <span>3.410</span>
+              <span>2.980</span>
+            </div>
+            <div style="flex:1; min-width:0;">
+              <svg viewBox="0 0 720 210" preserveAspectRatio="none" style="width:100%; height:210px; display:block; overflow:visible;" id="dash-svg-chart">
+                <defs>
+                  <linearGradient id="cpxFatGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#00C566" stop-opacity="0.42"></stop>
+                    <stop offset="100%" stop-color="#00C566" stop-opacity="0"></stop>
+                  </linearGradient>
+                </defs>
+                <g id="dash-svg-grid-lines"></g>
+                <path id="dash-svg-area" d="" fill="url(#cpxFatGrad)"></path>
+                <path id="dash-svg-line" d="" fill="none" stroke="#00C566" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                <g id="dash-svg-points"></g>
+              </svg>
+              <div class="chart-x-axis" id="dash-chart-x-axis"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <h2>Faturamento por máquina</h2>
+          <div id="dash-ranking-maquinas" style="display:flex; flex-direction:column; gap:13px; margin-top:18px;"></div>
+        </div>
+      </div>
+
+      <!-- Faturamento por Dono & Ciclos por Plano -->
+      <div style="display:grid; grid-template-columns: 1fr 1.35fr; gap:18px; margin-bottom:18px;">
+        <div class="chart-card">
+          <h2>Faturamento por dono</h2>
+          <div id="dash-ranking-donos" style="display:flex; flex-direction:column; gap:13px; margin-top:18px;"></div>
+        </div>
+
+        <div class="chart-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:10px;">
+            <h2>Ciclos por plano</h2>
+            <div style="display:flex; gap:14px; font-size:11.5px; color:#b7c2d0;">
+              <span style="display:flex; align-items:center; gap:6px;"><i style="width:9px; height:9px; border-radius:2px; background:#5587B3; display:block;"></i>Básica</span>
+              <span style="display:flex; align-items:center; gap:6px;"><i style="width:9px; height:9px; border-radius:2px; background:#1B3864; display:block;"></i>Intermediária</span>
+              <span style="display:flex; align-items:center; gap:6px;"><i style="width:9px; height:9px; border-radius:2px; background:#FDCB24; display:block;"></i>Avançada</span>
+            </div>
+          </div>
+          <div style="display:flex; align-items:flex-end; gap:14px; height:200px;" id="dash-ciclos-plano-bars"></div>
+        </div>
+      </div>
+
+      <!-- Payback por Máquina -->
+      <div class="table-card" style="margin-bottom:18px;">
+        <div class="table-card-head">
+          <h2>Payback por máquina</h2>
+          <span class="sub" style="font-size:11.5px; color:#8a97a7;">investimento recuperado sobre o custo da estação</span>
+          <span style="margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:11.5px; color:#00C566;">payback médio 4,7 meses</span>
+        </div>
+        <div style="padding:6px 20px 18px;" id="dash-payback-list"></div>
+      </div>
+
+      <!-- Ordens de Manutenção Abertas -->
+      <div class="table-card" style="border-color: rgba(255,145,0,.28);">
+        <div class="table-card-head">
+          <h2>Ordens de manutenção abertas</h2>
+          <span class="count" id="dash-oms-count" style="color:#FF9100;">4 em aberto</span>
+        </div>
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Máquina</th>
+                <th>Problema</th>
+                <th>Prioridade</th>
+                <th>Abertura</th>
+                <th>Responsável</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="dash-oms-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ============================================================
+       PÁGINA 4 — GESTÃO DE DONOS & CADASTROS (EXCLUSIVO CRPADMIN)
+       ============================================================ -->
+  <main class="page" id="page-cadastros">
+    <div class="cpx-fade-up">
+      <div class="page-head">
+        <div>
+          <h1>DONOS & CADASTROS DA PLATAFORMA</h1>
+          <p>Visão central de todos os donos cadastrados e gestão de titularidade de máquinas</p>
+        </div>
+        <button class="btn btn-primary" id="btn-open-new-owner" style="background:var(--brand-yellow); color:#000; font-weight:800;">+ Cadastrar Novo Dono</button>
+      </div>
+
+      <div class="table-card">
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Responsável / Nome</th>
+                <th>CNPJ</th>
+                <th>E-mail</th>
+                <th>Telefone</th>
+                <th>Empresa</th>
+                <th>Nível</th>
+                <th>Máquinas Atribuídas</th>
+                <th style="text-align:right;">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="cadastros-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ============================================================
+       PÁGINA 5 — CUPONS & VOUCHERS QR CODE
+       ============================================================ -->
+  <main class="page" id="page-coupons">
+    <div class="cpx-fade-up">
+      <div class="page-head">
+        <div>
+          <h1>🎟️ GESTÃO DE CUPONS & VOUCHERS</h1>
+          <p>Crie códigos promocionais QR Code, defina porcentagem de desconto, modalidades e limite de utilizações</p>
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn btn-outline" id="btn-reset-all-coupons" style="border-color:#7fb2dd; color:#7fb2dd;">🔄 Resetar Usos (Testes)</button>
+          <button class="btn btn-primary" id="btn-open-new-coupon" style="background:var(--brand-yellow); color:#000; font-weight:800;">+ Adicionar Novo Cupom</button>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-scroll">
+          <table class="coupons-data-table data-table">
+            <thead>
+              <tr>
+                <th>Código Promocional</th>
+                <th>Descrição / Finalidade</th>
+                <th>Desconto</th>
+                <th>Modalidade Permitida</th>
+                <th>Estações Permitidas</th>
+                <th>Utilizações / Limite</th>
+                <th>Status</th>
+                <th style="text-align:right;">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="coupons-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ============================================================
+       MODAL — Detalhes e Controle da Estação
+       ============================================================ -->
+  <div class="modal-overlay" id="detail-modal">
+    <div class="modal-box" style="width:min(900px, 100%);">
+      <div class="modal-sticky-head">
+        <div>
+          <div class="detail-title">
+            <h2 id="modal-totem-name">Totem 014</h2>
+            <span class="status-pill" id="modal-status-pill"><i id="modal-status-dot"></i> <span id="modal-status-text">Higienizando</span></span>
+          </div>
+          <div class="detail-loc" id="modal-totem-location">Av. das Nações 1200 — Piso G1 · SP Centro</div>
+        </div>
+        <button class="modal-close" id="modal-close-btn">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="info-grid-2">
+          <div class="info-box">
+            <div class="lbl">Dono da máquina</div>
+            <div class="val" id="modal-owner-val">Marcos Ribeiro</div>
+          </div>
+          <div class="info-box">
+            <div class="lbl">Ponto de instalação</div>
+            <div class="val" id="modal-ponto-val">Estacionamento G1, pilar B2</div>
+          </div>
+        </div>
+
+        <!-- Active Cycle Box -->
+        <div class="cycle-box is-active" id="modal-cycle-box" style="padding:18px; margin-bottom:16px;">
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px;">
+            <span class="gear" style="font-size:18px;" id="modal-gear-icon">⚙️</span>
+            <div style="flex:1;">
+              <div style="font-size:13.5px; font-weight:700; color:#fff;" id="modal-cycle-stage">Névoa sanitizante — etapa 2 de 4</div>
+              <div style="font-size:12px; color:#8a97a7;" id="modal-cycle-sub">Plano Avançada · restam 2m 10s</div>
+            </div>
+            <span style="font-family:var(--font-mono); font-size:24px; font-weight:700; color:#5587B3;" id="modal-cycle-pct">42%</span>
+          </div>
+          <div style="height:10px; border-radius:5px; background:rgba(255,255,255,.09); overflow:hidden;">
+            <div id="modal-cycle-bar" style="height:100%; width:42%; background:linear-gradient(90deg, #5587B3, rgba(255,255,255,.75)); background-size:40px 40px; border-radius:5px; animation:cpxStripe .8s linear infinite;"></div>
+          </div>
+        </div>
+
+        <!-- 4 Stat boxes -->
+        <div class="info-grid-4">
+          <div class="info-box">
+            <div class="lbl">Temperatura</div>
+            <div class="val mono" id="modal-stat-temp">38 °C</div>
+          </div>
+          <div class="info-box">
+            <div class="lbl">Trava da porta</div>
+            <div class="val" id="modal-stat-door" style="color:#FF9100;">Travada</div>
+          </div>
+          <div class="info-box">
+            <div class="lbl">Faturamento</div>
+            <div class="val mono" id="modal-stat-rev" style="color:#00C566;">R$ 612,00</div>
+          </div>
+          <div class="info-box">
+            <div class="lbl">Ciclos</div>
+            <div class="val mono" id="modal-stat-cycles">38</div>
+          </div>
+        </div>
+
+        <!-- 2 Fluid Level Gauges -->
+        <div class="gauge-row">
+          <div class="gauge-card">
+            <div class="gauge-ring" id="modal-uv-ring" style="background: conic-gradient(#00C566 360deg, rgba(255,255,255,.09) 0deg);">
+              <div class="inner" id="modal-uv-text" style="color:#00C566; font-weight:800;">100%</div>
+            </div>
+            <div>
+              <div class="gauge-title">Sanitizante UV</div>
+              <div class="gauge-sub" id="modal-uv-sensor-sub">Sensor de nível do reservatório</div>
+            </div>
+          </div>
+
+          <div class="gauge-card">
+            <div class="gauge-ring" id="modal-fr-ring" style="background: conic-gradient(#FDCB24 360deg, rgba(255,255,255,.09) 0deg);">
+              <div class="inner" id="modal-fr-text" style="color:#FDCB24; font-weight:800;">100%</div>
+            </div>
+            <div>
+              <div class="gauge-title">Fragrância</div>
+              <div class="gauge-sub">Cartucho aromático</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Remote Action Buttons -->
+        <div class="actions-row">
+          <button class="btn btn-outline" id="btn-open-config">⚙️ Configurar</button>
+          <button class="btn btn-orange push-right" id="btn-act-open-om">🛠️ Manutenção</button>
+        </div>
+
+        <!-- Admin Ownership Card -->
+        <div class="admin-panel admin-panel-yellow-border" id="modal-admin-owner-card">
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+            <span class="admin-badge">🔒 SOMENTE ADMIN</span>
+            <span class="admin-panel-note">Ação exclusiva ADMIN — trocar dono da máquina</span>
+          </div>
+          <div class="admin-form-row">
+            <div class="grow">
+              <label class="field-label" id="modal-current-owner-lbl">Dono atual: Marcos Ribeiro</label>
+              <select class="form-control" id="modal-select-new-owner"></select>
+            </div>
+            <button class="btn btn-primary" id="modal-btn-confirm-owner" style="background:#FDCB24; color:#0c0e11; font-weight:700;">Reatribuir</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL — Configuração de Parâmetros e Preços da Estação
+       ============================================================ -->
+  <div class="modal-overlay" id="config-modal">
+    <div class="modal-box" style="width:min(880px, 98vw);">
+      <div class="modal-sticky-head">
+        <span style="font-size:18px;">⚙️</span>
+        <div>
+          <h2 style="font-family:'Archivo',sans-serif; font-style:italic; font-weight:900; font-size:20px; margin:0;">CONFIGURAR ESTAÇÃO</h2>
+          <div style="font-size:12.5px; color:#8a97a7;" id="config-sub-info">Totem 014 — parâmetros de preço, planos e pagamento</div>
+        </div>
+        <button class="modal-close" id="config-close">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <form id="form-totem-config">
+          <div class="plans-config-grid">
+            <!-- BÁSICA -->
+            <div class="plan-block" style="--plan-color: #5587B3;">
+              <div class="plan-block-head">
+                <span class="plan-name">Básica</span>
+                <span class="plan-desc">Ciclo essencial (UV-C + Névoa + Secagem)</span>
+                <label class="plan-toggle"><input type="checkbox" id="conf-basic-enabled" checked> Ativado</label>
+              </div>
+              <div class="plan-fields">
+                <div><label class="field-label">Preço (R$)</label><input type="number" step="0.01" class="form-control" id="conf-basic-price" value="14.00" required></div>
+                <div><label class="field-label">Fase 0 — UV-C (s)</label><input type="number" class="form-control" id="conf-basic-uv" value="60" required></div>
+                <div><label class="field-label">Fase 1 — Spray Névoa (s)</label><input type="number" class="form-control" id="conf-basic-mist" value="15" required></div>
+                <div><label class="field-label">Fase 1.5 — Saturação (s)</label><input type="number" class="form-control" id="conf-basic-sat" value="45" required></div>
+                <div><label class="field-label">Fase 2 — Secagem Térmica (s)</label><input type="number" class="form-control" id="conf-basic-dry" value="120" required></div>
+                <div><label class="field-label">Fase 3 — Exaustão Ozônio (s)</label><input type="number" class="form-control" id="conf-basic-ozone" value="115" required></div>
+                <div><label class="field-label">Fase 4 — Fragrância (s)</label><input type="number" class="form-control" id="conf-basic-frag" value="5" required></div>
+              </div>
+              <div class="plan-total">Tempo total de ciclo: <strong id="lbl-basic-total">360</strong> s (<span id="lbl-basic-min">6</span> min)</div>
+            </div>
+
+            <!-- INTERMEDIÁRIA -->
+            <div class="plan-block" style="--plan-color: #FDCB24;">
+              <div class="plan-block-head">
+                <span class="plan-name">Intermediária (Mais Popular)</span>
+                <span class="plan-desc">Ciclo balanceado completo</span>
+                <label class="plan-toggle"><input type="checkbox" id="conf-inter-enabled" checked> Ativado</label>
+              </div>
+              <div class="plan-fields">
+                <div><label class="field-label">Preço (R$)</label><input type="number" step="0.01" class="form-control" id="conf-inter-price" value="17.00" required></div>
+                <div><label class="field-label">Fase 0 — UV-C (s)</label><input type="number" class="form-control" id="conf-inter-uv" value="75" required></div>
+                <div><label class="field-label">Fase 1 — Spray Névoa (s)</label><input type="number" class="form-control" id="conf-inter-mist" value="20" required></div>
+                <div><label class="field-label">Fase 1.5 — Saturação (s)</label><input type="number" class="form-control" id="conf-inter-sat" value="45" required></div>
+                <div><label class="field-label">Fase 2 — Secagem Térmica (s)</label><input type="number" class="form-control" id="conf-inter-dry" value="150" required></div>
+                <div><label class="field-label">Fase 3 — Exaustão Ozônio (s)</label><input type="number" class="form-control" id="conf-inter-ozone" value="125" required></div>
+                <div><label class="field-label">Fase 4 — Fragrância (s)</label><input type="number" class="form-control" id="conf-inter-frag" value="5" required></div>
+              </div>
+              <div class="plan-total">Tempo total de ciclo: <strong id="lbl-inter-total">420</strong> s (<span id="lbl-inter-min">7</span> min)</div>
+            </div>
+
+            <!-- AVANÇADA -->
+            <div class="plan-block" style="--plan-color: #00C566;">
+              <div class="plan-block-head">
+                <span class="plan-name">Avançada (Limpeza Pesada)</span>
+                <span class="plan-desc">Ciclo estendido premium</span>
+                <label class="plan-toggle"><input type="checkbox" id="conf-adv-enabled" checked> Ativado</label>
+              </div>
+              <div class="plan-fields">
+                <div><label class="field-label">Preço (R$)</label><input type="number" step="0.01" class="form-control" id="conf-adv-price" value="20.00" required></div>
+                <div><label class="field-label">Fase 0 — UV-C (s)</label><input type="number" class="form-control" id="conf-adv-uv" value="90" required></div>
+                <div><label class="field-label">Fase 1 — Spray Névoa (s)</label><input type="number" class="form-control" id="conf-adv-mist" value="25" required></div>
+                <div><label class="field-label">Fase 1.5 — Saturação (s)</label><input type="number" class="form-control" id="conf-adv-sat" value="45" required></div>
+                <div><label class="field-label">Fase 2 — Secagem Térmica (s)</label><input type="number" class="form-control" id="conf-adv-dry" value="180" required></div>
+                <div><label class="field-label">Fase 3 — Exaustão Ozônio (s)</label><input type="number" class="form-control" id="conf-adv-ozone" value="135" required></div>
+                <div><label class="field-label">Fase 4 — Fragrância (s)</label><input type="number" class="form-control" id="conf-adv-frag" value="5" required></div>
+              </div>
+              <div class="plan-total">Tempo total de ciclo: <strong id="lbl-adv-total">480</strong> s (<span id="lbl-adv-min">8</span> min)</div>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-top:20px;">
+            <div>
+              <h3 style="font-family:var(--font-display); font-weight:800; font-size:12.5px; letter-spacing:.08em; text-transform:uppercase; color:#7fb2dd; margin:0 0 12px;">Métodos de pagamento ativos</h3>
+              <div class="payment-methods-grid">
+                <label class="checkbox-row"><input type="checkbox" id="conf-pay-pix" checked> Pix (Cielo PIX)</label>
+                <label class="checkbox-row"><input type="checkbox" id="conf-pay-credit"> Cartão de Crédito</label>
+                <label class="checkbox-row"><input type="checkbox" id="conf-pay-debit"> Cartão de Débito</label>
+                <label class="checkbox-row"><input type="checkbox" id="conf-pay-free" checked> Isento (Grátis)</label>
+              </div>
+            </div>
+
+            <div>
+              <h3 style="font-family:var(--font-display); font-weight:800; font-size:12.5px; letter-spacing:.08em; text-transform:uppercase; color:#7fb2dd; margin:0 0 12px;">Credenciais Cielo (Opcional)</h3>
+              <label class="field-label">Merchant ID</label>
+              <input type="text" class="form-control" id="conf-cielo-id" style="margin-bottom:10px; font-family:var(--font-mono);" value="323399b3-d649-4cdb-86c8-4c798a24f15a">
+              <label class="field-label">Merchant Key</label>
+              <input type="text" class="form-control" id="conf-cielo-key" style="font-family:var(--font-mono);" value="nBctqkHQfwBfrPPOyi9SMEEKLxH1eOHgBBPFSED5">
+            </div>
+          </div>
+
+          <!-- SEÇÃO: VÍDEO DE HIGIENIZAÇÃO (TELA DO TOTEM) -->
+          <div style="margin-top: 24px; padding: 18px; border-radius: 14px; background: rgba(0, 240, 255, 0.03); border: 1px solid rgba(0, 240, 255, 0.2);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+              <div>
+                <h3 style="font-family:var(--font-display); font-weight:900; font-size:14px; letter-spacing:.05em; text-transform:uppercase; color:var(--brand-yellow); margin:0 0 4px; display:flex; align-items:center; gap:8px;">
+                  <span>🎬</span> VÍDEO DA ETAPA DE HIGIENIZAÇÃO (TELA DO TOTEM)
+                </h3>
+                <p style="font-size: 11.5px; color: #8a97a7; margin: 0;">
+                  Este vídeo é exibido em destaque no Totem durante o ciclo ativo de esterilização e secagem do capacete.
+                </p>
+              </div>
+              <span id="conf-video-status-badge" style="background: rgba(85,135,179,0.15); border: 1px solid #5587B3; color: #7fb2dd; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px;">
+                Animação Padrão
+              </span>
+            </div>
+
+            <div style="display: grid; grid-template-columns: minmax(260px, 1.2fr) 1.8fr; gap: 16px; align-items: center;">
+              <!-- Video Preview Player (MP4 / WebM / YouTube) -->
+              <div style="background: #090e1a; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; overflow: hidden; min-height: 150px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
+                <video id="conf-video-preview" controls loop muted style="width: 100%; height: 100%; max-height: 170px; object-fit: cover; display: none; background: #000;"></video>
+                <iframe id="conf-youtube-preview" style="width: 100%; height: 170px; border: none; display: none;" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                <div id="conf-video-placeholder" style="padding: 24px 16px; text-align: center; color: #64748b;">
+                  <div style="font-size: 32px; margin-bottom: 6px;">🎞️</div>
+                  <div style="font-size: 11.5px; font-weight: 600; color: #94a3b8;">Nenhum vídeo customizado</div>
+                  <div style="font-size: 10px; color: #64748b;">A máquina usará a animação gráfica nativa</div>
+                </div>
+              </div>
+
+              <!-- Upload Controls -->
+              <div style="display: flex; flex-direction: column; gap: 10px;">
+                <!-- Drag & Drop / File Selector -->
+                <div id="conf-video-dropzone" style="border: 2px dashed rgba(85,135,179,0.4); border-radius: 10px; padding: 14px; text-align: center; background: rgba(255,255,255,0.02); cursor: pointer; transition: all 0.2s ease;">
+                  <input type="file" id="conf-video-file-input" accept="video/mp4,video/webm,video/mov,video/*" style="display: none;">
+                  <div style="font-size: 12px; font-weight: 700; color: #e7edf4; margin-bottom: 2px;">
+                    📂 Clique para selecionar ou arraste o vídeo (.mp4, .webm)
+                  </div>
+                  <div style="font-size: 10.5px; color: #8a97a7;">Tamanho máximo: 150 MB (Recomendado: 1080p ou 720p 16:9)</div>
+                </div>
+
+                <!-- Direct URL / YouTube Input -->
+                <div style="display: flex; gap: 8px;">
+                  <input type="url" class="form-control" id="conf-video-url-input" placeholder="Cole a URL do YouTube (ex: https://youtube.com/watch?v=... ou youtu.be/...) ou link .mp4" style="font-size: 11px; font-family: var(--font-mono); flex: 1;">
+                  <button type="button" class="btn btn-outline" id="btn-save-video-url" style="font-size: 11px; padding: 6px 12px; white-space: nowrap;">
+                    Aplicar URL
+                  </button>
+                </div>
+
+                <!-- Progress Bar -->
+                <div id="conf-video-progress-wrap" style="display: none;">
+                  <div style="display: flex; justify-content: space-between; font-size: 10.5px; color: #7fb2dd; margin-bottom: 4px;">
+                    <span>Enviando vídeo para o Totem...</span>
+                    <span id="conf-video-progress-pct">0%</span>
+                  </div>
+                  <div style="height: 6px; border-radius: 3px; background: rgba(255,255,255,0.08); overflow: hidden;">
+                    <div id="conf-video-progress-bar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #FDCB24, #00F0FF); border-radius: 3px; transition: width 0.2s;"></div>
+                  </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                  <button type="button" class="btn btn-outline" id="btn-remove-custom-video" style="display: none; border-color: rgba(255,61,87,0.4); color: #FF6B7F; font-size: 11px; padding: 6px 12px;">
+                    🗑️ Remover & Restaurar Padrão
+                  </button>
+                  <button type="button" class="btn btn-primary" id="btn-upload-video-now" style="display: none; background: #5587B3; color: #fff; font-weight: 700; font-size: 11px; padding: 6px 14px;">
+                    ⬆️ Iniciar Envio do Vídeo
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:22px;">
+            <button type="button" class="btn btn-outline" id="config-cancel">Cancelar</button>
+            <button type="submit" class="btn btn-primary" style="background:#FDCB24; color:#0c0e11; font-weight:700;">Salvar Configurações</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL — Criar Ordem de Manutenção (OM)
+       ============================================================ -->
+  <div class="modal-overlay" id="om-modal">
+    <div class="modal-box compact" style="width:min(560px,100%); background:linear-gradient(150deg, rgba(28,22,10,.96), rgba(13,16,21,.98)); border-color:rgba(255,145,0,.4);">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
+        <span style="font-size:18px;">🛠️</span>
+        <h2 style="font-family:'Archivo',sans-serif; font-style:italic; font-weight:900; font-size:20px; margin:0; color:#fff;">CRIAR ORDEM DE MANUTENÇÃO</h2>
+        <button class="modal-close" id="om-close-btn" style="margin-left:auto;">✕</button>
+      </div>
+      <p style="margin:0 0 18px; font-size:12.5px; color:#8a97a7;">A abertura da OM coloca a estação em manutenção imediatamente.</p>
+      <form id="form-create-om">
+        <div style="display:grid; gap:14px;">
+          <div>
+            <label class="field-label">Totem / estação</label>
+            <input readonly class="form-control" id="om-totem-label" value="" placeholder="Selecione uma estação..." style="background:rgba(255,255,255,.04); color:#8a97a7;">
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div>
+              <label class="field-label">Tipo de problema</label>
+              <select class="form-control" id="om-issue-type">
+                <option>Mecânico</option><option>Elétrico</option><option>Sensor</option><option>Limpeza</option><option>Outro</option>
+              </select>
+            </div>
+            <div>
+              <label class="field-label">Prioridade</label>
+              <select class="form-control" id="om-priority">
+                <option>Baixa</option><option selected>Média</option><option>Alta</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="field-label">Descrição</label>
+            <textarea rows="3" class="form-control" id="om-desc" placeholder="Descreva o sintoma observado…" style="resize:vertical;"></textarea>
+          </div>
+          <div>
+            <label class="field-label">Responsável designado <span style="color:#5b6675;">(opcional)</span></label>
+            <select class="form-control" id="om-assignee">
+              <option>Não designar agora</option><option>Equipe de Suporte Técnico</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:20px;">
+          <button type="button" class="btn btn-outline" id="om-cancel-btn">Cancelar</button>
+          <button type="submit" class="btn btn-orange" style="background:#FF9100; color:#1a1206; font-weight:700;">Abrir OM</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL — Realocar Estação (Mudar Local)
+       ============================================================ -->
+  <div class="modal-overlay" id="move-modal">
+    <div class="modal-box compact" style="width:min(520px,100%); background:linear-gradient(150deg, rgba(20,29,45,.97), rgba(13,16,21,.98)); border-color:rgba(85,135,179,.45);">
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:6px;">
+        <h2 style="font-family:'Archivo',sans-serif; font-style:italic; font-weight:900; font-size:20px; margin:0; color:#fff;">REALOCAR ESTAÇÃO</h2>
+        <button class="modal-close" id="move-close-btn" style="margin-left:auto;">✕</button>
+      </div>
+      <p style="margin:0 0 18px; font-size:12.5px; color:#8a97a7;">A movimentação interrompe ciclos em andamento e recalcula comissões.</p>
+      <form id="form-move-station">
+        <div style="display:grid; gap:14px;">
+          <div>
+            <label class="field-label">Máquina</label>
+            <select class="form-control" id="move-select-totem"></select>
+          </div>
+          <div>
+            <label class="field-label">Local atual</label>
+            <input readonly class="form-control" id="move-current-location" value="" placeholder="Ponto Atual" style="background:rgba(255,255,255,.04); color:#8a97a7;">
+          </div>
+          <div>
+            <label class="field-label">Novo local</label>
+            <select class="form-control" id="move-new-location">
+              <option value="">Selecione o ponto de instalação...</option>
+            </select>
+          </div>
+          <div>
+            <label class="field-label">Motivo / observação</label>
+            <textarea rows="2" class="form-control" id="move-reason" placeholder="Ex.: baixo tráfego no ponto atual" style="resize:vertical;"></textarea>
+          </div>
+          <div style="display:flex; gap:10px; padding:12px 14px; border:1px solid rgba(255,145,0,.4); border-radius:12px; background:rgba(255,145,0,.08); font-size:12.5px; color:#FFB454;">
+            <span>⚠️</span><span>Ação sensível: a realocação é registrada em auditoria e notifica o dono da máquina.</span>
+          </div>
+        </div>
+        <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:20px;">
+          <button type="button" class="btn btn-outline" id="move-cancel-btn">Cancelar</button>
+          <button type="submit" class="btn btn-primary" style="background:#5587B3; color:#0c0e11; font-weight:700;">Confirmar Realocação</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL — Novo Local
+       ============================================================ -->
+  <div class="modal-overlay" id="new-depot-modal">
+    <div class="modal-box compact" style="width:min(440px,100%); background:linear-gradient(180deg, rgba(20,26,36,.98), rgba(13,16,21,.99));">
+      <div style="display:flex; align-items:center; margin-bottom:6px;">
+        <h2 style="font-family:'Archivo',sans-serif; font-style:italic; font-weight:900; font-size:20px; margin:0; color:#fff;">NOVO LOCAL</h2>
+        <button class="modal-close" id="new-depot-close" style="margin-left:auto;">✕</button>
+      </div>
+      <p style="margin:0 0 20px; font-size:12.5px; color:#8a97a7;">Cadastre um ponto de instalação para receber estações.</p>
+      <form id="form-new-depot">
+        <div style="display:grid; gap:14px;">
+          <div>
+            <label class="field-label">Nome do local</label>
+            <input type="text" class="form-control" id="nd-name" placeholder="Ex.: Shopping Nações — Piso G2" required>
+          </div>
+          <div>
+            <label class="field-label">Endereço</label>
+            <input type="text" class="form-control" id="nd-address" placeholder="Rua, número, cidade" required>
+          </div>
+          <div>
+            <label class="field-label">Filial regional</label>
+            <select class="form-control" id="nd-branno">
+              <option>SP Centro</option><option>SP Norte</option><option>SP Sul</option><option>Campinas</option>
+            </select>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div>
+              <label class="field-label">Comissão do local (%)</label>
+              <input type="number" class="form-control" id="nd-commission" value="12" style="font-family:var(--font-mono);">
+            </div>
+            <div>
+              <label class="field-label">Tráfego médio/dia</label>
+              <input type="number" class="form-control" id="nd-traffic" value="1200" style="font-family:var(--font-mono);">
+            </div>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%; margin-top:22px; background:#FDCB24; color:#0c0e11; font-weight:700; font-size:13.5px; padding:12px;">Cadastrar local</button>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- ============================================================
+       MODAL — Novo Cupom Promocional
+       ============================================================ -->
+  <div class="modal-overlay" id="new-coupon-modal">
+    <div class="modal-box compact" style="width:min(520px,100%);">
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:18px;">
+        <h2 style="font-family: var(--font-display); font-weight: 900; font-size: 20px; margin:0; color:var(--brand-yellow);">NOVO CUPOM PROMOCIONAL</h2>
+        <button class="modal-close" id="new-coupon-close" style="margin-left:auto;">✕</button>
+      </div>
+      <form id="form-new-coupon">
+        <div class="form-group">
+          <label class="field-label">Código do Cupom (ex: VERAO2026, GRATIS100) *</label>
+          <input type="text" class="form-control" id="nc-code" placeholder="Ex: PROMO50" required style="font-family: var(--font-mono); font-weight:700; text-transform:uppercase;">
+        </div>
+        <div class="form-group">
+          <label class="field-label">Descrição / Nome da Campanha</label>
+          <input type="text" class="form-control" id="nc-desc" placeholder="Ex: Desconto 50% de Inauguração" required>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+          <div class="form-group">
+            <label class="field-label">Porcentagem de Desconto (%) *</label>
+            <input type="number" min="1" max="100" class="form-control" id="nc-discount" value="50" required>
+          </div>
+          <div class="form-group">
+            <label class="field-label">Quantas vezes pode ser usado? *</label>
+            <input type="number" min="1" max="99999" class="form-control" id="nc-max-usages" value="1" required title="Limite de utilizações permitidas para este cupom">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="field-label">Modalidade de Higienização Aplicável</label>
+          <select class="form-control" id="nc-mode">
+            <option value="TODOS">Todas as Modalidades (Qualquer Plano)</option>
+            <option value="BASICA">Apenas Básica</option>
+            <option value="INTERMEDIARIA">Apenas Intermediária</option>
+            <option value="AVANCADA">Apenas Avançada</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="field-label">Máquinas / Estações Onde o Cupom é Válido</label>
+          <select class="form-control" id="nc-totems-scope">
+            <option value="TODAS">🌐 Todas as Máquinas da Rede (Geral)</option>
+            <option value="ESPECIFICAS">📍 Selecionar Máquinas Específicas...</option>
+          </select>
+          <div id="nc-totems-checkboxes" style="display:none; max-height:140px; overflow-y:auto; background:#0f172a; padding:10px 14px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); margin-top:8px;"></div>
+        </div>
+        <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:16px;">
+          <button type="button" class="btn btn-outline" id="new-coupon-cancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary" style="background:var(--brand-yellow); color:#000; font-weight:800;">Criar Cupom</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL — QR Code do Cupom (Leitura no Totem / Impressão / Download)
+       ============================================================ -->
+  <div class="modal-overlay" id="coupon-qrcode-modal">
+    <div class="modal-box compact" style="width:min(480px,96vw); text-align:center;">
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px;">
+        <h2 style="font-family: var(--font-display); font-weight: 900; font-size: 18px; margin:0; color:var(--brand-yellow); text-align:left;">📱 QR CODE DO CUPOM</h2>
+        <span class="totem-badge" id="qr-modal-code-badge" style="background:#1e293b; border:1px solid var(--brand-yellow); color:var(--brand-yellow); font-family:var(--font-mono); font-weight:800; font-size:13px; padding:4px 10px;">--</span>
+        <button class="modal-close" id="coupon-qr-close" style="margin-left:auto;">✕</button>
+      </div>
+
+      <div style="background: #0f172a; border-radius: 14px; padding: 20px; border: 1px solid rgba(255,255,255,0.06); margin-bottom: 16px;">
+        <div style="background: #ffffff; border-radius: 12px; padding: 16px; display: inline-flex; justify-content: center; align-items: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5); margin-bottom: 14px;">
+          <img id="qr-modal-img" src="" alt="QR Code do Cupom" style="width: 220px; height: 220px; display: block; image-rendering: pixelated;">
+        </div>
+
+        <div id="qr-modal-desc" style="font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 4px;">--</div>
+        <div style="display:flex; justify-content:center; gap:8px; margin-bottom: 12px; flex-wrap:wrap;">
+          <span id="qr-modal-discount" style="background:rgba(16,185,129,0.15); color:var(--status-green); border:1px solid var(--status-green); font-weight:800; font-size:12.5px; padding:3px 10px; border-radius:6px;">--% OFF</span>
+          <span id="qr-modal-mode" style="background:rgba(59,130,246,0.15); color:#7fb2dd; border:1px solid #3b82f6; font-size:12px; padding:3px 10px; border-radius:6px;">--</span>
+          <span id="qr-modal-totems" style="background:rgba(234,179,8,0.15); color:var(--brand-yellow); border:1px solid var(--brand-yellow); font-size:12px; padding:3px 10px; border-radius:6px;">🌐 Todas</span>
+          <span id="qr-modal-usages" style="background:rgba(255,255,255,0.08); color:#cbd5e1; font-size:12px; padding:3px 10px; border-radius:6px; font-family:var(--font-mono);">--</span>
+        </div>
+
+        <div style="background: rgba(234,179,8,0.1); border: 1px solid rgba(234,179,8,0.25); border-radius: 8px; padding: 10px 12px; font-size: 12px; color: #fde047; text-align: left; line-height: 1.4;">
+          📷 <strong>Como usar na máquina:</strong> Aponte este QR Code na tela do celular para a câmera / leitor óptico (EM2003X) do Totem CapaXero para aplicar o desconto na hora.
+        </div>
+      </div>
+
+      <div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap;">
+        <button class="btn btn-outline" id="btn-qr-copy-code" style="font-size:12.5px; padding:8px 14px;">📋 Copiar Código</button>
+        <button class="btn btn-outline" id="btn-qr-download" style="border-color:#7fb2dd; color:#7fb2dd; font-size:12.5px; padding:8px 14px;">💾 Baixar Imagem (PNG)</button>
+        <button class="btn btn-primary" id="btn-qr-print" style="background:var(--brand-yellow); color:#000; font-weight:800; font-size:12.5px; padding:8px 16px;">🖨️ Imprimir Voucher</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL — Editar Perfil do Usuário Logado
+       ============================================================ -->
+  <div class="modal-overlay" id="edit-profile-modal">
+    <div class="modal-box compact" style="width:min(480px,96vw);">
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:18px;">
+        <h2 style="font-family: var(--font-display); font-weight: 900; font-size: 20px; margin:0; color:var(--brand-yellow);">✏️ EDITAR MEU PERFIL</h2>
+        <button class="modal-close" id="edit-profile-close" style="margin-left:auto;">✕</button>
+      </div>
+      <form id="form-edit-profile">
+        <div class="form-group">
+          <label class="field-label">Nome Completo / Responsável *</label>
+          <input type="text" class="form-control" id="ep-responsible" placeholder="Ex: Jonathan Silveira" required>
+        </div>
+        <div class="form-group">
+          <label class="field-label">E-mail de Contato *</label>
+          <input type="email" class="form-control" id="ep-email" placeholder="seuemail@capaxero.com.br" required>
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+          <div class="form-group">
+            <label class="field-label">Telefone / WhatsApp *</label>
+            <input type="text" class="form-control" id="ep-phone" placeholder="(11) 99999-9999" required maxlength="15">
+          </div>
+          <div class="form-group">
+            <label class="field-label">Empresa / Razão Social</label>
+            <input type="text" class="form-control" id="ep-company" placeholder="Ex: Grupo Fan Ltda">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="field-label">Nova Senha de Acesso <span style="color:#8a97a7;">(deixe em branco para manter a atual)</span></label>
+          <input type="password" class="form-control" id="ep-password" placeholder="••••••••" minlength="4" autocomplete="new-password">
+        </div>
+        <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:20px;">
+          <button type="button" class="btn btn-outline" id="edit-profile-cancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary" style="background:var(--brand-yellow); color:#000; font-weight:800;">Salvar Alterações</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL — Cadastrar Novo Dono (Exclusivo Super Admin CRPADMIN)
+       ============================================================ -->
+  <div class="modal-overlay" id="new-owner-modal">
+    <div class="modal-box compact" style="width:min(520px,96vw);">
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:18px;">
+        <h2 style="font-family: var(--font-display); font-weight: 900; font-size: 20px; margin:0; color:var(--brand-yellow);">👤 CADASTRAR NOVO DONO</h2>
+        <button class="modal-close" id="new-owner-close" style="margin-left:auto;">✕</button>
+      </div>
+      <p style="margin:0 0 16px; font-size:12.5px; color:#8a97a7;">Crie a conta de acesso para um novo operador/dono de estações.</p>
+      <form id="form-new-owner">
+        <div class="form-group">
+          <label class="field-label">CNPJ da Empresa / Titular *</label>
+          <input type="text" class="form-control" id="no-cnpj" placeholder="00.000.000/0000-00" required maxlength="18">
+        </div>
+        <div class="form-group">
+          <label class="field-label">Nome do Responsável *</label>
+          <input type="text" class="form-control" id="no-responsible" placeholder="Ex: Magno dos Santos" required>
+        </div>
+        <div class="form-group">
+          <label class="field-label">Nome Fantasia / Empresa (Opcional)</label>
+          <input type="text" class="form-control" id="no-company" placeholder="Ex: Posto Rota Sul Ltda">
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+          <div class="form-group">
+            <label class="field-label">E-mail Comercial *</label>
+            <input type="email" class="form-control" id="no-email" placeholder="contato@empresa.com" required autocomplete="email">
+          </div>
+          <div class="form-group">
+            <label class="field-label">Telefone / WhatsApp</label>
+            <input type="text" class="form-control" id="no-phone" placeholder="(11) 99999-9999" maxlength="15">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="field-label">Senha Inicial de Acesso *</label>
+          <input type="password" class="form-control" id="no-password" placeholder="Mínimo 4 dígitos" required minlength="4" autocomplete="new-password">
+        </div>
+        <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:20px;">
+          <button type="button" class="btn btn-outline" id="new-owner-cancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary" style="background:var(--brand-yellow); color:#000; font-weight:800;">Criar Conta de Dono</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

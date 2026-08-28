@@ -1,0 +1,3014 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apresentação Interativa de Telas — Ecossistema CapaXero</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       DESIGN SYSTEM & CSS VARIABLES - CAPAXERO BRANDING
+       ========================================================================== */
+    :root {
+      --bg-dark: #070B14;
+      --bg-surface: #0D1527;
+      --bg-card: rgba(19, 30, 53, 0.75);
+      --bg-card-hover: rgba(28, 44, 76, 0.85);
+      --bg-glass: rgba(15, 23, 42, 0.65);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-highlight: rgba(85, 135, 179, 0.35);
+      
+      --cpx-blue-dark: #1B3864;
+      --cpx-blue-mid: #254A82;
+      --cpx-blue-light: #5587B3;
+      --cpx-cyan: #00F0FF;
+      --cpx-yellow: #FDCB24;
+      --cpx-gold: #F59E0B;
+      --cpx-purple: #8B5CF6;
+      --cpx-purple-dark: #6D28D9;
+      --cpx-green: #10B981;
+      --cpx-red: #EF4444;
+      
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
+      --text-dim: #64748B;
+      
+      --font-display: 'Outfit', sans-serif;
+      --font-body: 'Plus Jakarta Sans', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      
+      --shadow-glow-cyan: 0 0 35px rgba(0, 240, 255, 0.25);
+      --shadow-glow-yellow: 0 0 35px rgba(253, 203, 36, 0.25);
+      --shadow-glow-purple: 0 0 35px rgba(139, 92, 246, 0.25);
+      --shadow-glow-green: 0 0 35px rgba(16, 185, 129, 0.25);
+      --shadow-card: 0 20px 45px rgba(0, 0, 0, 0.6);
+      
+      --transition-smooth: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Ambient Background Animated Gradients */
+    .ambient-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .ambient-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.18;
+      animation: floatOrb 20s infinite alternate ease-in-out;
+    }
+
+    .orb-1 { width: 550px; height: 550px; background: #00F0FF; top: -100px; left: -100px; }
+    .orb-2 { width: 650px; height: 650px; background: #8B5CF6; bottom: -150px; right: -100px; animation-duration: 25s; }
+    .orb-3 { width: 450px; height: 450px; background: #FDCB24; top: 40%; left: 45%; animation-duration: 18s; opacity: 0.12; }
+
+    @keyframes floatOrb {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(60px, 40px) scale(1.1); }
+      100% { transform: translate(-40px, 70px) scale(0.95); }
+    }
+
+    /* Grid Overlay Pattern */
+    .grid-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-image: 
+        linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* ==========================================================================
+       HEADER & NAVIGATION BAR
+       ========================================================================== */
+    header.app-header {
+      position: relative;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 28px;
+      background: rgba(13, 21, 39, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-subtle);
+      height: 64px;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+    }
+
+    .brand-logo-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, var(--cpx-yellow) 0%, var(--cpx-gold) 100%);
+      border-radius: 10px;
+      color: #070B14;
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 20px;
+      box-shadow: 0 0 20px rgba(253, 203, 36, 0.4);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-title {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(90deg, #FFFFFF, var(--cpx-yellow));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-subtitle {
+      font-size: 11px;
+      color: var(--cpx-cyan);
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    /* Filter / Category Pills */
+    .filter-tabs {
+      display: flex;
+      align-items: center;
+      background: rgba(7, 11, 20, 0.6);
+      padding: 4px;
+      border-radius: 100px;
+      border: 1px solid var(--border-subtle);
+      gap: 2px;
+    }
+
+    .filter-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 6px 14px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .filter-btn:hover {
+      color: var(--text-main);
+    }
+
+    .filter-btn.active {
+      background: var(--cpx-blue-dark);
+      color: #FFFFFF;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border-highlight);
+    }
+
+    .filter-btn .pill-count {
+      font-size: 10px;
+      background: rgba(255, 255, 255, 0.12);
+      padding: 2px 6px;
+      border-radius: 20px;
+    }
+
+    /* Header Actions */
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .action-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+      font-size: 16px;
+    }
+
+    .action-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-1px);
+    }
+
+    .btn-overview {
+      padding: 0 14px;
+      width: auto;
+      font-size: 13px;
+      font-weight: 600;
+      gap: 6px;
+    }
+
+    /* ==========================================================================
+       MAIN PRESENTATION STAGE & SLIDE CAROUSEL
+       ========================================================================== */
+    main.presentation-stage {
+      position: relative;
+      z-index: 10;
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 32px 80px 32px;
+    }
+
+    .slides-container {
+      width: 100%;
+      max-width: 1440px;
+      height: 100%;
+      position: relative;
+    }
+
+    .slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: grid;
+      grid-template-columns: 1.05fr 1.35fr;
+      gap: 32px;
+      opacity: 0;
+      visibility: hidden;
+      transform: scale(0.96) translateX(40px);
+      transition: opacity 0.45s ease, transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.45s;
+      align-items: center;
+    }
+
+    .slide.active {
+      opacity: 1;
+      visibility: visible;
+      transform: scale(1) translateX(0);
+      z-index: 20;
+    }
+
+    .slide.exit-left {
+      opacity: 0;
+      visibility: hidden;
+      transform: scale(0.96) translateX(-40px);
+    }
+
+    /* Single Column Layout (Intro / Overview Slides) */
+    .slide.slide-fullwidth {
+      grid-template-columns: 1fr;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    /* ==========================================================================
+       LEFT COLUMN: SLIDE INFO & EXPLANATION
+       ========================================================================== */
+    .slide-info-panel {
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 24px;
+      padding: 32px;
+      height: 100%;
+      max-height: 640px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-card);
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border-subtle) transparent;
+      position: relative;
+    }
+
+    .slide-info-panel::-webkit-scrollbar {
+      width: 6px;
+    }
+    .slide-info-panel::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 6px;
+    }
+
+    .badge-category {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 12px;
+      align-self: flex-start;
+    }
+
+    .badge-totem {
+      background: rgba(0, 240, 255, 0.12);
+      color: var(--cpx-cyan);
+      border: 1px solid rgba(0, 240, 255, 0.3);
+    }
+
+    .badge-web {
+      background: rgba(253, 203, 36, 0.12);
+      color: var(--cpx-yellow);
+      border: 1px solid rgba(253, 203, 36, 0.3);
+    }
+
+    .badge-tech {
+      background: rgba(139, 92, 246, 0.12);
+      color: var(--cpx-purple);
+      border: 1px solid rgba(139, 92, 246, 0.3);
+    }
+
+    .badge-system {
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--cpx-green);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .slide-title-group {
+      margin-bottom: 16px;
+    }
+
+    .slide-number-tag {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--text-dim);
+      font-weight: 600;
+      margin-bottom: 4px;
+      display: block;
+    }
+
+    .slide-heading {
+      font-family: var(--font-display);
+      font-size: 26px;
+      font-weight: 800;
+      line-height: 1.25;
+      letter-spacing: -0.02em;
+      color: #FFFFFF;
+    }
+
+    .slide-objective {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 20px;
+      border-left: 3px solid var(--cpx-cyan);
+      padding-left: 12px;
+    }
+
+    /* Key Points / Features Cards */
+    .features-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      transition: var(--transition-smooth);
+    }
+
+    .feature-item:hover {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: var(--border-highlight);
+    }
+
+    .feature-icon-box {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+
+    .icon-cyan { background: rgba(0, 240, 255, 0.15); color: var(--cpx-cyan); }
+    .icon-yellow { background: rgba(253, 203, 36, 0.15); color: var(--cpx-yellow); }
+    .icon-purple { background: rgba(139, 92, 246, 0.15); color: var(--cpx-purple); }
+    .icon-green { background: rgba(16, 185, 129, 0.15); color: var(--cpx-green); }
+    .icon-red { background: rgba(239, 68, 68, 0.15); color: var(--cpx-red); }
+
+    .feature-text {
+      flex: 1;
+    }
+
+    .feature-text strong {
+      display: block;
+      font-size: 13px;
+      color: #FFFFFF;
+      margin-bottom: 2px;
+    }
+
+    .feature-text span {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    /* Technical & Hardware Specs Box */
+    .tech-specs-box {
+      margin-top: auto;
+      background: rgba(7, 11, 20, 0.7);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 14px;
+      font-size: 12px;
+    }
+
+    .tech-specs-title {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--cpx-yellow);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .specs-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .spec-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .spec-label {
+      color: var(--text-dim);
+      font-size: 10px;
+    }
+
+    .spec-val {
+      font-family: var(--font-mono);
+      color: var(--text-main);
+      font-weight: 600;
+      font-size: 11px;
+    }
+
+    /* ==========================================================================
+       RIGHT COLUMN: INTERACTIVE DEVICE SCREEN MOCKUP
+       ========================================================================== */
+    .slide-preview-panel {
+      height: 100%;
+      max-height: 640px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    /* Device Mockup Shell (Totem Kiosk 16:9 Landscape / Web Browser) */
+    .device-mockup {
+      width: 100%;
+      height: 100%;
+      background: #020617;
+      border-radius: 20px;
+      border: 10px solid #1E293B;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .device-mockup.web-browser {
+      border-width: 4px;
+      border-color: #334155;
+    }
+
+    /* Browser Bar */
+    .browser-bar {
+      height: 32px;
+      background: #1E293B;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      gap: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      flex-shrink: 0;
+    }
+
+    .browser-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .browser-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .dot-red { background: #EF4444; }
+    .dot-yellow { background: #F59E0B; }
+    .dot-green { background: #10B981; }
+
+    .browser-url {
+      flex: 1;
+      background: #0F172A;
+      height: 22px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .browser-url span {
+      color: var(--cpx-cyan);
+    }
+
+    /* Device Screen Canvas */
+    .screen-canvas {
+      flex: 1;
+      position: relative;
+      background: #0B0F19;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Interactive Overlay Hint */
+    .interactive-hint-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(0, 240, 255, 0.2);
+      border: 1px solid var(--cpx-cyan);
+      color: var(--cpx-cyan);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 100px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      z-index: 30;
+      backdrop-filter: blur(8px);
+      pointer-events: none;
+      animation: pulseCyan 2s infinite;
+    }
+
+    @keyframes pulseCyan {
+      0%, 100% { opacity: 0.8; }
+      50% { opacity: 0.4; }
+    }
+
+    /* ==========================================================================
+       DETAILED SCREEN SIMULATIONS INSIDE MOCKUPS
+       ========================================================================== */
+
+    /* ----------------------------------------------------
+       MOCKUP SCREEN 01: HOME / STANDBY
+       ---------------------------------------------------- */
+    .mock-home-screen {
+      height: 100%;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      padding: 20px;
+      background: radial-gradient(circle at 70% 30%, #152545 0%, #080D1A 100%);
+      color: #FFF;
+      gap: 16px;
+    }
+
+    .mock-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .mock-logo {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--cpx-yellow);
+      letter-spacing: -0.02em;
+    }
+
+    .mock-status-pill {
+      background: rgba(16, 185, 129, 0.18);
+      border: 1px solid var(--cpx-green);
+      color: var(--cpx-green);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .mock-status-pill::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--cpx-green);
+      box-shadow: 0 0 8px var(--cpx-green);
+    }
+
+    .mock-home-content {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .mock-video-card {
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      height: 100%;
+      min-height: 260px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 0 40px rgba(0, 240, 255, 0.1);
+    }
+
+    .helmet-3d-visual {
+      font-size: 64px;
+      filter: drop-shadow(0 0 25px rgba(0, 240, 255, 0.6));
+      animation: floatHelmet 4s ease-in-out infinite alternate;
+    }
+
+    @keyframes floatHelmet {
+      0% { transform: translateY(-8px) rotate(-3deg); }
+      100% { transform: translateY(8px) rotate(3deg); }
+    }
+
+    .mock-video-overlay {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      right: 12px;
+      background: rgba(13, 21, 39, 0.85);
+      backdrop-filter: blur(8px);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 11px;
+      color: var(--cpx-cyan);
+      display: flex;
+      justify-content: space-between;
+      font-weight: 600;
+    }
+
+    .mock-home-cta-box {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .mock-home-title {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .mock-home-bullets {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .mock-home-bullets div {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-totem-start {
+      background: linear-gradient(135deg, var(--cpx-yellow) 0%, var(--cpx-gold) 100%);
+      color: #070B14;
+      border: none;
+      padding: 16px 20px;
+      border-radius: 14px;
+      font-family: var(--font-display);
+      font-size: 15px;
+      font-weight: 900;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      box-shadow: 0 8px 24px rgba(253, 203, 36, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: transform 0.2s;
+    }
+
+    .btn-totem-start:hover {
+      transform: scale(1.03);
+    }
+
+    /* ----------------------------------------------------
+       MOCKUP SCREEN 02: MODOS DE HIGIENIZAÇÃO
+       ---------------------------------------------------- */
+    .mock-modes-screen {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      background: #080D1A;
+      gap: 16px;
+    }
+
+    .mock-modes-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      flex: 1;
+    }
+
+    .mode-card {
+      background: rgba(19, 30, 53, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+
+    .mode-card:hover, .mode-card.selected {
+      background: rgba(28, 44, 76, 0.95);
+      border-color: var(--cpx-cyan);
+      transform: translateY(-4px);
+      box-shadow: 0 10px 25px rgba(0, 240, 255, 0.2);
+    }
+
+    .mode-card.featured {
+      border-color: var(--cpx-yellow);
+      box-shadow: 0 10px 30px rgba(253, 203, 36, 0.25);
+    }
+
+    .mode-badge-top {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--cpx-yellow);
+      color: #070B14;
+      font-size: 9px;
+      font-weight: 800;
+      padding: 3px 10px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .mode-header h4 {
+      font-family: var(--font-display);
+      font-size: 15px;
+      color: #FFF;
+    }
+    .mode-header p {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .mode-time-badge {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--cpx-cyan);
+      font-weight: 700;
+      margin: 8px 0;
+    }
+
+    .mode-features-mini {
+      font-size: 10px;
+      color: var(--text-dim);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .mode-price-tag {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 800;
+      color: #FFF;
+      margin-top: 10px;
+    }
+
+    .btn-select-mode {
+      background: rgba(255, 255, 255, 0.1);
+      color: #FFF;
+      border: none;
+      padding: 8px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      margin-top: 8px;
+      cursor: pointer;
+      text-transform: uppercase;
+    }
+
+    .mode-card.selected .btn-select-mode, .mode-card:hover .btn-select-mode {
+      background: var(--cpx-cyan);
+      color: #070B14;
+    }
+
+    /* ----------------------------------------------------
+       MOCKUP SCREEN 03: PAGAMENTO CIELO & PIX
+       ---------------------------------------------------- */
+    .mock-pay-screen {
+      height: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      padding: 20px;
+      background: #080D1A;
+      align-items: center;
+    }
+
+    .pay-summary-card {
+      background: rgba(19, 30, 53, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .pay-pinpad-card {
+      background: rgba(15, 23, 42, 0.9);
+      border: 2px dashed rgba(0, 240, 255, 0.4);
+      border-radius: 16px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 10px;
+      position: relative;
+    }
+
+    .pinpad-device-icon {
+      font-size: 48px;
+      filter: drop-shadow(0 0 15px rgba(0, 240, 255, 0.5));
+      animation: pulseDevice 2s infinite;
+    }
+
+    @keyframes pulseDevice {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.06); }
+    }
+
+    /* ----------------------------------------------------
+       MOCKUP SCREEN 05: HIGIENIZAÇÃO ATIVA REATIVA
+       ---------------------------------------------------- */
+    .mock-active-cleaning {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      position: relative;
+      transition: background 0.6s ease;
+      color: #FFF;
+      justify-content: space-between;
+    }
+
+    /* Dynamic Stage Styles */
+    .mock-active-cleaning.stage-uv {
+      background: radial-gradient(circle at center, #3B0764 0%, #0B0F19 85%);
+    }
+    .mock-active-cleaning.stage-nevoa {
+      background: radial-gradient(circle at center, #083344 0%, #0B0F19 85%);
+    }
+    .mock-active-cleaning.stage-secagem {
+      background: radial-gradient(circle at center, #451A03 0%, #0B0F19 85%);
+    }
+    .mock-active-cleaning.stage-ozonio {
+      background: radial-gradient(circle at center, #064E3B 0%, #0B0F19 85%);
+    }
+
+    .active-steps-bar {
+      display: flex;
+      justify-content: space-between;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 12px;
+      padding: 8px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      gap: 6px;
+    }
+
+    .step-pill-mini {
+      flex: 1;
+      text-align: center;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 6px 4px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-dim);
+      transition: var(--transition-smooth);
+      cursor: pointer;
+    }
+
+    .step-pill-mini.active {
+      background: var(--cpx-cyan);
+      color: #070B14;
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+    }
+    .mock-active-cleaning.stage-uv .step-pill-mini.active {
+      background: var(--cpx-purple);
+      color: #FFF;
+      box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
+    }
+    .mock-active-cleaning.stage-secagem .step-pill-mini.active {
+      background: var(--cpx-gold);
+      color: #070B14;
+      box-shadow: 0 0 15px rgba(245, 158, 11, 0.5);
+    }
+    .mock-active-cleaning.stage-ozonio .step-pill-mini.active {
+      background: var(--cpx-green);
+      color: #070B14;
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
+    }
+
+    .active-center-gauge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 28px;
+    }
+
+    .timer-circle-wrap {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      border: 4px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow: 0 0 30px rgba(0, 240, 255, 0.2);
+    }
+
+    .timer-val {
+      font-family: var(--font-mono);
+      font-size: 28px;
+      font-weight: 800;
+      color: #FFF;
+    }
+
+    .timer-label {
+      font-size: 9px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .active-trivia-card {
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 12px 16px;
+      max-width: 220px;
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    .active-trivia-card strong {
+      color: var(--cpx-yellow);
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    /* ----------------------------------------------------
+       MOCKUP SCREEN: WEB DASHBOARD / STATIONS
+       ---------------------------------------------------- */
+    .mock-web-dashboard {
+      height: 100%;
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      background: #0F172A;
+      color: #FFF;
+    }
+
+    .web-sidebar {
+      background: #090E1A;
+      border-right: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .web-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+
+    .web-nav-item.active {
+      background: var(--cpx-blue-dark);
+      color: #FFF;
+      font-weight: 700;
+      border-left: 3px solid var(--cpx-yellow);
+    }
+
+    .web-main-content {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      overflow-y: auto;
+    }
+
+    .web-top-kpis {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .kpi-card {
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+
+    .kpi-label {
+      font-size: 10px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .kpi-num {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 800;
+      color: #FFF;
+      margin-top: 2px;
+    }
+
+    .mock-station-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+    }
+
+    .mock-station-table th {
+      text-align: left;
+      padding: 8px;
+      color: var(--text-dim);
+      font-size: 10px;
+      text-transform: uppercase;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .mock-station-table td {
+      padding: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: var(--text-muted);
+    }
+
+    .status-badge-dot {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 10px;
+      font-weight: 700;
+    }
+    .badge-online { background: rgba(16, 185, 129, 0.15); color: #10B981; }
+    .badge-running { background: rgba(0, 240, 255, 0.15); color: #00F0FF; }
+    .badge-alert { background: rgba(239, 68, 68, 0.15); color: #EF4444; }
+
+    /* ==========================================================================
+       BOTTOM CONTROLS & PROGRESS BAR
+       ========================================================================== */
+    footer.app-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100vw;
+      height: 64px;
+      background: rgba(13, 21, 39, 0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-top: 1px solid var(--border-subtle);
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+    }
+
+    .progress-bar-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--cpx-yellow), var(--cpx-cyan));
+      width: 5%;
+      transition: width 0.3s ease;
+      box-shadow: 0 0 10px var(--cpx-cyan);
+    }
+
+    .slide-counter {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .slide-counter span.current {
+      color: var(--cpx-yellow);
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border-subtle);
+      color: #FFF;
+      padding: 8px 18px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: var(--transition-smooth);
+    }
+
+    .nav-btn:hover {
+      background: var(--cpx-blue-dark);
+      border-color: var(--border-highlight);
+      transform: translateY(-2px);
+    }
+
+    .nav-btn.primary {
+      background: linear-gradient(135deg, var(--cpx-yellow) 0%, var(--cpx-gold) 100%);
+      color: #070B14;
+      border: none;
+      box-shadow: 0 4px 15px rgba(253, 203, 36, 0.3);
+    }
+
+    .keyboard-tip {
+      font-size: 11px;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .kbd {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-main);
+    }
+
+    /* ==========================================================================
+       MODAL: OVERVIEW GRID DRAWER
+       ========================================================================== */
+    .overview-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(7, 11, 20, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      padding: 40px;
+      opacity: 0;
+      visibility: hidden;
+      transition: var(--transition-smooth);
+    }
+
+    .overview-modal.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .overview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+      overflow-y: auto;
+      padding-bottom: 40px;
+    }
+
+    .overview-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 14px;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .overview-card:hover, .overview-card.active {
+      background: var(--bg-card-hover);
+      border-color: var(--cpx-cyan);
+      transform: translateY(-4px);
+      box-shadow: 0 10px 25px rgba(0, 240, 255, 0.2);
+    }
+
+    .overview-card .card-num {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--cpx-cyan);
+      font-weight: 700;
+    }
+
+    .overview-card .card-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: #FFF;
+    }
+
+    /* Sound Effect Feedback */
+    .audio-toggle-btn.muted {
+      color: var(--text-dim);
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .slide {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+        gap: 16px;
+      }
+      .slide-preview-panel {
+        max-height: 380px;
+      }
+      .slide-info-panel {
+        max-height: 380px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Animated Lights -->
+  <div class="ambient-bg">
+    <div class="ambient-orb orb-1"></div>
+    <div class="ambient-orb orb-2"></div>
+    <div class="ambient-orb orb-3"></div>
+  </div>
+  <div class="grid-overlay"></div>
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="brand-group" onclick="goToSlide(0)">
+      <div class="brand-logo-badge">CX</div>
+      <div class="brand-text">
+        <div class="brand-title">CAPAXERO &bull; ECOSSISTEMA</div>
+        <div class="brand-subtitle">Guia Visual de Telas & UI/UX</div>
+      </div>
+    </div>
+
+    <!-- Category Filter Tabs -->
+    <div class="filter-tabs">
+      <button class="filter-btn active" onclick="filterCategory('ALL')">Todas <span class="pill-count">16</span></button>
+      <button class="filter-btn" onclick="filterCategory('TOTEM')">Totem Kiosk <span class="pill-count">8</span></button>
+      <button class="filter-btn" onclick="filterCategory('WEB')">Painel Web <span class="pill-count">6</span></button>
+      <button class="filter-btn" onclick="filterCategory('TECH')">Técnico/IoT <span class="pill-count">2</span></button>
+    </div>
+
+    <!-- Actions -->
+    <div class="header-actions">
+      <button class="action-btn btn-overview" onclick="toggleOverview()">
+        <span>📑 Índice Geral</span>
+      </button>
+      <button class="action-btn" id="soundBtn" onclick="toggleSound()" title="Ativar/Desativar Efeitos Sonoros">
+        🔊
+      </button>
+      <button class="action-btn" onclick="toggleFullscreen()" title="Tela Cheia">
+        ⛶
+      </button>
+    </div>
+  </header>
+
+  <!-- Presentation Stage -->
+  <main class="presentation-stage">
+    <div class="slides-container">
+
+      <!-- =======================================================
+           SLIDE 1: INTRO / ECOSSISTEMA CAPAXERO
+           ======================================================= -->
+      <section class="slide slide-fullwidth active" data-category="ALL" data-index="0">
+        <div style="max-width: 900px; margin: 0 auto; background: var(--bg-card); padding: 48px; border-radius: 28px; border: 1px solid var(--border-subtle); backdrop-filter: blur(20px); box-shadow: var(--shadow-card);">
+          <div class="badge-category badge-system" style="margin: 0 auto 16px auto;">
+            ⚡ Apresentação Oficial do Produto
+          </div>
+          <h1 style="font-family: var(--font-display); font-size: 42px; font-weight: 900; line-height: 1.15; margin-bottom: 16px; background: linear-gradient(135deg, #FFFFFF 0%, var(--cpx-yellow) 50%, var(--cpx-cyan) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+            Ecossistema Completo de Telas CapaXero
+          </h1>
+          <p style="font-size: 16px; color: var(--text-muted); line-height: 1.6; margin-bottom: 32px; max-width: 760px; margin-left: auto; margin-right: auto;">
+            Apresentação técnica e executiva detalhada de todas as interfaces do <strong>Totem Kiosk Touchscreen (Android IoT)</strong> e do <strong>Painel Administrativo Web Cloud</strong> para monitoramento, vendas e telemetria de higienização de capacetes.
+          </p>
+
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 36px; text-align: left;">
+            <div style="background: rgba(0, 240, 255, 0.06); border: 1px solid rgba(0, 240, 255, 0.2); padding: 18px; border-radius: 16px;">
+              <div style="font-size: 24px; margin-bottom: 6px;">📱</div>
+              <div style="font-weight: 800; font-size: 15px; color: var(--cpx-cyan); margin-bottom: 4px;">Totem Kiosk</div>
+              <div style="font-size: 12px; color: var(--text-muted);">8 telas para motociclistas e técnicos touch 16:9.</div>
+            </div>
+            <div style="background: rgba(253, 203, 36, 0.06); border: 1px solid rgba(253, 203, 36, 0.2); padding: 18px; border-radius: 16px;">
+              <div style="font-size: 24px; margin-bottom: 6px;">🌐</div>
+              <div style="font-weight: 800; font-size: 15px; color: var(--cpx-yellow); margin-bottom: 4px;">Painel Web Cloud</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Dashboard, mapa de estações, cupons QR e gestão remota.</div>
+            </div>
+            <div style="background: rgba(139, 92, 246, 0.06); border: 1px solid rgba(139, 92, 246, 0.2); padding: 18px; border-radius: 16px;">
+              <div style="font-size: 24px; margin-bottom: 6px;">⚙️</div>
+              <div style="font-weight: 800; font-size: 15px; color: var(--cpx-purple); margin-bottom: 4px;">Hardware & Sensores</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Integração Cielo PPC930, Relés UPUS e Leitor QR Óptico.</div>
+            </div>
+          </div>
+
+          <button class="btn-totem-start" style="margin: 0 auto; padding: 14px 36px; font-size: 16px;" onclick="nextSlide()">
+            ▶ Iniciar Navegação pelas Telas
+          </button>
+        </div>
+      </section>
+
+      <!-- =======================================================
+           SLIDE 2: TOTEM - TELA 01: HOME / STANDBY
+           ======================================================= -->
+      <section class="slide" data-category="TOTEM" data-index="1">
+        <!-- Left: Info -->
+        <div class="slide-info-panel">
+          <div class="badge-category badge-totem">📱 Totem Kiosk Android</div>
+          <div class="slide-title-group">
+            <span class="slide-number-tag">TELA 01 &bull; KIOSK STANDBY</span>
+            <h2 class="slide-heading">Home / Standby (Tela de Atração)</h2>
+          </div>
+          <p class="slide-objective">
+            Atrair motociclistas em trânsito no estabelecimento comercial, comunicar a proposta de valor e convidar ao toque para iniciar a higienização.
+          </p>
+
+          <div class="features-list">
+            <div class="feature-item">
+              <div class="feature-icon-box icon-cyan">✨</div>
+              <div class="feature-text">
+                <strong>Animação 3D & Vídeo Promocional</strong>
+                <span>Demonstra visualmente o processo de luz UV-C, névoa atomizada e secagem rápida.</span>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon-box icon-yellow">💰</div>
+              <div class="feature-text">
+                <strong>Âncora de Preço Transparente</strong>
+                <span>Destaca chamadas diretas como <em>"A partir de R$ 14,00"</em> e <em>"Pronto em 6 a 8 minutos"</em>.</span>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon-box icon-green">🟢</div>
+              <div class="feature-text">
+                <strong>Badge de Máquina Pronta & Idiomas</strong>
+                <span>Status de operação em tempo real e seletor de idiomas (PT-BR, EN, ES).</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tech-specs-box">
+            <div class="tech-specs-title">⚡ Detalhes de Engenharia & UX</div>
+            <div class="specs-grid">
+              <div class="spec-item"><span class="spec-label">Resolução</span><span class="spec-val">1920x1080 (16:9 Landscape)</span></div>
+              <div class="spec-item"><span class="spec-label">Interação</span><span class="spec-val">Sensor PIR / Toque Qualquer Ponto</span></div>
+              <div class="spec-item"><span class="spec-label">Vídeo Loop</span><span class="spec-val">MP4 H.264 Hardware Decoded</span></div>
+              <div class="spec-item"><span class="spec-label">Transição</span><span class="spec-val">Slide Fade 300ms p/ Modos</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Interactive Mockup -->
+        <div class="slide-preview-panel">
+          <div class="device-mockup">
+            <div class="interactive-hint-badge">Simulação Interativa</div>
+            <div class="screen-canvas">
+              <div class="mock-home-screen">
+                <div class="mock-header">
+                  <div class="mock-logo">CAPAXERO</div>
+                  <div style="display: flex; gap: 8px; align-items: center;">
+                    <div class="mock-status-pill">Máquina Pronta</div>
+                    <div style="font-size: 11px; background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 6px;">🌐 PT-BR</div>
+                  </div>
+                </div>
+
+                <div class="mock-home-content">
+                  <div class="mock-video-card">
+                    <div class="helmet-3d-visual">🪖</div>
+                    <div class="mock-video-overlay">
+                      <span>✨ Luz UV-C + Névoa Ativa</span>
+                      <span>⏱️ 6 a 8 min</span>
+                    </div>
+                  </div>
+
+                  <div class="mock-home-cta-box">
+                    <div class="mock-home-title">Capacete Limpo, Seco e Perfumado!</div>
+                    <div class="mock-home-bullets">
+                      <div><span>🟣</span> Elimina 99.9% de fungos e bactérias</div>
+                      <div><span>💨</span> Névoa atomizada bactericida profunda</div>
+                      <div><span>🔥</span> Secagem com ar quente controlado</div>
+                      <div><span>🍃</span> Ozônio anti-odor e perfume exclusivo</div>
+                    </div>
+                    <button class="btn-totem-start" onclick="nextSlide()">
+                      👉 TOQUE PARA INICIAR
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =======================================================
+           SLIDE 3: TOTEM - TELA 02: SELEÇÃO DE MODOS
+           ======================================================= -->
+      <section class="slide" data-category="TOTEM" data-index="2">
+        <div class="slide-info-panel">
+          <div class="badge-category badge-totem">📱 Totem Kiosk Android</div>
+          <div class="slide-title-group">
+            <span class="slide-number-tag">TELA 02 &bull; ESCOLHA DE SERVIÇO</span>
+            <h2 class="slide-heading">Seleção de Modos de Higienização</h2>
+          </div>
+          <p class="slide-objective">
+            Apresentar os 3 planos de higienização de forma comparativa e intuitiva, com destaque para a opção mais popular recomendada.
+          </p>
+
+          <div class="features-list">
+            <div class="feature-item">
+              <div class="feature-icon-box icon-cyan">🔹</div>
+              <div class="feature-text">
+                <strong>Básica (6 Minutos — R$ 14,00)</strong>
+                <span>Ideal para o dia a dia e manutenção rápida da higiene do capacete.</span>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon-box icon-yellow">⭐</div>
+              <div class="feature-text">
+                <strong>Intermediária (7 Minutos — R$ 17,00)</strong>
+                <span>Opção mais recomendada: reforço no tempo de secagem e fragrância duradoura.</span>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon-box icon-purple">👑</div>
+              <div class="feature-text">
+                <strong>Avançada (8 Minutos — R$ 20,00)</strong>
+                <span>Ciclo turbo para capacetes muito suados, dias chuvosos ou capacetes pesados.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tech-specs-box">
+            <div class="tech-specs-title">⚡ Parametrização Dinâmica</div>
+            <div class="specs-grid">
+              <div class="spec-item"><span class="spec-label">Preços & Tempos</span><span class="spec-val">Configurados via Cloud</span></div>
+              <div class="spec-item"><span class="spec-label">Timeout</span><span class="spec-val">45s sem toque retorna ao Standby</span></div>
+              <div class="spec-item"><span class="spec-label">Botões Touch</span><span class="spec-val">Mínimo 68dp (Luva amigável)</span></div>
+              <div class="spec-item"><span class="spec-label">Ciclo Físico</span><span class="spec-val">Todas executam as 5 fases</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="slide-preview-panel">
+          <div class="device-mockup">
+            <div class="interactive-hint-badge">Clique nos cards para testar</div>
+            <div class="screen-canvas">
+              <div class="mock-modes-screen">
+                <div class="mock-header">
+                  <div style="font-size: 12px; color: var(--text-muted); cursor: pointer;" onclick="goToSlide(1)">◀ Voltar</div>
+                  <div style="font-weight: 800; font-size: 14px;">ESCOLHA O MODO DE HIGIENIZAÇÃO</div>
+                  <div style="font-family: var(--font-mono); font-size: 12px; color: var(--cpx-yellow);">⏱️ 45s</div>
+                </div>
+
+                <div class="mock-modes-grid">
+                  <!-- Mode 1 -->
+                  <div class="mode-card" onclick="selectModeMock(this, 'Básica', 'R$ 14,00', '6 min')">
+                    <div class="mode-header">
+                      <h4>🔹 BÁSICA</h4>
+                      <p>Uso Diário</p>
+                    </div>
+                    <div class="mode-time-badge">⏱️ 6 MINUTOS</div>
+                    <div class="mode-features-mini">
+                      <div>✓ Luz UV Germicida</div>
+                      <div>✓ Névoa Sanitizante</div>
+                      <div>✓ Secagem Térmica</div>
+                      <div>✓ Ozônio & Perfume</div>
+                    </div>
+                    <div class="mode-price-tag">R$ 14,00</div>
+                    <button class="btn-select-mode">Selecionar</button>
+                  </div>
+
+                  <!-- Mode 2 (Featured) -->
+                  <div class="mode-card featured selected" onclick="selectModeMock(this, 'Intermediária', 'R$ 17,00', '7 min')">
+                    <div class="mode-badge-top">⭐ Mais Escolhido</div>
+                    <div class="mode-header">
+                      <h4>⭐ INTERMEDIÁRIA</h4>
+                      <p>Recomendado</p>
+                    </div>
+                    <div class="mode-time-badge">⏱️ 7 MINUTOS</div>
+                    <div class="mode-features-mini">
+                      <div>✓ Luz UV Germicida</div>
+                      <div>✓ Névoa Sanitizante</div>
+                      <div>✓ Secagem Térmica +</div>
+                      <div>✓ Ozônio & Perfume</div>
+                    </div>
+                    <div class="mode-price-tag" style="color: var(--cpx-yellow);">R$ 17,00</div>
+                    <button class="btn-select-mode" style="background: var(--cpx-yellow); color: #000;">Selecionar</button>
+                  </div>
+
+                  <!-- Mode 3 -->
+                  <div class="mode-card" onclick="selectModeMock(this, 'Avançada', 'R$ 20,00', '8 min')">
+                    <div class="mode-header">
+                      <h4>👑 AVANÇADA</h4>
+                      <p>Limpeza Pesada</p>
+                    </div>
+                    <div class="mode-time-badge">⏱️ 8 MINUTOS</div>
+                    <div class="mode-features-mini">
+                      <div>✓ Luz UV Germicida</div>
+                      <div>✓ Névoa Sanitizante</div>
+                      <div>✓ Secagem Turbo ++</div>
+                      <div>✓ Ozônio & Perfume</div>
+                    </div>
+                    <div class="mode-price-tag">R$ 20,00</div>
+                    <button class="btn-select-mode">Selecionar</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =======================================================
+           SLIDE 4: TOTEM - TELA 03: PAGAMENTO CIELO & PIX
+           ======================================================= -->
+      <section class="slide" data-category="TOTEM" data-index="3">
+        <div class="slide-info-panel">
+          <div class="badge-category badge-totem">📱 Totem Kiosk Android</div>
+          <div class="slide-title-group">
+            <span class="slide-number-tag">TELA 03 &bull; CHECKOUT & TEF</span>
+            <h2 class="slide-heading">Pagamento Integrado Cielo & PIX</h2>
+          </div>
+          <p class="slide-objective">
+            Orientar o cliente a finalizar o pagamento diretamente na máquina PIN Pad Cielo acoplada ou escanear um voucher/cupom promocional no leitor óptico.
+          </p>
+
+          <div class="features-list">
+            <div class="feature-item">
+              <div class="feature-icon-box icon-cyan">💳</div>
+              <div class="feature-text">
+                <strong>Terminal Cielo PPC930 Integrado</strong>
+                <span>Suporta Cartão de Crédito, Débito e Pagamento por Aproximação (NFC / Apple Pay / Google Pay).</span>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon-box icon-green">⚡</div>
+              <div class="feature-text">
+                <strong>PIX Dinâmico Instantâneo</strong>
+                <span>Gera QR Code direto na maquininha Cielo com confirmação e baixa em segundos.</span>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon-box icon-yellow">🎟️</div>
+              <div class="feature-text">
+                <strong>Leitor Óptico EM2003X para Cupons</strong>
+                <span>Valida cupons promocionais ou de cortesia de parceiros instantaneamente via Cloud API.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tech-specs-box">
+            <div class="tech-specs-title">⚡ Integração TEF & Periféricos</div>
+            <div class="specs-grid">
+              <div class="spec-item"><span class="spec-label">Protocolo Pinpad</span><span class="spec-val">Cielo LIO / SDK Android PPC930</span></div>
+              <div class="spec-item"><span class="spec-label">Leitor Barcode</span><span class="spec-val">USB HID / Virtual COM EM2003X</span></div>
+              <div class="spec-item"><span class="spec-label">Validação Cupom</span><span class="spec-val">GET /api/v1/coupons/{code}</span></div>
+              <div class="spec-item"><span class="spec-label">Baixa Cupom</span><span class="spec-val">POST /api/v1/coupons/{code}/redeem</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="slide-preview-panel">
+          <div class="device-mockup">
+            <div class="interactive-hint-badge">Simulação de Pagamento</div>
+            <div class="screen-canvas">
+              <div class="mock-pay-screen">
+                <div class="pay-summary-card">
+                  <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Resumo do Pedido</div>
+                  <div style="font-weight: 800; font-size: 16px; color: #FFF;">⭐ Higienização Intermediária</div>
+                  <div style="font-size: 11px; color: var(--cpx-cyan);">⏱️ Duração: 7 Minutos</div>
+                  <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; margin-top: 6px;">
+                    <div style="font-size: 11px; color: var(--text-dim);">TOTAL A PAGAR:</div>
+                    <div style="font-family: var(--font-display); font-size: 24px; font-weight: 900; color: var(--cpx-yellow);">R$ 17,00</div>
+                  </div>
+                  <div style="background: rgba(0, 240, 255, 0.1); border: 1px dashed var(--cpx-cyan); padding: 8px; border-radius: 8px; font-size: 10px; color: var(--cpx-cyan); text-align: center; cursor: pointer;">
+                    🎟️ Escaneie seu Cupom no Leitor Abaixo
+                  </div>
+                </div>
+
+                <div class="pay-pinpad-card">
+                  <div class="pinpad-device-icon">💳</div>
+                  <div style="font-weight: 800; font-size: 13px; color: #FFF;">SIGA AS INSTRUÇÕES NA MÁQUINA CIELO</div>
+                  <div style="font-size: 11px; color: var(--text-muted);">Aproxime ou insira o cartão, ou selecione PIX</div>
+                  <div style="background: rgba(16, 185, 129, 0.2); border: 1px solid var(--cpx-green); color: var(--cpx-green); font-size: 11px; padding: 6px 12px; border-radius: 20px; font-weight: 700; display: flex; align-items: center; gap: 6px;">
+                    <span style="animation: pulseCyan 1.5s infinite;">⏳</span> Aguardando transação...
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =======================================================
+           SLIDE 5: TOTEM - TELA 04: INSTRUÇÕES DE INSERÇÃO
+           ======================================================= -->
+      <section class="slide" data-category="TOTEM" data-index="4">
+        <div class="slide-info-panel">
+          <div class="badge-category badge-totem">📱 Totem Kiosk Android</div>
+          <div class="slide-title-group">
+            <span class="slide-number-tag">TELA 04 &bull; INSERÇÃO NA CABINE</span>
+            <h2 class="slide-heading">Instruções de Inserção do Capacete</h2>
+          </div>
+          <p class="slide-objective">
+            Orientar o motociclista no posicionamento correto do capacete no suporte interno e validar o fechamento hermético da porta via sensor magnético.
+          </p>
+
+          <div class="features-list">
+            <div class="feature-item">
+              <div class="feature-icon-box icon-green">🔓</div>
+              <div class="feature-text">
+                <strong>Destrave Automático da Trava Solenoide</strong>
+                <span>A porta magnética abre automaticamente após a aprovação do pagamento.</span>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon-box icon-yellow">⚠️</div>
+              <div class="feature-text">
+                <strong>Alerta Crítico: Viseira Abaixada (Fechada)</strong>
+                <span>Orienta manter a viseira abaixada para que a névoa e o ar quente circulem exclusivamente no forro interno.</span>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon-box icon-cyan">🧲</div>
+              <div class="feature-text">
+                <strong>Sensor Magnético de Porta (Canal CH4)</strong>
+                <span>O botão <em>"INICIAR"</em> só é liberado quando o sensor confirma a porta fechada com segurança.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tech-specs-box">
+            <div class="tech-specs-title">⚡ Sensores & Atuadores</div>
+            <div class="specs-grid">
+              <div class="spec-item"><span class="spec-label">Trava Solenoide</span><span class="spec-val">Pulso 12V / Relé b0-l0</span></div>
+              <div class="spec-item"><span class="spec-label">Sensor Porta</span><span class="spec-val">Contato Reed Switch / CH4</span></div>
+              <div class="spec-item"><span class="spec-label">Segurança</span><span class="spec-val">Bloqueia UV/Névoa se porta aberta</span></div>
+              <div class="spec-item"><span class="spec-label">Áudio TTS</span><span class="spec-val">Comando de voz sintetizado PT-BR</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="slide-preview-panel">
+          <div class="device-mockup">
+            <div class="interactive-hint-badge">Sensor de Porta Ativo</div>
+            <div class="screen-canvas">
+              <div style="height: 100%; display: grid; grid-template-rows: auto 1fr; padding: 20px; background: #080D1A; gap: 14px;">
+                <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid var(--cpx-green); padding: 10px 14px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+                  <span style="font-weight: 800; font-size: 13px; color: var(--cpx-green);">🔓 PORTA DESTRAVADA! COLOQUE SEU CAPACETE</span>
+                  <span style="font-size: 11px; color: var(--text-muted);">Tempo restante: 50s</span>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1.1fr; gap: 14px; align-items: center;">
+                  <div style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 14px; text-align: center; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                    <div style="font-size: 52px; margin-bottom: 8px;">🪖</div>
+                    <div style="font-size: 11px; color: var(--cpx-cyan); font-weight: 700;">Abertura voltada para BAIXO</div>
+                  </div>
+
+                  <div style="display: flex; flex-direction: column; gap: 8px; font-size: 11px;">
+                    <div style="background: rgba(255,255,255,0.04); padding: 8px 10px; border-radius: 8px;">1. Encaixe o capacete no suporte central</div>
+                    <div style="background: rgba(253, 203, 36, 0.15); border-left: 3px solid var(--cpx-yellow); padding: 8px 10px; border-radius: 8px; color: var(--cpx-yellow); font-weight: 700;">
+                      2. ⚠️ Mantenha a VISEIRA FECHADA
+                    </div>
+                    <div style="background: rgba(255,255,255,0.04); padding: 8px 10px; border-radius: 8px;">3. Feche a porta da cabine com firmeza</div>
+
+                    <button class="btn-totem-start" style="padding: 10px; font-size: 13px; margin-top: 6px;" onclick="nextSlide()">
+                      🔒 PORTA FECHADA &bull; INICIAR
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =======================================================
+           SLIDE 6: TOTEM - TELA 05: HIGIENIZAÇÃO ATIVA
+           ======================================================= -->
+      <section class="slide" data-category="TOTEM" data-index="5">
+        <div class="slide-info-panel">
+          <div class="badge-category badge-totem">📱 Totem Kiosk Android</div>
+          <div class="slide-title-group">
+            <span class="slide-number-tag">TELA 05 &bull; CICLO EM EXECUÇÃO</span>
+            <h2 class="slide-heading">Higienização Ativa (Fundo Reativo)</h2>
+          </div>
+          <p class="slide-objective">
+            Exibir o progresso do ciclo em tempo real com plano de fundo animado que se transforma visualmente de acordo com a etapa química/física ativa.
+          </p>
+
+          <div class="features-list">
+            <div class="feature-item">
+              <div class="feature-icon-box icon-purple">🟣</div>
+              <div class="feature-text">
+                <strong>1. Esterilização UV-C Germicida</strong>
+                <span>Fundo violeta com radiação ionizante eliminando esporos de fungos.</span>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon-box icon-cyan">🔵</div>
+              <div class="feature-text">
+                <strong>2. Névoa Sanitizante Atomizada</strong>
+                <span>Fundo ciano líquido com microgotículas de sanitizante biodegradável.</span>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon-box icon-yellow">🟠</div>
+              <div class="feature-text">
+                <strong>3. Secagem Térmica (Ar Quente)</strong>
+                <span>Fundo âmbar com fluxo contínuo de calor suave que seca as espumas.</span>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon-box icon-green">🟢</div>
+              <div class="feature-text">
+                <strong>4. Ozônio Anti-odor & Fragrância</strong>
+                <span>Fundo esmeralda purificante e injeção do perfume exclusivo CapaXero.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tech-specs-box">
+            <div class="tech-specs-title">⚡ Controle da Placa Serial</div>
+            <div class="specs-grid">
+              <div class="spec-item"><span class="spec-label">Driver Serial</span><span class="spec-val">libserial_port.so / 9600 8N1</span></div>
+              <div class="spec-item"><span class="spec-label">Temperatura</span><span class="spec-val">Monitorada via Sensor CH17</span></div>
+              <div class="spec-item"><span class="spec-label">Nível de Líquido</span><span class="spec-val">Telemetria contínua CH15</span></div>
+              <div class="spec-item"><span class="spec-label">Botão Parar</span><span class="spec-val">Aciona Exaustão Rápida 5s</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="slide-preview-panel">
+          <div class="device-mockup">
+            <div class="interactive-hint-badge">Clique nas etapas para ver a mudança</div>
+            <div class="screen-canvas">
+              <div class="mock-active-cleaning stage-nevoa" id="interactiveCleaningStage">
+                <!-- Top Progress Bar -->
+                <div>
+                  <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 8px;">
+                    <span style="color: var(--cpx-yellow); font-weight: 700;">🔒 CABINE BLOQUEADA POR SEGURANÇA</span>
+                    <span style="font-family: var(--font-mono); color: var(--text-muted);">TEMPO RESTANTE: 04:20 MIN</span>
+                  </div>
+
+                  <div class="active-steps-bar">
+                    <div class="step-pill-mini" onclick="switchStageVisual('stage-uv', '06:30', 'Esterilização UV-C Germicida Ativa')">🟣 UV-C</div>
+                    <div class="step-pill-mini active" onclick="switchStageVisual('stage-nevoa', '04:20', 'Névoa Sanitizante Atomizada')">🔵 Névoa</div>
+                    <div class="step-pill-mini" onclick="switchStageVisual('stage-secagem', '02:40', 'Secagem Térmica c/ Ar Quente')">🟠 Secagem</div>
+                    <div class="step-pill-mini" onclick="switchStageVisual('stage-ozonio', '00:50', 'Ozônio & Fragrância CapaXero')">🟢 Ozônio</div>
+                  </div>
+                </div>
+
+                <!-- Center Gauge & Trivia -->
+                <div class="active-center-gauge">
+                  <div class="timer-circle-wrap">
+                    <div class="timer-val" id="stageTimerVal">04:20</div>
+                    <div class="timer-label" id="stageNameLabel">NÉVOA ATIVA</div>
+                  </div>
+
+                  <div class="active-trivia-card">
+                    <strong>💡 VOCÊ SABIA?</strong>
+                    O acúmulo de suor no capacete propicia proliferação de fungos que causam caspa e queda capilar. A CapaXero elimina 99,9% dos microrganismos!
+                  </div>
+                </div>
+
+                <!-- Bottom Bar -->
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <button style="background: rgba(239, 68, 68, 0.2); border: 1px solid var(--cpx-red); color: var(--cpx-red); padding: 6px 12px; border-radius: 8px; font-size: 10px; font-weight: 700; cursor: pointer;" onclick="goToSlide(6)">
+                    🛑 Parar Higienização
+                  </button>
+                  <span style="font-size: 10px; color: var(--text-dim);">Etapa 2 de 4</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =======================================================
+           SLIDE 7: TOTEM - TELA 06: MODAL DE PARADA & CONCLUSAO
+           ======================================================= -->
+      <section class="slide" data-category="TOTEM" data-index="6">
+        <div class="slide-info-panel">
+          <div class="badge-category badge-totem">📱 Totem Kiosk Android</div>
+          <div class="slide-title-group">
+            <span class="slide-number-tag">TELAS 06 & 07 &bull; SEGURANÇA & RETIRADA</span>
+            <h2 class="slide-heading">Parada de Emergência & Conclusão</h2>
+          </div>
+          <p class="slide-objective">
+            Garantir a segurança do motociclista em caso de interrupção forçada e conduzir a entrega do capacete perfumado e seco ao fim do ciclo.
+          </p>
+
+          <div class="features-list">
+            <div class="feature-item">
+              <div class="feature-icon-box icon-red">🛑</div>
+              <div class="feature-text">
+                <strong>Rotina de Interrupção com Exaustão Rápida</strong>
+                <span>Corta resistências térmicas e lâmpadas UV imediatamente, ligando exaustor por 5s antes do destrave.</span>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon-box icon-green">🎉</div>
+              <div class="feature-text">
+                <strong>Tela de Conclusão & Destrave</strong>
+                <span>Avisa visual e sonoramente que a porta foi destravada e que o capacete está pronto para uso.</span>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon-box icon-yellow">⭐</div>
+              <div class="feature-text">
+                <strong>Pesquisa de Satisfação & Feedback</strong>
+                <span>Avaliação por estrelas rápida (1 a 5 estrelas) e lembrete para fechar a porta após a retirada.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tech-specs-box">
+            <div class="tech-specs-title">⚡ Protocolo de Finalização</div>
+            <div class="specs-grid">
+              <div class="spec-item"><span class="spec-label">Perfume</span><span class="spec-val">Válvula b14 acionada por 3s</span></div>
+              <div class="spec-item"><span class="spec-label">Trava Solenoide</span><span class="spec-val">Comando 0x8A (Abertura)</span></div>
+              <div class="spec-item"><span class="spec-label">Sincronização</span><span class="spec-val">POST /transactions/sync</span></div>
+              <div class="spec-item"><span class="spec-label">Auto Reset</span><span class="spec-val">Retorna à Home em 30 segundos</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="slide-preview-panel">
+          <div class="device-mockup">
+            <div class="interactive-hint-badge">Tela de Conclusão</div>
+            <div class="screen-canvas">
+              <div style="height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center; background: radial-gradient(circle at center, #064E3B 0%, #080D1A 90%); gap: 14px;">
+                <div style="font-size: 54px; animation: floatHelmet 3s infinite alternate;">🎉</div>
+                <div style="font-family: var(--font-display); font-size: 22px; font-weight: 900; color: #FFF;">
+                  HIGIENIZAÇÃO CONCLUÍDA!
+                </div>
+                <div style="font-size: 12px; color: var(--cpx-cyan); max-width: 320px;">
+                  Sua cabine foi destravada. Retire seu capacete limpo, seco e perfumado!
+                </div>
+
+                <div style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 12px 18px; display: flex; flex-direction: column; gap: 8px;">
+                  <span style="font-size: 11px; color: var(--text-muted);">Como foi sua experiência?</span>
+                  <div style="font-size: 22px; color: var(--cpx-yellow); cursor: pointer; letter-spacing: 4px;">⭐⭐⭐⭐⭐</div>
+                </div>
+
+                <div style="font-size: 10px; color: var(--text-dim);">
+                  ⚠️ Por favor, feche a porta após retirar seu capacete.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =======================================================
+           SLIDE 8: TOTEM - TELA 08: MODO TÉCNICO & MANUTENÇÃO
+           ======================================================= -->
+      <section class="slide" data-category="TECH" data-index="7">
+        <div class="slide-info-panel">
+          <div class="badge-category badge-tech">⚙️ Modo Engenharia / Técnico</div>
+          <div class="slide-title-group">
+            <span class="slide-number-tag">TELA 08 &bull; DIAGNÓSTICO DE HARDWARE</span>
+            <h2 class="slide-heading">Painel de Manutenção & Teste Serial</h2>
+          </div>
+          <p class="slide-objective">
+            Painel protegido por senha ou aproximação de crachá RFID de manutenção para testes de atuadores, leitura de sensores e calibração de insumos.
+          </p>
+
+          <div class="features-list">
+            <div class="feature-item">
+              <div class="feature-icon-box icon-purple">⚡</div>
+              <div class="feature-text">
+                <strong>Teste Individual de Relés & Cargas</strong>
+                <span>Acionamento manual isolado de Lâmpadas UV, Bomba Sanitizante, Fogger, Soprador e Válvulas.</span>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon-box icon-cyan">📊</div>
+              <div class="feature-text">
+                <strong>Telemetria dos Sensores em Tempo Real</strong>
+                <span>Leitura contínua do Sensor de Porta (CH4), Nível de Sanitizante (CH1) e Temperatura Interna.</span>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon-box icon-yellow">🔄</div>
+              <div class="feature-text">
+                <strong>Reset de Cupons de Teste & Ping Cloud</strong>
+                <span>Botões rápidos para testar a comunicação com a API Cloud e resetar vouchers de homologação.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tech-specs-box">
+            <div class="tech-specs-title">⚡ Acesso Técnico Seguro</div>
+            <div class="specs-grid">
+              <div class="spec-item"><span class="spec-label">Acesso</span><span class="spec-val">5 toques no logo + PIN</span></div>
+              <div class="spec-item"><span class="spec-label">Logs</span><span class="spec-val">Exportação USB / SQLite Log</span></div>
+              <div class="spec-item"><span class="spec-label">Purga de Dutos</span><span class="spec-val">Comando 0x79 (Limpeza)</span></div>
+              <div class="spec-item"><span class="spec-label">OTA Firmware</span><span class="spec-val">Atualização remota de APK</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="slide-preview-panel">
+          <div class="device-mockup">
+            <div class="interactive-hint-badge">Modo Técnico Ativo</div>
+            <div class="screen-canvas">
+              <div style="height: 100%; display: flex; flex-direction: column; padding: 16px; background: #050811; color: #FFF; font-size: 11px; gap: 10px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;">
+                  <span style="font-family: var(--font-mono); color: var(--cpx-yellow); font-weight: 700;">🔧 MODO TÉCNICO &bull; TOTEM-CPX-001</span>
+                  <span style="background: rgba(16, 185, 129, 0.2); color: var(--cpx-green); padding: 2px 6px; border-radius: 4px;">UPUS_3 ONLINE</span>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
+                  <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 8px; border-radius: 8px;">
+                    <div style="color: var(--text-dim); font-size: 9px;">TRAVA MAGNÉTICA</div>
+                    <button style="width: 100%; margin-top: 4px; padding: 4px; background: var(--cpx-blue-dark); color: #FFF; border: none; border-radius: 4px; font-size: 10px; cursor: pointer;">Pulsar Trava</button>
+                  </div>
+                  <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 8px; border-radius: 8px;">
+                    <div style="color: var(--text-dim); font-size: 9px;">LÂMPADAS UV-C</div>
+                    <button style="width: 100%; margin-top: 4px; padding: 4px; background: var(--cpx-purple); color: #FFF; border: none; border-radius: 4px; font-size: 10px; cursor: pointer;">Testar UV (3s)</button>
+                  </div>
+                  <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 8px; border-radius: 8px;">
+                    <div style="color: var(--text-dim); font-size: 9px;">ATOMIZADOR NÉVOA</div>
+                    <button style="width: 100%; margin-top: 4px; padding: 4px; background: var(--cpx-cyan); color: #000; border: none; border-radius: 4px; font-size: 10px; font-weight: 700; cursor: pointer;">Disparar Névoa</button>
+                  </div>
+                </div>
+
+                <div style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; display: flex; justify-content: space-around;">
+                  <div style="text-align: center;"><div style="color: var(--text-dim); font-size: 9px;">PORTA (CH4)</div><div style="color: var(--cpx-green); font-weight: 700;">FECHADA</div></div>
+                  <div style="text-align: center;"><div style="color: var(--text-dim); font-size: 9px;">NÍVEL LÍQUIDO</div><div style="color: var(--cpx-green); font-weight: 700;">94% (OK)</div></div>
+                  <div style="text-align: center;"><div style="color: var(--text-dim); font-size: 9px;">TEMP. INTERNA</div><div style="color: var(--cpx-yellow); font-weight: 700;">38.4 °C</div></div>
+                </div>
+
+                <div style="display: flex; gap: 8px; margin-top: auto;">
+                  <button style="flex: 1; padding: 8px; background: rgba(253, 203, 36, 0.2); border: 1px solid var(--cpx-yellow); color: var(--cpx-yellow); border-radius: 6px; font-size: 10px; font-weight: 700; cursor: pointer;">🔄 Resetar Cupons Homologação</button>
+                  <button style="padding: 8px 14px; background: rgba(239, 68, 68, 0.2); border: 1px solid var(--cpx-red); color: var(--cpx-red); border-radius: 6px; font-size: 10px; font-weight: 700; cursor: pointer;" onclick="goToSlide(1)">Sair</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =======================================================
+           SLIDE 9: WEB - TELA 09: PAINEL DE ESTAÇÕES
+           ======================================================= -->
+      <section class="slide" data-category="WEB" data-index="8">
+        <div class="slide-info-panel">
+          <div class="badge-category badge-web">🌐 Painel Web Cloud</div>
+          <div class="slide-title-group">
+            <span class="slide-number-tag">TELA 09 &bull; MONITORAMENTO OPERACIONAL</span>
+            <h2 class="slide-heading">Gestão de Estações (Mapa & Cards)</h2>
+          </div>
+          <p class="slide-objective">
+            Visão em tempo real de todas as máquinas em campo, com alternância entre Mapa Geográfico Interativo e Grade de Cards de telemetria.
+          </p>
+
+          <div class="features-list">
+            <div class="feature-item">
+              <div class="feature-icon-box icon-cyan">🗺️</div>
+              <div class="feature-text">
+                <strong>Toggle Mapa / Lista em Tempo Real</strong>
+                <span>Marcadores interativos georreferenciados com status de conexão e nível de sanitizante.</span>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon-box icon-yellow">🔄</div>
+              <div class="feature-text">
+                <strong>Bloco de Ciclo Dinâmico nos Cards</strong>
+                <span>Status instantâneo: <em>Plano padrão em execução</em>, <em>Aguardando equipe</em> ou <em>Sem telemetria</em>.</span>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon-box icon-purple">⚙️</div>
+              <div class="feature-text">
+                <strong>Acesso ao Modal "Configurar Máquina"</strong>
+                <span>Ajuste remoto individual de preços, tempos de ciclo e formas de pagamento aceitas.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tech-specs-box">
+            <div class="tech-specs-title">⚡ Telemetria & Heartbeat</div>
+            <div class="specs-grid">
+              <div class="spec-item"><span class="spec-label">Heartbeat</span><span class="spec-val">POST a cada 60s por máquina</span></div>
+              <div class="spec-item"><span class="spec-label">Filtros</span><span class="spec-val">Busca instantânea SVG</span></div>
+              <div class="spec-item"><span class="spec-label">Segurança</span><span class="spec-val">Bearer Token X-Totem-ID</span></div>
+              <div class="spec-item"><span class="spec-label">Alerta Sanitizante</span><span class="spec-val">Disparo Push / WhatsApp</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="slide-preview-panel">
+          <div class="device-mockup web-browser">
+            <div class="browser-bar">
+              <div class="browser-dots">
+                <div class="browser-dot dot-red"></div>
+                <div class="browser-dot dot-yellow"></div>
+                <div class="browser-dot dot-green"></div>
+              </div>
+              <div class="browser-url">https://admin.capaxero.com.br/<span>estacoes</span></div>
+            </div>
+            <div class="screen-canvas">
+              <div class="mock-web-dashboard">
+                <div class="web-sidebar">
+                  <div style="font-family: var(--font-display); font-weight: 800; font-size: 14px; color: var(--cpx-yellow); margin-bottom: 12px;">CAPAXERO</div>
+                  <div class="web-nav-item active">🏢 Estações</div>
+                  <div class="web-nav-item" onclick="goToSlide(9)">📍 Locais</div>
+                  <div class="web-nav-item" onclick="goToSlide(10)">📊 Dashboard</div>
+                  <div class="web-nav-item" onclick="goToSlide(12)">🎟️ Cupons</div>
+                </div>
+
+                <div class="web-main-content">
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="font-weight: 800; font-size: 14px;">Estações em Campo (12 Ativas)</div>
+                    <div style="display: flex; gap: 6px;">
+                      <button style="background: var(--cpx-blue-dark); color: #FFF; border: 1px solid var(--border-highlight); padding: 4px 8px; border-radius: 6px; font-size: 10px;">🗺️ Mapa</button>
+                      <button style="background: rgba(255,255,255,0.05); color: var(--text-muted); border: 1px solid var(--border-subtle); padding: 4px 8px; border-radius: 6px; font-size: 10px;">📋 Lista</button>
+                    </div>
+                  </div>
+
+                  <table class="mock-station-table">
+                    <thead>
+                      <tr>
+                        <th>Estação</th>
+                        <th>Local</th>
+                        <th>Status</th>
+                        <th>Nível Líquido</th>
+                        <th>Ações</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td style="font-weight: 700; color: #FFF;">CPX-001 (Shopping Iguatemi)</td>
+                        <td>Piso G2 - Motos</td>
+                        <td><span class="status-badge-dot badge-running">Ciclo Ativo (Interm.)</span></td>
+                        <td><span style="color: var(--cpx-green);">92%</span></td>
+                        <td><button style="background: var(--cpx-blue-dark); border: none; color: #FFF; padding: 2px 6px; border-radius: 4px; font-size: 9px; cursor: pointer;" onclick="goToSlide(11)">Configurar</button></td>
+                      </tr>
+                      <tr>
+                        <td style="font-weight: 700; color: #FFF;">CPX-002 (Posto Shell Rebouças)</td>
+                        <td>Box de Serviços</td>
+                        <td><span class="status-badge-dot badge-online">Standby / Pronta</span></td>
+                        <td><span style="color: var(--cpx-green);">88%</span></td>
+                        <td><button style="background: var(--cpx-blue-dark); border: none; color: #FFF; padding: 2px 6px; border-radius: 4px; font-size: 9px; cursor: pointer;">Configurar</button></td>
+                      </tr>
+                      <tr>
+                        <td style="font-weight: 700; color: #FFF;">CPX-003 (Kartódromo Granja Viana)</td>
+                        <td>Paddock 1</td>
+                        <td><span class="status-badge-dot badge-alert">Repor Insumo</span></td>
+                        <td><span style="color: var(--cpx-red); font-weight: 700;">8% (Baixo)</span></td>
+                        <td><button style="background: var(--cpx-blue-dark); border: none; color: #FFF; padding: 2px 6px; border-radius: 4px; font-size: 9px; cursor: pointer;">Configurar</button></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =======================================================
+           SLIDE 10: WEB - TELA 10: GESTÃO DE LOCAIS
+           ======================================================= -->
+      <section class="slide" data-category="WEB" data-index="9">
+        <div class="slide-info-panel">
+          <div class="badge-category badge-web">🌐 Painel Web Cloud</div>
+          <div class="slide-title-group">
+            <span class="slide-number-tag">TELA 10 &bull; INFRAESTRUTURA & PONTOS</span>
+            <h2 class="slide-heading">Gestão de Locais & Realocação</h2>
+          </div>
+          <p class="slide-objective">
+            Administração física dos pontos comerciais, estabelecimentos parceiros e ferramentas para transferência rápida de totens entre locais.
+          </p>
+
+          <div class="features-list">
+            <div class="feature-item">
+              <div class="feature-icon-box icon-cyan">📍</div>
+              <div class="feature-text">
+                <strong>Mapeamento de Estabelecimentos Parceiros</strong>
+                <span>Cadastro de shoppings, postos de combustível, centros comerciais e concessionárias de motocicletas.</span>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon-box icon-yellow">🔄</div>
+              <div class="feature-text">
+                <strong>Drawer Lateral de Realocação de Máquinas</strong>
+                <span>Mova uma estação de um ponto para outro em segundos com reatribuição automática de regras comerciais.</span>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon-box icon-purple">🔒</div>
+              <div class="feature-text">
+                <strong>Bloco Restrito ADMIN</strong>
+                <span>Controle de comissões por ponto comercial, contratos e contatos dos responsáveis locais.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tech-specs-box">
+            <div class="tech-specs-title">⚡ Gestão Territorial</div>
+            <div class="specs-grid">
+              <div class="spec-item"><span class="spec-label">Geocoding</span><span class="spec-val">Latitude / Longitude automáticos</span></div>
+              <div class="spec-item"><span class="spec-label">Vínculo</span><span class="spec-val">1 Local para N Totens</span></div>
+              <div class="spec-item"><span class="spec-label">Comissão</span><span class="spec-val">Percentual de faturamento local</span></div>
+              <div class="spec-item"><span class="spec-label">Histórico</span><span class="spec-val">Log de movimentações físicas</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="slide-preview-panel">
+          <div class="device-mockup web-browser">
+            <div class="browser-bar">
+              <div class="browser-dots"><div class="browser-dot dot-red"></div><div class="browser-dot dot-yellow"></div><div class="browser-dot dot-green"></div></div>
+              <div class="browser-url">https://admin.capaxero.com.br/<span>locais</span></div>
+            </div>
+            <div class="screen-canvas">
+              <div class="mock-web-dashboard">
+                <div class="web-sidebar">
+                  <div style="font-family: var(--font-display); font-weight: 800; font-size: 14px; color: var(--cpx-yellow); margin-bottom: 12px;">CAPAXERO</div>
+                  <div class="web-nav-item" onclick="goToSlide(8)">🏢 Estações</div>
+                  <div class="web-nav-item active">📍 Locais</div>
+                  <div class="web-nav-item" onclick="goToSlide(10)">📊 Dashboard</div>
+                  <div class="web-nav-item" onclick="goToSlide(12)">🎟️ Cupons</div>
+                </div>
+
+                <div class="web-main-content">
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="font-weight: 800; font-size: 14px;">Locais Cadastrados (8 Pontos)</div>
+                    <button style="background: var(--cpx-yellow); color: #000; border: none; padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800;">+ Novo Local</button>
+                  </div>
+
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255,255,255,0.08); padding: 10px; border-radius: 8px;">
+                      <div style="font-weight: 700; font-size: 12px; color: #FFF;">Shopping Iguatemi SP</div>
+                      <div style="font-size: 10px; color: var(--text-dim);">Av. Brig. Faria Lima, 2232</div>
+                      <div style="margin-top: 6px; font-size: 10px; color: var(--cpx-cyan);">🔹 2 Máquinas Vinculadas (CPX-001, CPX-004)</div>
+                    </div>
+                    <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255,255,255,0.08); padding: 10px; border-radius: 8px;">
+                      <div style="font-weight: 700; font-size: 12px; color: #FFF;">Posto Shell Rebouças</div>
+                      <div style="font-size: 10px; color: var(--text-dim);">Av. Rebouças, 1800</div>
+                      <div style="margin-top: 6px; font-size: 10px; color: var(--cpx-cyan);">🔹 1 Máquina Vinculada (CPX-002)</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =======================================================
+           SLIDE 11: WEB - TELA 11: DASHBOARD FINANCEIRO & OPERACIONAL
+           ======================================================= -->
+      <section class="slide" data-category="WEB" data-index="10">
+        <div class="slide-info-panel">
+          <div class="badge-category badge-web">🌐 Painel Web Cloud</div>
+          <div class="slide-title-group">
+            <span class="slide-number-tag">TELA 11 &bull; BUSINESS INTELLIGENCE</span>
+            <h2 class="slide-heading">Dashboard Financeiro & Desempenho</h2>
+          </div>
+          <p class="slide-objective">
+            Visão executiva unificada com métricas de receita bruta, total de ciclos realizados, ranking de rentabilidade por estação e ordens de manutenção (OM).
+          </p>
+
+          <div class="features-list">
+            <div class="feature-item">
+              <div class="feature-icon-box icon-green">💵</div>
+              <div class="feature-text">
+                <strong>Métricas Financeiras com Tipografia Fluida</strong>
+                <span>Faturamento total, ticket médio por ciclo e divisão por modalidade (Básica, Intermediária, Avançada).</span>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon-box icon-yellow">📈</div>
+              <div class="feature-text">
+                <strong>Gráfico de Curva de Vendas Diárias</strong>
+                <span>Linha suavizada de receita e volumetria de clientes com marcadores interativos por período.</span>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon-box icon-purple">🏆</div>
+              <div class="feature-text">
+                <strong>Ranking Top Estações & Alertas de OM</strong>
+                <span>Identificação rápida das máquinas mais lucrativas e contagem de chamados preventivos abertos.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tech-specs-box">
+            <div class="tech-specs-title">⚡ Inteligência de Dados</div>
+            <div class="specs-grid">
+              <div class="spec-item"><span class="spec-label">Atualização</span><span class="spec-val">Quase Tempo Real / WebSocket</span></div>
+              <div class="spec-item"><span class="spec-label">Exportação</span><span class="spec-val">Relatórios CSV, XLS e PDF</span></div>
+              <div class="spec-item"><span class="spec-label">Split de Pagto</span><span class="spec-val">Cálculo de repasse aos parceiros</span></div>
+              <div class="spec-item"><span class="spec-label">Previsibilidade</span><span class="spec-val">Estimativa de reposição de fluido</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="slide-preview-panel">
+          <div class="device-mockup web-browser">
+            <div class="browser-bar">
+              <div class="browser-dots"><div class="browser-dot dot-red"></div><div class="browser-dot dot-yellow"></div><div class="browser-dot dot-green"></div></div>
+              <div class="browser-url">https://admin.capaxero.com.br/<span>dashboard</span></div>
+            </div>
+            <div class="screen-canvas">
+              <div class="mock-web-dashboard">
+                <div class="web-sidebar">
+                  <div style="font-family: var(--font-display); font-weight: 800; font-size: 14px; color: var(--cpx-yellow); margin-bottom: 12px;">CAPAXERO</div>
+                  <div class="web-nav-item" onclick="goToSlide(8)">🏢 Estações</div>
+                  <div class="web-nav-item" onclick="goToSlide(9)">📍 Locais</div>
+                  <div class="web-nav-item active">📊 Dashboard</div>
+                  <div class="web-nav-item" onclick="goToSlide(12)">🎟️ Cupons</div>
+                </div>
+
+                <div class="web-main-content">
+                  <div class="web-top-kpis">
+                    <div class="kpi-card">
+                      <div class="kpi-label">Faturamento Mês</div>
+                      <div class="kpi-num" style="color: var(--cpx-green);">R$ 48.920</div>
+                    </div>
+                    <div class="kpi-card">
+                      <div class="kpi-label">Ciclos Totais</div>
+                      <div class="kpi-num" style="color: var(--cpx-cyan);">2.870</div>
+                    </div>
+                    <div class="kpi-card">
+                      <div class="kpi-label">Ticket Médio</div>
+                      <div class="kpi-num" style="color: var(--cpx-yellow);">R$ 17,04</div>
+                    </div>
+                    <div class="kpi-card">
+                      <div class="kpi-label">Ordens de Manut.</div>
+                      <div class="kpi-num" style="color: #FFF;">1 Aberta</div>
+                    </div>
+                  </div>
+
+                  <!-- Mini Chart -->
+                  <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255,255,255,0.06); padding: 10px; border-radius: 10px;">
+                    <div style="font-size: 10px; color: var(--text-dim); margin-bottom: 6px;">CURVA DE FATURAMENTO (ÚLTIMOS 7 DIAS)</div>
+                    <div style="height: 60px; display: flex; align-items: flex-end; gap: 8px; padding: 4px 0;">
+                      <div style="flex: 1; background: var(--cpx-blue-dark); height: 45%; border-radius: 4px;"></div>
+                      <div style="flex: 1; background: var(--cpx-blue-dark); height: 60%; border-radius: 4px;"></div>
+                      <div style="flex: 1; background: var(--cpx-blue-dark); height: 50%; border-radius: 4px;"></div>
+                      <div style="flex: 1; background: var(--cpx-blue-dark); height: 75%; border-radius: 4px;"></div>
+                      <div style="flex: 1; background: var(--cpx-blue-dark); height: 90%; border-radius: 4px;"></div>
+                      <div style="flex: 1; background: var(--cpx-cyan); height: 100%; border-radius: 4px;"></div>
+                      <div style="flex: 1; background: var(--cpx-yellow); height: 85%; border-radius: 4px;"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =======================================================
+           SLIDE 12: WEB - TELA 12: CONFIGURAÇÃO REMOTA DE MÁQUINA
+           ======================================================= -->
+      <section class="slide" data-category="WEB" data-index="11">
+        <div class="slide-info-panel">
+          <div class="badge-category badge-web">🌐 Painel Web Cloud</div>
+          <div class="slide-title-group">
+            <span class="slide-number-tag">TELA 12 &bull; MODAL DE CONFIGURAÇÃO</span>
+            <h2 class="slide-heading">Parâmetros Remotos de Máquina</h2>
+          </div>
+          <p class="slide-objective">
+            Modal operacional disparado a partir de qualquer estação para calibrar remotamente preços, tempos de higienização e métodos de pagamento.
+          </p>
+
+          <div class="features-list">
+            <div class="feature-item">
+              <div class="feature-icon-box icon-yellow">💰</div>
+              <div class="feature-text">
+                <strong>Precificação Dinâmica por Estação</strong>
+                <span>Defina valores independentes para locais premium vs postos de alta rotatividade.</span>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon-box icon-cyan">⏱️</div>
+              <div class="feature-text">
+                <strong>Tempos de Ciclo & Exaustão Personalizados</strong>
+                <span>Ajuste fino de segundos de UV-C, névoa, secagem térmica e borrifamento de fragrância.</span>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon-box icon-purple">💳</div>
+              <div class="feature-text">
+                <strong>Habilitação de Meios de Pagamento</strong>
+                <span>Ative ou desative de forma independente Cartão de Crédito, Débito, PIX e Cupons.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tech-specs-box">
+            <div class="tech-specs-title">⚡ Sincronização em Tempo Real</div>
+            <div class="specs-grid">
+              <div class="spec-item"><span class="spec-label">Propagação</span><span class="spec-val">Próximo Heartbeat (máx 60s)</span></div>
+              <div class="spec-item"><span class="spec-label">Fallback</span><span class="spec-val">Cache local SQLite em caso offline</span></div>
+              <div class="spec-item"><span class="spec-label">Payload</span><span class="spec-val">JSON estruturado assinado</span></div>
+              <div class="spec-item"><span class="spec-label">Auditoria</span><span class="spec-val">Log de quem alterou cada parâmetro</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="slide-preview-panel">
+          <div class="device-mockup web-browser">
+            <div class="browser-bar">
+              <div class="browser-dots"><div class="browser-dot dot-red"></div><div class="browser-dot dot-yellow"></div><div class="browser-dot dot-green"></div></div>
+              <div class="browser-url">https://admin.capaxero.com.br/estacoes/<span>modal-config</span></div>
+            </div>
+            <div class="screen-canvas">
+              <div style="height: 100%; padding: 20px; background: rgba(13, 21, 39, 0.95); display: flex; flex-direction: column; gap: 12px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;">
+                  <span style="font-weight: 800; font-size: 13px; color: var(--cpx-yellow);">⚙️ Configurar Máquina: TOTEM-CPX-001</span>
+                  <span style="font-size: 11px; color: var(--text-dim); cursor: pointer;">✖ Fechar</span>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 11px;">
+                  <div style="background: rgba(255,255,255,0.03); padding: 8px; border-radius: 6px;">
+                    <span style="color: var(--text-dim); display: block; margin-bottom: 2px;">Preço Plano Básico:</span>
+                    <input type="text" value="R$ 14,00" style="width: 100%; background: #070B14; border: 1px solid var(--border-subtle); color: #FFF; padding: 4px; border-radius: 4px; font-family: var(--font-mono);">
+                  </div>
+                  <div style="background: rgba(255,255,255,0.03); padding: 8px; border-radius: 6px;">
+                    <span style="color: var(--text-dim); display: block; margin-bottom: 2px;">Preço Plano Intermediário:</span>
+                    <input type="text" value="R$ 17,00" style="width: 100%; background: #070B14; border: 1px solid var(--border-subtle); color: #FFF; padding: 4px; border-radius: 4px; font-family: var(--font-mono);">
+                  </div>
+                  <div style="background: rgba(255,255,255,0.03); padding: 8px; border-radius: 6px;">
+                    <span style="color: var(--text-dim); display: block; margin-bottom: 2px;">Tempo Secagem Interm.:</span>
+                    <input type="text" value="180 segundos" style="width: 100%; background: #070B14; border: 1px solid var(--border-subtle); color: #FFF; padding: 4px; border-radius: 4px; font-family: var(--font-mono);">
+                  </div>
+                  <div style="background: rgba(255,255,255,0.03); padding: 8px; border-radius: 6px;">
+                    <span style="color: var(--text-dim); display: block; margin-bottom: 2px;">Fragrância Borrifo:</span>
+                    <input type="text" value="3.5 segundos" style="width: 100%; background: #070B14; border: 1px solid var(--border-subtle); color: #FFF; padding: 4px; border-radius: 4px; font-family: var(--font-mono);">
+                  </div>
+                </div>
+
+                <button class="btn-totem-start" style="padding: 10px; font-size: 12px; margin-top: auto;">
+                  💾 Salvar & Sincronizar com Totem
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =======================================================
+           SLIDE 13: WEB - TELA 13: GESTÃO DE CUPONS QR CODE
+           ======================================================= -->
+      <section class="slide" data-category="WEB" data-index="12">
+        <div class="slide-info-panel">
+          <div class="badge-category badge-web">🌐 Painel Web Cloud</div>
+          <div class="slide-title-group">
+            <span class="slide-number-tag">TELA 13 &bull; MARKETING & PROMOÇÕES</span>
+            <h2 class="slide-heading">Gestão de Cupons & Vouchers QR</h2>
+          </div>
+          <p class="slide-objective">
+            Emissão de cupons de desconto e gratuidades para parcerias comerciais, com geração automática de imagem QR Code para impressão ou envio por WhatsApp.
+          </p>
+
+          <div class="features-list">
+            <div class="feature-item">
+              <div class="feature-icon-box icon-cyan">🎟️</div>
+              <div class="feature-text">
+                <strong>Modalidades de Desconto Flexíveis</strong>
+                <span>Suporte a Desconto Percentual (ex: 20%, 50%), Valor Fixo em Reais (ex: R$ 5,00) ou Gratuidade 100%.</span>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon-box icon-yellow">📷</div>
+              <div class="feature-text">
+                <strong>Download Imediato de QR Code (PNG/SVG)</strong>
+                <span>Pronto para aplicação em folhetos de moto clubes, eventos ou adesivos de parceiros.</span>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon-box icon-green">🔒</div>
+              <div class="feature-text">
+                <strong>Controle de Uso Único & Anti-Fraude</strong>
+                <span>Baixa atômica imediata via API REST quando o totem inicia o ciclo, evitando reutilização.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tech-specs-box">
+            <div class="tech-specs-title">⚡ Endpoints de Cupons</div>
+            <div class="specs-grid">
+              <div class="spec-item"><span class="spec-label">Consulta</span><span class="spec-val">GET /coupons/{code}</span></div>
+              <div class="spec-item"><span class="spec-label">Baixa (Redeem)</span><span class="spec-val">POST /coupons/{code}/redeem</span></div>
+              <div class="spec-item"><span class="spec-label">Validade</span><span class="spec-val">Expiração por Timestamp Unix</span></div>
+              <div class="spec-item"><span class="spec-label">Limite</span><span class="spec-val">MaxUsages & CurrentUsages</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="slide-preview-panel">
+          <div class="device-mockup web-browser">
+            <div class="browser-bar">
+              <div class="browser-dots"><div class="browser-dot dot-red"></div><div class="browser-dot dot-yellow"></div><div class="browser-dot dot-green"></div></div>
+              <div class="browser-url">https://admin.capaxero.com.br/<span>cupons</span></div>
+            </div>
+            <div class="screen-canvas">
+              <div class="mock-web-dashboard">
+                <div class="web-sidebar">
+                  <div style="font-family: var(--font-display); font-weight: 800; font-size: 14px; color: var(--cpx-yellow); margin-bottom: 12px;">CAPAXERO</div>
+                  <div class="web-nav-item" onclick="goToSlide(8)">🏢 Estações</div>
+                  <div class="web-nav-item" onclick="goToSlide(9)">📍 Locais</div>
+                  <div class="web-nav-item" onclick="goToSlide(10)">📊 Dashboard</div>
+                  <div class="web-nav-item active">🎟️ Cupons</div>
+                </div>
+
+                <div class="web-main-content">
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="font-weight: 800; font-size: 14px;">Cupons Ativos</div>
+                    <button style="background: var(--cpx-yellow); color: #000; border: none; padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800;">+ Criar Cupom QR</button>
+                  </div>
+
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                    <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255,255,255,0.08); padding: 8px 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                      <div>
+                        <div style="font-family: var(--font-mono); font-weight: 700; color: var(--cpx-cyan); font-size: 11px;">GRATIS-CAPAXERO-100</div>
+                        <div style="font-size: 9px; color: var(--text-muted);">100% OFF &bull; Demonstração</div>
+                      </div>
+                      <div style="font-size: 18px;">📱</div>
+                    </div>
+
+                    <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255,255,255,0.08); padding: 8px 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                      <div>
+                        <div style="font-family: var(--font-mono); font-weight: 700; color: var(--cpx-yellow); font-size: 11px;">DESC20-MOTOCLUBE</div>
+                        <div style="font-size: 9px; color: var(--text-muted);">20% OFF &bull; Qualquer Plano</div>
+                      </div>
+                      <div style="font-size: 18px;">📱</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =======================================================
+           SLIDE 14: WEB - TELA 14: PERFIL & NÍVEIS DE ACESSO
+           ======================================================= -->
+      <section class="slide" data-category="WEB" data-index="13">
+        <div class="slide-info-panel">
+          <div class="badge-category badge-web">🌐 Painel Web Cloud</div>
+          <div class="slide-title-group">
+            <span class="slide-number-tag">TELA 14 &bull; GOVERNANÇA & SEGURANÇA</span>
+            <h2 class="slide-heading">Perfil de Usuário & Controle RBAC</h2>
+          </div>
+          <p class="slide-objective">
+            Gerenciamento de credenciais, dados cadastrais da operadora e controle granular de permissões entre Administradores, Gestores de Ponto e Técnicos.
+          </p>
+
+          <div class="features-list">
+            <div class="feature-item">
+              <div class="feature-icon-box icon-cyan">👤</div>
+              <div class="feature-text">
+                <strong>Controle de Perfis (RBAC)</strong>
+                <span>Diferenciação clara de acesso entre Admin Global, Franqueado e Equipe de Manutenção de Campo.</span>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon-box icon-yellow">🏢</div>
+              <div class="feature-text">
+                <strong>Visão de Máquinas sob Responsabilidade</strong>
+                <span>Contagem e filtro automático de totens vinculados ao usuário logado.</span>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon-box icon-purple">🔐</div>
+              <div class="feature-text">
+                <strong>Gestão de Chaves de API de Máquina</strong>
+                <span>Emissão e revogação de tokens Bearer (`X-Totem-ID`) para novos quiosques instalados.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tech-specs-box">
+            <div class="tech-specs-title">⚡ Segurança & Compliance</div>
+            <div class="specs-grid">
+              <div class="spec-item"><span class="spec-label">Autenticação</span><span class="spec-val">JWT Bearer Token + 2FA</span></div>
+              <div class="spec-item"><span class="spec-label">Criptografia</span><span class="spec-val">HTTPS TLS 1.3 ponta a ponta</span></div>
+              <div class="spec-item"><span class="spec-label">Auditoria</span><span class="spec-val">Registro de logs de acesso</span></div>
+              <div class="spec-item"><span class="spec-label">LGPD</span><span class="spec-val">Em conformidade (dados anonimizados)</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="slide-preview-panel">
+          <div class="device-mockup web-browser">
+            <div class="browser-bar">
+              <div class="browser-dots"><div class="browser-dot dot-red"></div><div class="browser-dot dot-yellow"></div><div class="browser-dot dot-green"></div></div>
+              <div class="browser-url">https://admin.capaxero.com.br/<span>perfil</span></div>
+            </div>
+            <div class="screen-canvas">
+              <div style="height: 100%; padding: 24px; background: #0F172A; color: #FFF; display: flex; flex-direction: column; gap: 14px;">
+                <div style="display: flex; align-items: center; gap: 14px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 14px;">
+                  <div style="width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, var(--cpx-yellow), var(--cpx-gold)); color: #000; font-weight: 900; display: flex; align-items: center; justify-content: center; font-size: 20px;">
+                    AD
+                  </div>
+                  <div>
+                    <div style="font-weight: 800; font-size: 15px;">Administrador Geral</div>
+                    <div style="font-size: 11px; color: var(--cpx-cyan);">admin@capaxero.com.br &bull; Acesso Master</div>
+                  </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 11px;">
+                  <div style="background: rgba(30, 41, 59, 0.7); padding: 10px; border-radius: 8px;">
+                    <div style="color: var(--text-dim);">MÁQUINAS SOB GESTÃO</div>
+                    <div style="font-size: 18px; font-weight: 800; color: var(--cpx-yellow);">12 Totens Ativos</div>
+                  </div>
+                  <div style="background: rgba(30, 41, 59, 0.7); padding: 10px; border-radius: 8px;">
+                    <div style="color: var(--text-dim);">NÍVEL DE ACESSO</div>
+                    <div style="font-size: 18px; font-weight: 800; color: var(--cpx-green);">Super Admin</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =======================================================
+           SLIDE 15: ARQUITETURA DE TELEMETRIA & HARDWARE
+           ======================================================= -->
+      <section class="slide slide-fullwidth" data-category="TECH" data-index="14">
+        <div style="max-width: 1100px; width: 100%; margin: 0 auto; background: var(--bg-card); padding: 36px; border-radius: 24px; border: 1px solid var(--border-subtle); backdrop-filter: blur(20px); box-shadow: var(--shadow-card);">
+          <div class="badge-category badge-tech" style="margin: 0 auto 12px auto;">
+            ⚡ Arquitetura IoT & Fluxo de Dados
+          </div>
+          <h2 style="font-family: var(--font-display); font-size: 28px; font-weight: 800; margin-bottom: 24px; text-align: center;">
+            Integração Serial (UART) & Sincronização Cloud
+          </h2>
+
+          <div style="display: grid; grid-template-columns: 1fr 0.3fr 1fr; gap: 16px; align-items: center; text-align: left;">
+            <!-- Totem Hardware -->
+            <div style="background: rgba(0, 240, 255, 0.05); border: 1px solid rgba(0, 240, 255, 0.2); padding: 18px; border-radius: 16px;">
+              <div style="font-weight: 800; font-size: 14px; color: var(--cpx-cyan); margin-bottom: 10px;">🤖 TOTEM KIOSK (EDGE IoT)</div>
+              <ul style="font-size: 11px; color: var(--text-muted); list-style: none; display: flex; flex-direction: column; gap: 6px;">
+                <li>🔹 <strong>Leitor Óptico EM2003X:</strong> Leitura de Cupons QR</li>
+                <li>🔹 <strong>Pinpad Cielo PPC930:</strong> Cartões & PIX</li>
+                <li>🔹 <strong>Placa Serial UART:</strong> Relés UPUS_3 & Atuadores</li>
+                <li>🔹 <strong>Sensores:</strong> Porta Fechada & Nível de Líquido</li>
+                <li>🔹 <strong>SQLite Local:</strong> Operação Resiliente Offline</li>
+              </ul>
+            </div>
+
+            <!-- Flow Arrows -->
+            <div style="text-align: center; font-size: 20px; color: var(--cpx-yellow);">
+              ⇄
+            </div>
+
+            <!-- Cloud Backend -->
+            <div style="background: rgba(253, 203, 36, 0.05); border: 1px solid rgba(253, 203, 36, 0.2); padding: 18px; border-radius: 16px;">
+              <div style="font-weight: 800; font-size: 14px; color: var(--cpx-yellow); margin-bottom: 10px;">☁️ CLOUD BACKEND & WEB PANEL</div>
+              <ul style="font-size: 11px; color: var(--text-muted); list-style: none; display: flex; flex-direction: column; gap: 6px;">
+                <li>🔸 <strong>Heartbeat (60s):</strong> Telemetria e Alertas</li>
+                <li>🔸 <strong>Validador de Cupons:</strong> Baixa Imediata</li>
+                <li>🔸 <strong>Sincronização:</strong> Vendas e Faturamento</li>
+                <li>🔸 <strong>Configuração Remota:</strong> Preços e Tempos</li>
+                <li>🔸 <strong>Dashboard Web:</strong> Visão Consolidada</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =======================================================
+           SLIDE 16: CONCLUSÃO & RESUMO EXECUTIVO
+           ======================================================= -->
+      <section class="slide slide-fullwidth" data-category="ALL" data-index="15">
+        <div style="max-width: 860px; margin: 0 auto; background: var(--bg-card); padding: 42px; border-radius: 28px; border: 1px solid var(--border-subtle); backdrop-filter: blur(20px); box-shadow: var(--shadow-card); text-align: center;">
+          <div style="font-size: 48px; margin-bottom: 12px;">🚀</div>
+          <h2 style="font-family: var(--font-display); font-size: 34px; font-weight: 900; margin-bottom: 14px; color: #FFF;">
+            Ecossistema CapaXero Pronto para Escala
+          </h2>
+          <p style="font-size: 15px; color: var(--text-muted); line-height: 1.6; margin-bottom: 28px;">
+            Uma solução integrada de alta tecnologia que une hardware inteligente, interface touch moderna e intuitiva para o usuário final, e controle gerencial completo em nuvem.
+          </p>
+
+          <div style="display: flex; justify-content: center; gap: 14px;">
+            <button class="btn-totem-start" style="padding: 12px 28px; font-size: 14px;" onclick="goToSlide(1)">
+              🔄 Rever Telas do Totem
+            </button>
+            <button class="btn-totem-start" style="background: var(--cpx-blue-dark); color: #FFF; border: 1px solid var(--border-highlight); padding: 12px 28px; font-size: 14px;" onclick="goToSlide(8)">
+              🌐 Ver Painel Web
+            </button>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Overview Modal / Drawer -->
+  <div class="overview-modal" id="overviewModal">
+    <div class="overview-header">
+      <div style="font-family: var(--font-display); font-size: 22px; font-weight: 800; color: #FFF;">📑 Índice Completo de Telas</div>
+      <button class="action-btn" onclick="toggleOverview()">✖</button>
+    </div>
+    <div class="overview-grid" id="overviewGrid">
+      <!-- Injected by JavaScript -->
+    </div>
+  </div>
+
+  <!-- Bottom Navigation & Progress -->
+  <footer class="app-footer">
+    <div class="progress-bar-container">
+      <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+
+    <div class="slide-counter">
+      Slide <span class="current" id="currentSlideNum">1</span> de <span id="totalSlidesNum">16</span>
+    </div>
+
+    <div class="keyboard-tip">
+      <span>Navegue com</span>
+      <span class="kbd">◀</span>
+      <span class="kbd">▶</span>
+      <span>ou</span>
+      <span class="kbd">Espaço</span>
+    </div>
+
+    <div class="nav-controls">
+      <button class="nav-btn" onclick="prevSlide()">◀ Anterior</button>
+      <button class="nav-btn primary" onclick="nextSlide()">Próxima ▶</button>
+    </div>
+  </footer>
+
+  <!-- =======================================================
+       JAVASCRIPT LOGIC FOR SLIDESHOW, AUDIO & INTERACTIONS
+       ======================================================= -->
+  <script>
+    // Slide Management State
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    let soundEnabled = true;
+
+    // Web Audio Synthesizer for High-Tech Sound FX
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(type) {
+      if (!soundEnabled || !audioCtx) return;
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      const now = audioCtx.currentTime;
+
+      if (type === 'slide') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(320, now);
+        osc.frequency.exponentialRampToValueAtTime(640, now + 0.12);
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+        osc.start(now);
+        osc.stop(now + 0.12);
+      } else if (type === 'click') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(800, now);
+        osc.frequency.exponentialRampToValueAtTime(400, now + 0.08);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+        osc.start(now);
+        osc.stop(now + 0.08);
+      }
+    }
+
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      const btn = document.getElementById('soundBtn');
+      if (soundEnabled) {
+        btn.textContent = '🔊';
+        btn.classList.remove('muted');
+        playSound('click');
+      } else {
+        btn.textContent = '🔇';
+        btn.classList.add('muted');
+      }
+    }
+
+    function updateSlideUI() {
+      slides.forEach((slide, idx) => {
+        slide.classList.remove('active', 'exit-left');
+        if (idx === currentSlide) {
+          slide.classList.add('active');
+        } else if (idx < currentSlide) {
+          slide.classList.add('exit-left');
+        }
+      });
+
+      // Update counters & progress
+      document.getElementById('currentSlideNum').textContent = currentSlide + 1;
+      document.getElementById('totalSlidesNum').textContent = totalSlides;
+      const progressPercent = ((currentSlide + 1) / totalSlides) * 100;
+      document.getElementById('progressBar').style.width = progressPercent + '%';
+
+      // Update active card in overview
+      document.querySelectorAll('.overview-card').forEach((card, idx) => {
+        card.classList.toggle('active', idx === currentSlide);
+      });
+    }
+
+    function goToSlide(index) {
+      if (index >= 0 && index < totalSlides) {
+        currentSlide = index;
+        updateSlideUI();
+        playSound('slide');
+      }
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides - 1) {
+        goToSlide(currentSlide + 1);
+      } else {
+        goToSlide(0);
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 0) {
+        goToSlide(currentSlide - 1);
+      }
+    }
+
+    // Keyboard Navigation
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        e.preventDefault();
+        nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        e.preventDefault();
+        prevSlide();
+      } else if (e.key === 'f' || e.key === 'F') {
+        toggleFullscreen();
+      } else if (e.key === 'Escape') {
+        const modal = document.getElementById('overviewModal');
+        if (modal.classList.contains('open')) {
+          toggleOverview();
+        }
+      }
+    });
+
+    // Category Filtering
+    function filterCategory(category) {
+      playSound('click');
+      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.closest('.filter-btn').classList.add('active');
+
+      if (category === 'ALL') {
+        goToSlide(0);
+      } else if (category === 'TOTEM') {
+        goToSlide(1);
+      } else if (category === 'WEB') {
+        goToSlide(8);
+      } else if (category === 'TECH') {
+        goToSlide(7);
+      }
+    }
+
+    // Fullscreen Toggle
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => console.log(err));
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    // Overview Drawer
+    function toggleOverview() {
+      playSound('click');
+      const modal = document.getElementById('overviewModal');
+      modal.classList.toggle('open');
+    }
+
+    // Build Overview Grid Dynamically
+    function buildOverviewGrid() {
+      const grid = document.getElementById('overviewGrid');
+      grid.innerHTML = '';
+      
+      const slideTitles = [
+        "Apresentação do Ecossistema CapaXero",
+        "Totem: Tela 01 — Home / Standby",
+        "Totem: Tela 02 — Seleção de Modos",
+        "Totem: Tela 03 — Pagamento Cielo & PIX",
+        "Totem: Tela 04 — Inserção do Capacete",
+        "Totem: Tela 05 — Higienização Ativa",
+        "Totem: Tela 06/07 — Parada & Conclusão",
+        "Totem: Tela 08 — Modo Técnico Serial",
+        "Web: Tela 09 — Gestão de Estações",
+        "Web: Tela 10 — Gestão de Locais",
+        "Web: Tela 11 — Dashboard Financeiro",
+        "Web: Tela 12 — Configuração Remota",
+        "Web: Tela 13 — Cupons & Vouchers QR",
+        "Web: Tela 14 — Perfil & Níveis de Acesso",
+        "Arquitetura: Telemetria & Hardware",
+        "Conclusão Executiva"
+      ];
+
+      slideTitles.forEach((title, idx) => {
+        const card = document.createElement('div');
+        card.className = `overview-card ${idx === currentSlide ? 'active' : ''}`;
+        card.innerHTML = `
+          <div class="card-num">SLIDE ${String(idx + 1).padStart(2, '0')}</div>
+          <div class="card-name">${title}</div>
+        `;
+        card.onclick = () => {
+          goToSlide(idx);
+          toggleOverview();
+        };
+        grid.appendChild(card);
+      });
+    }
+
+    // Interactive Mode Simulation
+    function selectModeMock(card, name, price, time) {
+      playSound('click');
+      document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+    }
+
+    // Interactive Stage Simulation in Slide 05
+    function switchStageVisual(stageClass, time, name) {
+      playSound('click');
+      const stage = document.getElementById('interactiveCleaningStage');
+      stage.className = 'mock-active-cleaning ' + stageClass;
+      document.getElementById('stageTimerVal').textContent = time;
+      document.getElementById('stageNameLabel').textContent = name.toUpperCase();
+
+      document.querySelectorAll('.step-pill-mini').forEach(pill => pill.classList.remove('active'));
+      event.target.classList.add('active');
+    }
+
+    // Initialize
+    window.addEventListener('DOMContentLoaded', () => {
+      buildOverviewGrid();
+      updateSlideUI();
+    });
+  </script>
+</body>
+</html>
