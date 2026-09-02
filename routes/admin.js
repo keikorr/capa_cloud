@@ -40,6 +40,41 @@ const videoUpload = multer({
   }
 });
 
+/**
+ * Confere o formato das credenciais Cielo E-commerce antes de gravar.
+ *
+ * O Merchant ID da Cielo é um GUID (8-4-4-4-12, 32 dígitos hexadecimais). Um caractere a
+ * menos faz a API responder "MerchantId is required" no momento do pagamento — erro que não
+ * aparece para quem cadastrou. A Merchant Key emitida pela Cielo tem 40 caracteres.
+ * Devolve null quando está tudo certo, ou a mensagem de erro.
+ */
+const CIELO_GUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function validateEcommerceCredentials(cielo) {
+  if (!cielo || typeof cielo !== 'object') return null;
+
+  const merchantId = (cielo.ecommerceMerchantId || '').trim();
+  const merchantKey = (cielo.ecommerceMerchantKey || '').trim();
+
+  if (merchantId && !CIELO_GUID_REGEX.test(merchantId)) {
+    const digits = merchantId.replace(/-/g, '').length;
+    return `Merchant ID da Cielo inválido: "${merchantId}". ` +
+      `Deve ser um GUID no formato 8-4-4-4-12 (32 caracteres hexadecimais); ` +
+      `o valor informado tem ${digits}. Copie novamente do portal da Cielo.`;
+  }
+
+  if (merchantId && !merchantKey) {
+    return 'Informe também a Merchant Key da Cielo para esta máquina.';
+  }
+
+  if (merchantKey && merchantKey.length < 20) {
+    return `Merchant Key da Cielo parece incompleta (${merchantKey.length} caracteres). ` +
+      'A chave emitida pela Cielo costuma ter 40 caracteres.';
+  }
+
+  return null;
+}
+
 // Middleware auxiliar para extrair o usuário autenticado
 function extractUser(req) {
   const token = req.headers.authorization || req.query.token;
@@ -97,6 +132,19 @@ router.post('/admin/depots', (req, res) => {
  */
 router.delete('/admin/depots/:depotno', (req, res) => {
   const { depotno } = req.params;
+
+  const depots = store.getDepotsList();
+  const depot = depots.find(d => d.depotno === depotno);
+  if (!depot) {
+    return res.status(404).json({ success: false, message: 'Local não encontrado.' });
+  }
+  if (depot.devno) {
+    return res.status(400).json({
+      success: false,
+      message: 'Este local tem uma máquina alocada. Realoque a estação para outro local antes de excluir.'
+    });
+  }
+
   const deleted = store.deleteDepot(depotno);
   if (!deleted) {
     return res.status(404).json({ success: false, message: 'Local não encontrado.' });
@@ -190,6 +238,40 @@ router.get('/admin/users', (req, res) => {
     success: true,
     data: store.getUsersList()
   });
+});
+
+/**
+ * PUT /api/v1/admin/users/:id
+ * Exclusivo para CRPADMIN: edita os dados cadastrais de qualquer dono (nome, CNPJ, e-mail,
+ * telefone, empresa, tipo de vínculo — franqueado ou máquina própria — e senha opcional)
+ */
+router.put('/admin/users/:id', (req, res) => {
+  const user = extractUser(req);
+  if (user && user.role !== 'CRPADMIN') {
+    return res.status(403).json({
+      success: false,
+      message: 'Acesso negado. Apenas o perfil CRPADMIN pode editar cadastros.'
+    });
+  }
+
+  const { id } = req.params;
+  const { responsible_name, cnpj, email, phone, company_name, franchiseType, password } = req.body;
+
+  try {
+    const updated = store.updateUserProfile(id, {
+      responsible_name,
+      cnpj,
+      email,
+      phone,
+      company_name,
+      franchiseType,
+      password
+    });
+    wsManager.broadcastDashboardUpdate();
+    return res.json({ success: true, message: 'Cadastro atualizado com sucesso.', data: updated });
+  } catch (err) {
+    return res.status(400).json({ success: false, message: err.message });
+  }
 });
 
 /**
@@ -305,6 +387,14 @@ router.put('/admin/totems/:devno/config', (req, res) => {
   const totem = store.getTotem(devno);
   if (!totem) {
     return res.status(404).json({ success: false, message: 'Totem não encontrado.' });
+  }
+
+  // Credencial E-commerce malformada era aceita sem reclamar e só falhava na hora da
+  // cobrança, como um "MerchantId is required" da Cielo que ninguém via. Melhor recusar
+  // aqui, com o operador ainda olhando para o campo.
+  const cieloError = validateEcommerceCredentials(configData.cielo);
+  if (cieloError) {
+    return res.status(400).json({ success: false, message: cieloError });
   }
 
   const updatedTotem = store.updateTotemConfig(devno, configData, userRole);
@@ -475,7 +565,6 @@ router.post('/admin/remote-command', (req, res) => {
 
     case 'REFILL_FLUIDS':
       totem.liquidLevelPercent = 100;
-      totem.fragranceLevelPercent = 100;
       store.getAlerts().forEach(a => {
         if (a.devno === devno && a.type === 'LOW_LIQUID') {
           store.resolveAlert(a.id);
@@ -514,6 +603,58 @@ router.get('/admin/transactions', (req, res) => {
   return res.json({
     success: true,
     data: store.getTransactions(limit, user)
+  });
+});
+
+/**
+ * POST /api/v1/admin/maintenance
+ * Abre uma nova Ordem de Manutenção: coloca a máquina em manutenção e registra o alerta
+ */
+router.post('/admin/maintenance', (req, res) => {
+  const { devno, issueType, priority, description, assignee } = req.body;
+
+  if (!devno) {
+    return res.status(400).json({ success: false, message: 'Selecione a máquina.' });
+  }
+
+  const result = store.openMaintenanceOrder(devno, { issueType, priority, description, assignee });
+  if (!result) {
+    return res.status(404).json({ success: false, message: 'Totem não encontrado.' });
+  }
+
+  wsManager.broadcastDashboardUpdate();
+
+  return res.json({
+    success: true,
+    message: 'Ordem de manutenção aberta com sucesso.',
+    data: result.alert
+  });
+});
+
+/**
+ * POST /api/v1/admin/maintenance/:id/comment
+ * Adiciona um comentário a uma Ordem de Manutenção
+ */
+router.post('/admin/maintenance/:id/comment', (req, res) => {
+  const { id } = req.params;
+  const { text } = req.body;
+  const user = extractUser(req);
+
+  const alert = store.addMaintenanceComment(id, {
+    text,
+    author: user?.responsible_name || user?.username || 'Admin'
+  });
+
+  if (!alert) {
+    return res.status(400).json({ success: false, message: 'Comentário vazio ou ordem de manutenção não encontrada.' });
+  }
+
+  wsManager.broadcastDashboardUpdate();
+
+  return res.json({
+    success: true,
+    message: 'Comentário adicionado.',
+    data: alert
   });
 });
 

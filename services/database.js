@@ -7,6 +7,7 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const { sanitizeCpf, isValidCpf, formatCpf, COUPON_CPF_ENABLED } = require('./cpf');
 
 const DATA_DIR = path.join(__dirname, '..', 'data');
 const DB_FILE = path.join(DATA_DIR, 'capaxero_database.json');
@@ -98,6 +99,14 @@ class RelationalDatabase {
     if (!Array.isArray(this.tables.transactions)) this.tables.transactions = [];
     if (!Array.isArray(this.tables.alerts)) this.tables.alerts = [];
     if (!Array.isArray(this.tables.coupons)) this.tables.coupons = [];
+
+    // Migração: cupons criados antes do controle por CPF
+    for (const cp of this.tables.coupons) {
+      if (!Array.isArray(cp.redemptions)) cp.redemptions = [];
+      if (cp.maxUsagesPerCpf === undefined) cp.maxUsagesPerCpf = 1;
+      if (cp.requireCpf === undefined) cp.requireCpf = true;
+    }
+
     if (!this.tables.systemSettings || typeof this.tables.systemSettings !== 'object') {
       this.tables.systemSettings = {
         defaultCieloMerchantId: "5e4fc2b8-11e3-4f9c-ab97-fb7baaea405b",
@@ -115,7 +124,10 @@ class RelationalDatabase {
         applicableMode: null,
         isUsed: false,
         maxUsages: 1,
-        currentUsages: 0
+        maxUsagesPerCpf: 1,
+        requireCpf: true,
+        currentUsages: 0,
+        redemptions: []
       },
       {
         code: "DESC20-GERAL",
@@ -124,7 +136,10 @@ class RelationalDatabase {
         applicableMode: null,
         isUsed: false,
         maxUsages: 1,
-        currentUsages: 0
+        maxUsagesPerCpf: 1,
+        requireCpf: true,
+        currentUsages: 0,
+        redemptions: []
       },
       {
         code: "INTER50-CAPAXERO",
@@ -133,7 +148,10 @@ class RelationalDatabase {
         applicableMode: "INTERMEDIARIA",
         isUsed: false,
         maxUsages: 1,
-        currentUsages: 0
+        maxUsagesPerCpf: 1,
+        requireCpf: true,
+        currentUsages: 0,
+        redemptions: []
       }
     ];
 
@@ -189,7 +207,7 @@ class RelationalDatabase {
   // ==========================================
 
   createUser(userData) {
-    const { username, email, password, cnpj, responsible_name, phone, company_name, role } = userData;
+    const { username, email, password, cnpj, responsible_name, phone, company_name, role, franchiseType } = userData;
 
     // Normalização
     const cleanEmail = (email || '').trim().toLowerCase();
@@ -218,6 +236,7 @@ class RelationalDatabase {
       responsible_name: responsible_name.trim(),
       phone: phone || '',
       company_name: company_name || responsible_name.trim(),
+      franchiseType: franchiseType === 'PROPRIA' ? 'PROPRIA' : 'FRANQUEADO',
       created_at: new Date().toISOString()
     };
 
@@ -285,6 +304,21 @@ class RelationalDatabase {
 
     if (updates.company_name !== undefined) {
       user.company_name = updates.company_name.trim();
+    }
+
+    if (updates.cnpj !== undefined) {
+      const cleanCnpj = updates.cnpj.replace(/\D/g, '');
+      if (cleanCnpj) {
+        const cnpjExists = this.tables.users.some(u => u.id !== userId && (u.cnpj || '').replace(/\D/g, '') === cleanCnpj);
+        if (cnpjExists) {
+          throw new Error('Já existe outro usuário cadastrado com este CNPJ.');
+        }
+      }
+      user.cnpj = updates.cnpj.trim();
+    }
+
+    if (updates.franchiseType !== undefined) {
+      user.franchiseType = updates.franchiseType === 'PROPRIA' ? 'PROPRIA' : 'FRANQUEADO';
     }
 
     if (updates.password && updates.password.trim().length > 0) {
@@ -390,16 +424,32 @@ class RelationalDatabase {
       const config = { ...(t.config || {}) };
       if (!isOwner) {
         delete config.cieloMerchantKey;
+        delete config.cielo;
         if (config.cieloMerchantId) {
           config.cieloMerchantId = config.cieloMerchantId.slice(0, 4) + '****-****-' + config.cieloMerchantId.slice(-4);
         }
       }
-      return { ...t, config };
+      const { revenueToday, cyclesToday } = this.getTodayMetrics(t.devno);
+      return { ...t, config, revenueToday, totalCyclesToday: cyclesToday };
     });
   }
 
   getTotem(devno) {
     return this.tables.totems.find(t => t.devno === devno);
+  }
+
+  // Faturamento e ciclos realmente de HOJE, calculados a partir do histórico de transações
+  // (t.revenueToday/t.totalCyclesToday no registro do totem são contadores que só somam e nunca
+  // zeram — não servem para exibir "hoje", só para o total histórico da máquina).
+  getTodayMetrics(devno) {
+    const todayIso = new Date().toISOString().slice(0, 10);
+    const todayTxs = this.tables.transactions.filter(t =>
+      t.devno === devno && t.status === 'APPROVED' && t.timestamp && t.timestamp.slice(0, 10) === todayIso
+    );
+    return {
+      revenueToday: todayTxs.reduce((acc, t) => acc + Number(t.amount || 0), 0),
+      cyclesToday: todayTxs.length
+    };
   }
 
   upsertTotem(data) {
@@ -428,8 +478,6 @@ class RelationalDatabase {
       totalCyclesToday: 0,
       revenueToday: 0,
       liquidLevelPercent: 100,
-      fragranceLevelPercent: 100,
-      temperature: 25.0,
       doorLocked: true,
       config: {
         basicPrice: 14.0,
@@ -461,7 +509,6 @@ class RelationalDatabase {
       owner: data.owner || base.owner || "Jonathan",
       doorLocked: doorLocked,
       liquidLevelPercent: liquidLevel !== undefined ? liquidLevel : base.liquidLevelPercent,
-      temperature: data.temperature || data.temperatureCelsius || base.temperature,
       status: data.status || (data.machineState ? (data.machineState.includes('CLEAN') ? 'CLEANING' : (data.machineState === 'MAINTENANCE' ? 'MAINTENANCE' : 'IDLE')) : base.status),
       config: base.config, // Preserva integralmente as configurações salvas em banco
       lastHeartbeat: new Date().toISOString()
@@ -484,11 +531,12 @@ class RelationalDatabase {
       totem = this.upsertTotem({ devno });
     }
 
-    // Se NÃO for CRPADMIN, impede alteração de chaves Cielo
+    // Se NÃO for CRPADMIN, impede alteração de credenciais Cielo (Ecommerce, Conecta, Pinpad)
     const safeConfig = { ...newConfig };
     if (userRole !== 'CRPADMIN') {
       delete safeConfig.cieloMerchantId;
       delete safeConfig.cieloMerchantKey;
+      delete safeConfig.cielo;
     }
 
     // Merge profundo de config
@@ -539,6 +587,11 @@ class RelationalDatabase {
       isCouponsEnabled: incomingPayment.isCouponsEnabled !== undefined ? Boolean(incomingPayment.isCouponsEnabled) : (safeConfig.isCouponsEnabled !== undefined ? Boolean(safeConfig.isCouponsEnabled) : (oldPayment.isCouponsEnabled !== false))
     };
 
+    // Merge profundo das credenciais Cielo (Pinpad/Conecta/Ecommerce) — parametrização remota por máquina
+    const mergedCielo = safeConfig.cielo
+      ? { ...(oldConfig.cielo || {}), ...safeConfig.cielo, devno, updatedAt: new Date().toISOString() }
+      : oldConfig.cielo;
+
     totem.config = {
       ...oldConfig,
       ...safeConfig,
@@ -553,7 +606,8 @@ class RelationalDatabase {
       isDebitEnabled: mergedPayment.isDebitEnabled,
       isCouponsEnabled: mergedPayment.isCouponsEnabled,
       modes: mergedModes,
-      paymentMethods: mergedPayment
+      paymentMethods: mergedPayment,
+      cielo: mergedCielo
     };
 
     this.save();
@@ -600,11 +654,12 @@ class RelationalDatabase {
     let depots = this.tables.depots;
     return depots.map(d => {
       const totem = this.getTotem(d.devno);
+      const { revenueToday, cyclesToday } = totem ? this.getTodayMetrics(totem.devno) : { revenueToday: 0, cyclesToday: 0 };
       return {
         ...d,
         totemStatus: totem ? totem.status : 'OFFLINE',
-        revenueToday: totem ? totem.revenueToday : 0,
-        cyclesToday: totem ? totem.totalCyclesToday : 0,
+        revenueToday,
+        cyclesToday,
         totemOwner: totem ? (totem.owner || totem.owner_id) : ''
       };
     });
@@ -726,14 +781,44 @@ class RelationalDatabase {
       totem = this.upsertTotem({ devno, ...telemetry });
     }
 
+    // Sem sensor real de temperatura ou nível de fragrância na máquina (ver Upus3Packet do APK,
+    // que só define canais para porta e nível de líquido) — esses dois campos não são aceitos
+    // aqui de propósito, para não persistir números fabricados como se fossem telemetria real.
     totem.status = telemetry.status || totem.status;
-    if (telemetry.temperature !== undefined) totem.temperature = telemetry.temperature;
     if (telemetry.doorLocked !== undefined) totem.doorLocked = telemetry.doorLocked;
     if (telemetry.liquidLevelPercent !== undefined) totem.liquidLevelPercent = telemetry.liquidLevelPercent;
-    if (telemetry.fragranceLevelPercent !== undefined) totem.fragranceLevelPercent = telemetry.fragranceLevelPercent;
     if (telemetry.currentCycle !== undefined) totem.currentCycle = telemetry.currentCycle;
+    delete totem.temperature;
+    delete totem.fragranceLevelPercent;
     totem.lastHeartbeat = new Date().toISOString();
 
+    this.save();
+    return totem;
+  }
+
+  // Marca como OFFLINE qualquer totem sem heartbeat há mais de `timeoutMs`
+  // (o APK manda heartbeat a cada 60s — ver 03_web_backend_totem_integration_guide.md).
+  // Sem isso, uma máquina desligada da tomada fica "Disponível" no painel para sempre,
+  // pois o último status recebido (ex: IDLE) nunca é substituído.
+  markStaleTotemsOffline(timeoutMs = 3 * 60 * 1000) {
+    const now = Date.now();
+    const changed = [];
+    for (const totem of this.tables.totems) {
+      if (totem.status === 'OFFLINE') continue;
+      const last = totem.lastHeartbeat ? new Date(totem.lastHeartbeat).getTime() : 0;
+      if (!last || now - last > timeoutMs) {
+        totem.status = 'OFFLINE';
+        changed.push(totem.devno);
+      }
+    }
+    if (changed.length) this.save();
+    return changed;
+  }
+
+  markTotemOffline(devno) {
+    const totem = this.getTotem(devno);
+    if (!totem || totem.status === 'OFFLINE') return null;
+    totem.status = 'OFFLINE';
     this.save();
     return totem;
   }
@@ -747,7 +832,6 @@ class RelationalDatabase {
     totem.status = "IDLE";
     totem.currentCycle = null;
     totem.liquidLevelPercent = Math.max(0, (totem.liquidLevelPercent || 100) - 2);
-    totem.fragranceLevelPercent = Math.max(0, (totem.fragranceLevelPercent || 100) - 1);
 
     if (totem.liquidLevelPercent <= 20) {
       this.addAlert({
@@ -780,6 +864,48 @@ class RelationalDatabase {
     return alert;
   }
 
+  // Abre uma Ordem de Manutenção: coloca a máquina em manutenção e registra o alerta
+  // correspondente (mesmo save() persiste os dois, pois ambos vivem em this.tables).
+  openMaintenanceOrder(devno, data = {}) {
+    const totem = this.getTotem(devno);
+    if (!totem) return null;
+
+    totem.status = 'MAINTENANCE';
+
+    const priority = data.priority || 'Média';
+    const alert = this.addAlert({
+      devno,
+      totemName: totem.name,
+      type: 'MAINTENANCE',
+      severity: priority,
+      priority,
+      issueType: data.issueType || 'Outro',
+      assignee: data.assignee || '',
+      message: data.description || `Ordem de manutenção aberta para ${totem.name}`
+    });
+
+    return { totem, alert };
+  }
+
+  addMaintenanceComment(alertId, data = {}) {
+    const alert = this.tables.alerts.find(a => a.id === alertId);
+    if (!alert) return null;
+
+    const text = (data.text || '').trim();
+    if (!text) return null;
+
+    if (!Array.isArray(alert.comments)) alert.comments = [];
+    alert.comments.push({
+      id: "CMT-" + Date.now().toString().slice(-6) + Math.random().toString(36).slice(2, 5),
+      text,
+      author: data.author || 'Admin',
+      timestamp: new Date().toISOString()
+    });
+
+    this.save();
+    return alert;
+  }
+
   getAlerts(activeOnly = false, userFilter = null) {
     let alerts = this.tables.alerts;
     if (userFilter && userFilter.role !== 'CRPADMIN') {
@@ -797,6 +923,16 @@ class RelationalDatabase {
     if (alert) {
       alert.resolved = true;
       alert.resolvedAt = new Date().toISOString();
+
+      // Resolver uma Ordem de Manutenção devolve a máquina para operação
+      // (só se ela ainda estiver em manutenção — não sobrescreve ERROR/OFFLINE supervenientes).
+      if (alert.type === 'MAINTENANCE' && alert.devno) {
+        const totem = this.getTotem(alert.devno);
+        if (totem && totem.status === 'MAINTENANCE') {
+          totem.status = 'IDLE';
+        }
+      }
+
       this.save();
     }
     return alert;
@@ -854,8 +990,7 @@ class RelationalDatabase {
       .filter(dep => userFilter && userFilter.role !== 'CRPADMIN' ? ownedDevnos.has(dep.devno) : true)
       .map(dep => {
         const totem = this.getTotem(dep.devno);
-        const revenue = totem ? totem.revenueToday : 0;
-        const cycles = totem ? totem.totalCyclesToday : 0;
+        const { revenueToday: revenue, cyclesToday: cycles } = totem ? this.getTodayMetrics(totem.devno) : { revenueToday: 0, cyclesToday: 0 };
         const commission = (revenue * dep.commissionPercent) / 100;
         const netRevenue = revenue - commission;
 
@@ -967,13 +1102,74 @@ class RelationalDatabase {
   // CUPONS & VOUCHERS QR CODE
   // ==========================================
   getCouponsList() {
-    return this.tables.coupons || [];
+    return (this.tables.coupons || []).map(c => ({
+      ...c,
+      redemptions: Array.isArray(c.redemptions) ? c.redemptions : [],
+      maxUsagesPerCpf: Number(c.maxUsagesPerCpf) > 0 ? Number(c.maxUsagesPerCpf) : 1,
+      requireCpf: c.requireCpf !== false
+    }));
   }
 
   getCoupon(code) {
     if (!code) return null;
     const clean = code.trim().toUpperCase();
-    return (this.tables.coupons || []).find(c => c.code.toUpperCase() === clean);
+    const coupon = (this.tables.coupons || []).find(c => c.code.toUpperCase() === clean);
+    if (!coupon) return null;
+
+    // Compatibilidade com cupons criados antes do controle por CPF
+    if (!Array.isArray(coupon.redemptions)) coupon.redemptions = [];
+    if (coupon.maxUsagesPerCpf === undefined) coupon.maxUsagesPerCpf = 1;
+    if (coupon.requireCpf === undefined) coupon.requireCpf = true;
+
+    return coupon;
+  }
+
+  /** Quantas vezes um CPF específico já resgatou este cupom. */
+  countCpfUsages(coupon, cpf) {
+    const clean = sanitizeCpf(cpf);
+    if (!coupon || !clean || !Array.isArray(coupon.redemptions)) return 0;
+    return coupon.redemptions.filter(r => sanitizeCpf(r.cpf) === clean).length;
+  }
+
+  /** Histórico de CPFs que utilizaram o cupom (mais recentes primeiro). */
+  getCouponRedemptions(code) {
+    const coupon = this.getCoupon(code);
+    if (!coupon) return null;
+    return [...(coupon.redemptions || [])].sort((a, b) =>
+      String(b.redeemedAt || '').localeCompare(String(a.redeemedAt || ''))
+    );
+  }
+
+  /**
+   * Remove um registro de resgate (libera novamente aquele CPF).
+   * Devolve o cupom atualizado, ou null se o cupom/registro não existir.
+   */
+  removeCouponRedemption(code, redemptionId) {
+    const coupon = this.getCoupon(code);
+    if (!coupon) return null;
+
+    const index = (coupon.redemptions || []).findIndex(r => String(r.id) === String(redemptionId));
+    if (index === -1) return null;
+
+    coupon.redemptions.splice(index, 1);
+    coupon.currentUsages = Math.max(0, (coupon.currentUsages || 0) - 1);
+    if (coupon.currentUsages < (coupon.maxUsages || 1)) {
+      coupon.isUsed = false;
+    }
+
+    this.save();
+    return coupon;
+  }
+
+  /** Todos os CPFs registrados na rede, agregados por CPF. */
+  getAllCouponRedemptions() {
+    const rows = [];
+    for (const coupon of (this.tables.coupons || [])) {
+      for (const r of (coupon.redemptions || [])) {
+        rows.push({ ...r, couponCode: coupon.code, couponDescription: coupon.description });
+      }
+    }
+    return rows.sort((a, b) => String(b.redeemedAt || '').localeCompare(String(a.redeemedAt || '')));
   }
 
   addCoupon(data) {
@@ -993,6 +1189,13 @@ class RelationalDatabase {
       allowedTotems = [data.allowedTotems.trim().toUpperCase()];
     }
 
+    // Limite de utilizações por CPF (0 ou vazio = sem limite individual)
+    const rawPerCpf = Number(data.maxUsagesPerCpf);
+    const maxUsagesPerCpf = Number.isFinite(rawPerCpf) && rawPerCpf > 0 ? Math.floor(rawPerCpf) : 1;
+
+    // Exigir CPF do cliente para validar/resgatar (padrão: sim)
+    const requireCpf = data.requireCpf === undefined ? true : Boolean(data.requireCpf);
+
     let index = (this.tables.coupons || []).findIndex(c => c.code.toUpperCase() === code);
     const existing = index !== -1 ? this.tables.coupons[index] : null;
 
@@ -1004,8 +1207,11 @@ class RelationalDatabase {
       applicableMode,
       allowedTotems,
       maxUsages,
+      maxUsagesPerCpf,
+      requireCpf,
       currentUsages,
       isUsed: currentUsages >= maxUsages,
+      redemptions: existing && Array.isArray(existing.redemptions) ? existing.redemptions : [],
       createdAt: existing ? existing.createdAt : new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
@@ -1038,9 +1244,41 @@ class RelationalDatabase {
       cp.isUsed = false;
       cp.usedAt = null;
       cp.usedByTotem = null;
+      cp.redemptions = [];
       this.save();
       return cp;
     }
+    return null;
+  }
+
+  /**
+   * Verifica se o cupom pode ser utilizado pelo CPF informado.
+   * Retorna { error, message } quando bloqueado, ou null quando liberado.
+   */
+  checkCouponCpf(coupon, rawCpf) {
+    const cpf = sanitizeCpf(rawCpf);
+
+    if (!cpf) {
+      // Etapa de CPF desligada em services/cpf.js: resgate sem CPF é aceito.
+      if (!COUPON_CPF_ENABLED || coupon.requireCpf === false) return null;
+      return { error: 'COUPON_CPF_REQUIRED', message: 'Informe o CPF do cliente para utilizar este cupom.' };
+    }
+
+    if (!isValidCpf(cpf)) {
+      return { error: 'COUPON_CPF_INVALID', message: 'CPF inválido. Confira os números digitados.' };
+    }
+
+    const perCpf = Number(coupon.maxUsagesPerCpf) > 0 ? Number(coupon.maxUsagesPerCpf) : 1;
+    const used = this.countCpfUsages(coupon, cpf);
+    if (used >= perCpf) {
+      return {
+        error: 'COUPON_CPF_LIMIT_REACHED',
+        message: perCpf === 1
+          ? `O CPF ${formatCpf(cpf)} já utilizou este cupom.`
+          : `O CPF ${formatCpf(cpf)} já utilizou este cupom ${used} de ${perCpf} vezes permitidas.`
+      };
+    }
+
     return null;
   }
 
@@ -1055,6 +1293,10 @@ class RelationalDatabase {
         return { error: 'COUPON_NOT_ALLOWED_ON_THIS_TOTEM', message: `Este cupom não é válido para a máquina ${totemId}.` };
       }
     }
+
+    // Controle de utilização por CPF (limite individual do portador)
+    const cpfCheck = this.checkCouponCpf(coupon, details.cpf);
+    if (cpfCheck) return cpfCheck;
 
     const maxUsages = coupon.maxUsages || 1;
     if (coupon.currentUsages >= maxUsages || coupon.isUsed) {
@@ -1071,6 +1313,21 @@ class RelationalDatabase {
     if (details.selectedMode) coupon.lastUsedMode = details.selectedMode;
     if (details.orderId) coupon.lastOrderId = details.orderId;
 
+    // Registra o CPF que resgatou (exibido na aba Cupons do painel web)
+    const cpf = sanitizeCpf(details.cpf);
+    if (!Array.isArray(coupon.redemptions)) coupon.redemptions = [];
+    coupon.redemptions.push({
+      id: crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      cpf,
+      cpfFormatted: cpf ? formatCpf(cpf) : '',
+      redeemedAt: coupon.usedAt,
+      totemId: coupon.usedByTotem,
+      selectedMode: details.selectedMode || null,
+      orderId: details.orderId || null,
+      discountPercent: coupon.discountPercent,
+      discountAppliedInCents: Number(details.discountAppliedInCents) || 0
+    });
+
     this.save();
     return coupon;
   }
@@ -1082,6 +1339,7 @@ class RelationalDatabase {
       cp.usedAt = null;
       cp.usedByTotem = null;
       cp.currentUsages = 0;
+      cp.redemptions = [];
       count++;
     }
     this.save();

@@ -79,11 +79,15 @@ class StoreFacade {
   updatePendingOrder(orderId, updates) { return this.db.updatePendingOrder(orderId, updates); }
 
   updateHeartbeat(devno, telemetry) { return this.db.updateHeartbeat(devno, telemetry); }
+  markStaleTotemsOffline(timeoutMs) { return this.db.markStaleTotemsOffline(timeoutMs); }
+  markTotemOffline(devno) { return this.db.markTotemOffline(devno); }
   addTransaction(tx) { return this.db.addTransaction(tx); }
   getTransactions(limit, userFilter) { return this.db.getTransactions(limit, userFilter); }
 
   recordCycleComplete(devno, cycleData) { return this.db.recordCycleComplete(devno, cycleData); }
   addAlert(alert) { return this.db.addAlert(alert); }
+  openMaintenanceOrder(devno, data) { return this.db.openMaintenanceOrder(devno, data); }
+  addMaintenanceComment(alertId, data) { return this.db.addMaintenanceComment(alertId, data); }
   getAlerts(activeOnly, userFilter) { return this.db.getAlerts(activeOnly, userFilter); }
   resolveAlert(id) { return this.db.resolveAlert(id); }
 
@@ -100,6 +104,11 @@ class StoreFacade {
   resetCoupon(code) { return this.db.resetCoupon(code); }
   redeemCoupon(code, totemId, details) { return this.db.redeemCoupon(code, totemId, details); }
   resetCoupons(scope) { return this.db.resetCoupons(scope); }
+  checkCouponCpf(coupon, cpf) { return this.db.checkCouponCpf(coupon, cpf); }
+  countCpfUsages(coupon, cpf) { return this.db.countCpfUsages(coupon, cpf); }
+  getCouponRedemptions(code) { return this.db.getCouponRedemptions(code); }
+  getAllCouponRedemptions() { return this.db.getAllCouponRedemptions(); }
+  removeCouponRedemption(code, id) { return this.db.removeCouponRedemption(code, id); }
 }
 
 module.exports = new StoreFacade();

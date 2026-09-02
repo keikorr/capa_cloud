@@ -12,7 +12,7 @@ const API_SPECS = [
     endpoint: "/api/v1/totem/login",
     desc: "Chamado pelo totem Android no boot para validar o número de série e receber o token de sessão.",
     requestExample: {
-      devno: "CPX-001-SP",
+      devno: "CPX-001",
       appVersion: "v3.3.0",
       macAddress: "B8:27:EB:12:34:56"
     },
@@ -21,8 +21,8 @@ const API_SPECS = [
       success: true,
       message: "Totem autenticado com sucesso.",
       data: {
-        devno: "CPX-001-SP",
-        token: "CPX_AUTH_TOKEN_Q1BYLTAwMS1TUA==",
+        devno: "CPX-001",
+        token: "CPX_AUTH_TOKEN_Q1BYLTAwMQ==",
         config: { basicPrice: 13.0, intermediatePrice: 17.0, advancedPrice: 20.0 }
       }
     }
@@ -35,7 +35,7 @@ const API_SPECS = [
     desc: "Callback acionado pelo Terminal Cielo ao aprovar uma transação por aproximação (NFC), chip ou PIX.",
     requestExample: {
       orderId: "ORD-84920",
-      devno: "CPX-001-SP",
+      devno: "CPX-001",
       mode: "INTERMEDIARIA",
       amount: 17.00,
       paymentMethod: "CIELO_CREDITO_NFC",
@@ -56,14 +56,12 @@ const API_SPECS = [
     method: "POST",
     typeBadge: "post",
     endpoint: "/api/v1/totem/heartbeat",
-    desc: "Disparado a cada 60s ou quando sensores mudarem de valor (temperatura, trava da porta, nível de fluido).",
+    desc: "Disparado a cada 60s ou quando sensores mudarem de valor (trava da porta, nível de fluido). A máquina não tem sensor de temperatura nem de fragrância.",
     requestExample: {
-      devno: "CPX-001-SP",
+      devno: "CPX-001",
       status: "CLEANING",
-      temperature: 42.5,
       doorLocked: true,
-      liquidLevelPercent: 78,
-      fragranceLevelPercent: 62
+      liquidLevelPercent: 78
     },
     responseExample: {
       code: 0,
@@ -106,7 +104,7 @@ const API_SPECS = [
     endpoint: "/upus_APP/app/expressbox/devlogin",
     desc: "Utilizado pelo firmware chinês original para registro do totem pelo número de série.",
     requestExample: {
-      devno: "CPX-001-SP",
+      devno: "CPX-001",
       appVersion: "v3.2.7",
       devkind: 1
     },
@@ -114,8 +112,8 @@ const API_SPECS = [
       code: 0,
       msg: "Dispositivo conectado e autenticado.",
       data: {
-        devno: "CPX-001-SP",
-        devna: "Totem #01 — Shopping Iguatemi SP",
+        devno: "CPX-001",
+        devna: "Totem #01 — Shopping Central",
         compno: "87550094",
         cocode: "SPOST",
         branno: "BR-01"
@@ -129,13 +127,13 @@ const API_SPECS = [
     endpoint: "/upus_APP/app/expressbox/devnoinfo",
     desc: "Retorna a calibração de tempos em segundos: task0 (UV), task1 (Fogger), task2 (Aquecedor), task3 (Ozônio), task4 (Perfume).",
     requestExample: {
-      devno: "CPX-001-SP"
+      devno: "CPX-001"
     },
     responseExample: {
       code: 0,
       msg: "success",
       data: {
-        devno: "CPX-001-SP",
+        devno: "CPX-001",
         task0Time: 30,
         task1Time: 60,
         task2Time: 240,
@@ -153,11 +151,11 @@ const API_SPECS = [
     endpoint: "/upus_APP/app/device/remote/smoke",
     desc: "Dispara remotamente o atuador de fumaça/névoa atomizada para teste de bancada.",
     requestExample: {
-      devno: "CPX-001-SP"
+      devno: "CPX-001"
     },
     responseExample: {
       code: 0,
-      msg: "Teste de névoa disparado no totem CPX-001-SP.",
+      msg: "Teste de névoa disparado no totem CPX-001.",
       data: { success: true }
     }
   },
@@ -173,7 +171,7 @@ const API_SPECS = [
       msg: "success",
       data: {
         depotStats: [
-          { depotno: "DEP-01", depotna: "Shopping Iguatemi SP", cycles: 14, revenue: 238.00, commissionAmount: 35.70, netRevenue: 202.30 }
+          { depotno: "DEP-01", depotna: "Shopping Central", cycles: 14, revenue: 238.00, commissionAmount: 35.70, netRevenue: 202.30 }
         ],
         weekTotalRevenue: 6494.00,
         weekTotalCycles: 382

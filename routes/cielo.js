@@ -15,17 +15,60 @@ const { isValidWebhookToken } = require('../middleware/auth');
 const CIELO_MERCHANT_ID = process.env.CIELO_MERCHANT_ID || '';
 const CIELO_MERCHANT_KEY = process.env.CIELO_MERCHANT_KEY || '';
 
-// URLs da API Cielo E-commerce 3.0: respeitam CIELO_ENVIRONMENT em vez de apontar sempre para
-// produção. Sandbox/Homologação usam host de sandbox; só "Producao" usa o host real de cobrança.
-const CIELO_ECOMMERCE_IS_PROD = cieloConfig.environment === 'Producao';
-const CIELO_API_URL = process.env.CIELO_ECOMMERCE_API_URL ||
-  (CIELO_ECOMMERCE_IS_PROD
+// URLs da API Cielo E-commerce 3.0. O ambiente é resolvido por máquina (o painel grava
+// "Producao" ou "Sandbox" em config.cielo.ecommerceEnvironment), com CIELO_ENVIRONMENT do
+// .env como padrão. Antes eram constantes de módulo lidas uma única vez no boot, então
+// trocar o ambiente no painel não tinha efeito nenhum sem reiniciar o servidor.
+function ecommerceSalesUrl(isProduction) {
+  if (process.env.CIELO_ECOMMERCE_API_URL) return process.env.CIELO_ECOMMERCE_API_URL;
+  return isProduction
     ? 'https://api.cieloecommerce.cielo.com.br/1/sales/'
-    : 'https://apisandbox.cieloecommerce.cielo.com.br/1/sales/');
-const CIELO_QUERY_URL = process.env.CIELO_ECOMMERCE_QUERY_URL ||
-  (CIELO_ECOMMERCE_IS_PROD
+    : 'https://apisandbox.cieloecommerce.cielo.com.br/1/sales/';
+}
+
+function ecommerceQueryUrl(isProduction) {
+  if (process.env.CIELO_ECOMMERCE_QUERY_URL) return process.env.CIELO_ECOMMERCE_QUERY_URL;
+  return isProduction
     ? 'https://apiquery.cieloecommerce.cielo.com.br/1/sales/'
-    : 'https://apiquerysandbox.cieloecommerce.cielo.com.br/1/sales/');
+    : 'https://apiquerysandbox.cieloecommerce.cielo.com.br/1/sales/';
+}
+
+/**
+ * Credenciais e ambiente E-commerce/PIX efetivos de uma máquina.
+ *
+ * O painel salva as credenciais em `config.cielo.ecommerceMerchantId/Key/Environment`
+ * (modal "Credenciais Cielo" da estação), mas o checkout lia `config.cieloMerchantId/Key`
+ * na raiz da config. Os dois nomes nunca se encontravam: a credencial cadastrada ficava
+ * guardada e o PIX saía com a conta errada. A ordem de prioridade aqui é o que o painel
+ * grava, depois o campo antigo na raiz (legado), depois o .env.
+ */
+function resolveEcommerceCredentials(totem) {
+  const cfg = (totem && totem.config) || {};
+  const nested = cfg.cielo || {};
+
+  const pick = (...values) => {
+    for (const v of values) {
+      if (typeof v === 'string' && v.trim()) return v.trim();
+    }
+    return '';
+  };
+
+  const merchantId = pick(nested.ecommerceMerchantId, cfg.cieloMerchantId, CIELO_MERCHANT_ID);
+  const merchantKey = pick(nested.ecommerceMerchantKey, cfg.cieloMerchantKey, CIELO_MERCHANT_KEY);
+  const environment = pick(nested.ecommerceEnvironment, cieloConfig.environment) || 'Homologacao';
+  const expiration = Number(nested.pixExpirationSeconds) > 0
+    ? Number(nested.pixExpirationSeconds)
+    : PIX_EXPIRATION_SECONDS;
+
+  return {
+    merchantId,
+    merchantKey,
+    environment,
+    isProduction: environment === 'Producao',
+    isConfigured: Boolean(merchantId && merchantKey),
+    pixExpirationSeconds: expiration
+  };
+}
 
 // Janela de validade do QR Code Pix (spec: 300s / 5 minutos)
 const PIX_EXPIRATION_SECONDS = Number(process.env.CIELO_PIX_EXPIRATION_SECONDS || 300);
@@ -36,13 +79,13 @@ const CARD_FINISH_WATCHDOG_SECONDS = Number(process.env.CIELO_CARD_FINISH_WATCHD
 /**
  * Criação de transação Pix Real diretamente na API da Cielo
  */
-async function createCieloPixSale(orderId, amountInCents, merchantId, merchantKey) {
+async function createCieloPixSale(orderId, amountInCents, credentials) {
   try {
-    const activeMerchantId = merchantId || CIELO_MERCHANT_ID;
-    const activeMerchantKey = merchantKey || CIELO_MERCHANT_KEY;
+    const activeMerchantId = credentials.merchantId;
+    const activeMerchantKey = credentials.merchantKey;
 
     if (!activeMerchantId || !activeMerchantKey) {
-      console.warn('[CIELO PIX] Credenciais CIELO_MERCHANT_ID / CIELO_MERCHANT_KEY não configuradas.');
+      console.warn('[CIELO PIX] Nenhuma credencial E-commerce cadastrada para esta máquina (painel > Credenciais Cielo) nem no .env.');
       return null;
     }
 
@@ -57,7 +100,10 @@ async function createCieloPixSale(orderId, amountInCents, merchantId, merchantKe
       }
     };
 
-    const res = await fetch(CIELO_API_URL, {
+    const salesUrl = ecommerceSalesUrl(credentials.isProduction);
+    console.log(`[CIELO PIX] Criando cobrança ${orderId} em ${credentials.environment} (${salesUrl}) com MerchantId ...${activeMerchantId.slice(-6)}`);
+
+    const res = await fetch(salesUrl, {
       method: 'POST',
       headers: {
         'MerchantId': activeMerchantId,
@@ -93,13 +139,14 @@ async function createCieloPixSale(orderId, amountInCents, merchantId, merchantKe
 /**
  * Consulta de status em tempo real na API da Cielo
  */
-async function queryCieloPaymentStatus(paymentId, merchantId, merchantKey) {
-  const activeMerchantId = merchantId || CIELO_MERCHANT_ID;
-  const activeMerchantKey = merchantKey || CIELO_MERCHANT_KEY;
+async function queryCieloPaymentStatus(paymentId, credentials) {
+  const activeMerchantId = credentials.merchantId;
+  const activeMerchantKey = credentials.merchantKey;
 
   if (!paymentId || !activeMerchantId || !activeMerchantKey) return null;
   try {
-    const res = await fetch(CIELO_QUERY_URL + paymentId, {
+    // A consulta precisa cair no mesmo ambiente em que a cobrança foi criada.
+    const res = await fetch(ecommerceQueryUrl(credentials.isProduction) + paymentId, {
       headers: {
         'MerchantId': activeMerchantId,
         'MerchantKey': activeMerchantKey
@@ -199,10 +246,8 @@ router.post(['/cielo/checkout', '/checkout', '/'], async (req, res) => {
   const amountInCents = reqCents || Math.round(numAmount * 100);
   const totem = store.getTotem(id) || store.upsertTotem({ devno: id });
 
-  const activeMerchantId = (totem && totem.config && totem.config.cieloMerchantId) ? totem.config.cieloMerchantId : CIELO_MERCHANT_ID;
-  const activeMerchantKey = (totem && totem.config && totem.config.cieloMerchantKey) ? totem.config.cieloMerchantKey : CIELO_MERCHANT_KEY;
-
-  const cieloPix = await createCieloPixSale(orderId, amountInCents, activeMerchantId, activeMerchantKey);
+  const credentials = resolveEcommerceCredentials(totem);
+  const cieloPix = await createCieloPixSale(orderId, amountInCents, credentials);
 
   let qrCodePix = '';
   let qrCodeBase64 = '';
@@ -215,15 +260,34 @@ router.post(['/cielo/checkout', '/checkout', '/'], async (req, res) => {
     paymentId = cieloPix.paymentId;
     isRealCielo = true;
     console.log(`[CIELO PIX] QrCode oficial gerado com sucesso para ${orderId} (PaymentId: ${paymentId})`);
+  } else if (credentials.isConfigured) {
+    // A máquina TEM credencial cadastrada e mesmo assim a Cielo não devolveu o QR.
+    // Cair no EMV local aqui seria pior que falhar: o cliente pagaria um QR que não
+    // pertence à conta do lojista. Foi assim que este problema passou despercebido.
+    console.error(
+      `[CIELO PIX] Falha ao gerar cobrança real para ${orderId} em ${credentials.environment}. ` +
+      'Cobrança NÃO criada — confira as credenciais E-commerce no painel.'
+    );
+    return res.status(502).json({
+      code: -1,
+      success: false,
+      error: 'CIELO_PIX_UNAVAILABLE',
+      message: 'Não foi possível gerar o PIX na Cielo com as credenciais desta máquina. ' +
+        'Confira o Merchant ID / Merchant Key e o ambiente em Credenciais Cielo.'
+    });
   } else {
+    // Sem nenhuma credencial cadastrada: modo demonstração, QR local só para exercitar o fluxo.
     qrCodePix = generatePixBRCode({
       orderId,
       amount: numAmount,
-      pixKey: activeMerchantId || '5e4fc2b8-11e3-4f9c-ab97-fb7baaea405b',
+      pixKey: '5e4fc2b8-11e3-4f9c-ab97-fb7baaea405b',
       merchantName: 'CAPAXERO HIGIENIZACAO',
       merchantCity: 'FORTALEZA'
     });
-    console.log(`[CIELO PIX] Utilizando EMV Fallback para ${orderId}`);
+    console.warn(
+      `[CIELO PIX] Nenhuma credencial cadastrada — EMV de demonstração para ${orderId}. ` +
+      'Este QR NÃO credita em nenhuma conta.'
+    );
   }
 
   const checkoutData = {
@@ -240,8 +304,10 @@ router.post(['/cielo/checkout', '/checkout', '/'], async (req, res) => {
     qrCodeBase64,
     status: 'WAITING_PAYMENT',
     createdAt: new Date().toISOString(),
-    expiresAt: new Date(Date.now() + PIX_EXPIRATION_SECONDS * 1000).toISOString(),
-    expiresInSeconds: PIX_EXPIRATION_SECONDS
+    isDemoQrCode: !isRealCielo,
+    cieloEnvironment: credentials.environment,
+    expiresAt: new Date(Date.now() + credentials.pixExpirationSeconds * 1000).toISOString(),
+    expiresInSeconds: credentials.pixExpirationSeconds
   };
 
   store.createPendingOrder(checkoutData);
@@ -281,10 +347,7 @@ router.get(['/cielo/status/:orderId', '/status/:orderId'], async (req, res) => {
   if (order.status === 'WAITING_PAYMENT' && order.paymentId) {
     store.updatePendingOrder(orderId, { status: 'CHECKING' });
     const totem = store.getTotem(order.devno);
-    const activeMerchantId = (totem && totem.config && totem.config.cieloMerchantId) ? totem.config.cieloMerchantId : CIELO_MERCHANT_ID;
-    const activeMerchantKey = (totem && totem.config && totem.config.cieloMerchantKey) ? totem.config.cieloMerchantKey : CIELO_MERCHANT_KEY;
-
-    const cieloStatus = await queryCieloPaymentStatus(order.paymentId, activeMerchantId, activeMerchantKey);
+    const cieloStatus = await queryCieloPaymentStatus(order.paymentId, resolveEcommerceCredentials(totem));
     const current = store.getPendingOrder(orderId);
 
     if (!(cieloStatus && cieloStatus.status === 'APPROVED') ) {

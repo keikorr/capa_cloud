@@ -145,7 +145,7 @@ router.post('/expressbox/unlockupdate', (req, res) => {
 
   const tx = store.addTransaction({
     orderId: orderno || 'ORD-' + Math.floor(10000 + Math.random() * 90000),
-    devno: devno || 'CPX-001-SP',
+    devno: devno || 'CPX-001',
     mode: 'INTERMEDIARIA',
     amount: Number(money || 17.00),
     paymentMethod: paytype || 'CIELO_POS',
@@ -173,7 +173,7 @@ router.post('/expressbox/warning', (req, res) => {
   const { devno, warnkind, warnmsg } = req.body;
 
   const alert = store.addAlert({
-    devno: devno || 'CPX-001-SP',
+    devno: devno || 'CPX-001',
     type: warnkind || 'SENSOR_WARNING',
     severity: 'WARNING',
     message: warnmsg || `Alerta recebido do totem ${devno}`
@@ -276,8 +276,7 @@ router.post('/BgpartManage/getWashChestList', (req, res) => {
       devna: t.name,
       location: t.location,
       status: t.status,
-      liquidPercent: t.liquidLevelPercent,
-      temperature: t.temperature
+      liquidPercent: t.liquidLevelPercent
     }))
   });
 });

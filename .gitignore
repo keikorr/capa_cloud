@@ -3,4 +3,6 @@ cloudflared.exe
 *.log
 .DS_Store
 Thumbs.db
-./.env
+.env
+.env.*
+!.env.example

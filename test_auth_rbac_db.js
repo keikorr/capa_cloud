@@ -65,7 +65,7 @@ async function runAuthRbacTests() {
     console.log('✅ [5b. Listar Usuários como Dono]: Bloqueado com sucesso (RBAC):', ownerUsersAttempt.message);
 
     // 6. Transferência de Totem pelo CRPADMIN para o novo Dono
-    const transferRes = await fetch(`${baseUrl}/api/v1/admin/totems/CPX-001-SP/transfer`, {
+    const transferRes = await fetch(`${baseUrl}/api/v1/admin/totems/CPX-001/transfer`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -80,7 +80,7 @@ async function runAuthRbacTests() {
       headers: { 'Authorization': `Bearer ${ownerToken}` }
     }).then(r => r.json());
 
-    const ownedTotem = ownerTotemsRes.data?.find(t => t.devno === 'CPX-001-SP');
+    const ownedTotem = ownerTotemsRes.data?.find(t => t.devno === 'CPX-001');
     console.log('✅ [7. Visão do Dono]: Máquina atribuída:', ownedTotem?.devno, '| Dono:', ownedTotem?.owner, '| MerchantKey oculta:', ownedTotem?.config?.cieloMerchantKey === undefined ? 'SIM (Seguro)' : 'NÃO');
 
     console.log('\n======================================================');

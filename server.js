@@ -87,6 +87,19 @@ app.get('/health', (req, res) => {
 // Inicialização do WebSocket Server
 wsManager.init(server);
 
+// Watchdog: marca como OFFLINE totens sem heartbeat há mais de 3 minutos (o APK manda
+// heartbeat a cada 60s). Cobre o caso de a máquina ser desligada da tomada sem fechar o
+// WebSocket de forma limpa — sem isso o painel mostraria "Disponível" para sempre.
+const HEARTBEAT_TIMEOUT_MS = 3 * 60 * 1000;
+const OFFLINE_CHECK_INTERVAL_MS = 30 * 1000;
+setInterval(() => {
+  const changedDevnos = store.markStaleTotemsOffline(HEARTBEAT_TIMEOUT_MS);
+  if (changedDevnos.length) {
+    console.log(`[WATCHDOG] Totens marcados como OFFLINE por timeout de heartbeat: ${changedDevnos.join(', ')}`);
+    wsManager.broadcastDashboardUpdate();
+  }
+}, OFFLINE_CHECK_INTERVAL_MS);
+
 // Garante que os tokens de admin/webhook já apareçam no boot
 require('./middleware/auth').getAdminToken();
 require('./middleware/auth').getWebhookToken();

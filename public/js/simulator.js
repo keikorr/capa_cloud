@@ -87,12 +87,12 @@ class CapaxeroSimulator {
 
           const res = await resp.json();
           if (res.success) {
-            window.app.showToast(`✅ [Cielo POS] Transação ${orderId} APROVADA! Iniciando ciclo...`);
+            window.app.showToast(`[Cielo POS] Transação ${orderId} APROVADA! Iniciando ciclo...`, 'ok');
             this.runStepByStepCleaning(devno, mode, amount);
           }
         } catch (err) {
           console.error(err);
-          window.app.showToast('❌ Erro ao enviar webhook Cielo.');
+          window.app.showToast('Erro ao enviar webhook Cielo.', 'err');
         }
       });
     }
@@ -131,20 +131,18 @@ class CapaxeroSimulator {
     if (btnHeartbeat) {
       btnHeartbeat.addEventListener('click', async () => {
         const devno = document.getElementById('sim-hw-totem').value;
-        const randomTemp = 24 + Math.random() * 18;
-        
+
         await fetch('/api/v1/totem/heartbeat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             devno,
             status: 'IDLE',
-            temperature: parseFloat(randomTemp.toFixed(1)),
             doorLocked: true
           })
         });
 
-        window.app.showToast(`💓 Heartbeat enviado para ${devno} (Temp: ${randomTemp.toFixed(1)}°C)`);
+        window.app.showToast(`Heartbeat de teste enviado para ${devno}.`);
       });
     }
 
@@ -194,8 +192,7 @@ class CapaxeroSimulator {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             devno,
-            status: 'ERROR',
-            temperature: 56.8
+            status: 'ERROR'
           })
         });
       });
@@ -216,16 +213,16 @@ class CapaxeroSimulator {
     }
 
     const steps = [
-      { stepName: '🟣 FASE 1/4: ESTERILIZAÇÃO UV-C GERMICIDA', temp: 28.0, progress: 15, duration: 4 },
-      { stepName: '🔵 FASE 2/4: NÉVOA SANITIZANTE ATOMIZADA', temp: 34.5, progress: 40, duration: 5 },
-      { stepName: '🟠 FASE 3/4: SECAGEM TÉRMICA & AR QUENTE', temp: 44.0, progress: 75, duration: 5 },
-      { stepName: '🟢 FASE 4/4: OZÔNIO & BORRIFO DE FRAGRÂNCIA', temp: 36.0, progress: 95, duration: 4 }
+      { stepName: 'FASE 1/4: ESTERILIZAÇÃO UV-C GERMICIDA', progress: 15, duration: 4 },
+      { stepName: 'FASE 2/4: NÉVOA SANITIZANTE ATOMIZADA', progress: 40, duration: 5 },
+      { stepName: 'FASE 3/4: SECAGEM TÉRMICA & AR QUENTE', progress: 75, duration: 5 },
+      { stepName: 'FASE 4/4: OZÔNIO & BORRIFO DE FRAGRÂNCIA', progress: 95, duration: 4 }
     ];
 
     let currentStepIdx = 0;
     const totalSteps = steps.length;
 
-    window.app.showToast(`🚀 [Ciclo Iniciado] Totem ${devno} trancou a porta e começou o ciclo ${mode}.`);
+    window.app.showToast(`[Ciclo Iniciado] Totem ${devno} trancou a porta e começou o ciclo ${mode}.`);
 
     const executeNextStep = () => {
       if (currentStepIdx < totalSteps) {
@@ -237,7 +234,6 @@ class CapaxeroSimulator {
           body: JSON.stringify({
             devno,
             status: 'CLEANING',
-            temperature: current.temp,
             doorLocked: true,
             currentCycle: {
               mode,
@@ -273,7 +269,6 @@ class CapaxeroSimulator {
           body: JSON.stringify({
             devno,
             status: 'IDLE',
-            temperature: 26.0,
             doorLocked: false,
             currentCycle: null
           })

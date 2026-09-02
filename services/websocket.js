@@ -26,8 +26,13 @@ class WebSocketManager {
         this.totemSockets.set(devno, ws);
         console.log(`[WS] Totem conectado: ${devno}`);
 
-        // Atualiza status online
-        const totem = store.upsertTotem({ devno, status: "IDLE" });
+        // Atualiza status online. Não força IDLE em reconexão: com o totem mantendo um
+        // socket aberto, uma queda breve de rede no meio de um ciclo não pode zerar o
+        // estado que o painel mostra — só uma máquina nova ou offline entra como IDLE.
+        const known = store.getTotem(devno);
+        const totem = (known && known.status && known.status !== 'OFFLINE')
+          ? store.upsertTotem({ devno })
+          : store.upsertTotem({ devno, status: "IDLE" });
         this.broadcastDashboardUpdate();
 
         // Envia as configurações salvas no banco de dados para o totem sincronizar e guardar localmente
@@ -49,6 +54,10 @@ class WebSocketManager {
         ws.on('close', () => {
           this.totemSockets.delete(devno);
           console.log(`[WS] Totem desconectado: ${devno}`);
+          // Reação imediata a uma desconexão "limpa" (app fechado, rede caída detectada pelo
+          // socket). Se o totem só for desligado da tomada sem fechar o socket, o watchdog de
+          // heartbeat em server.js cobre o caso marcando OFFLINE após o timeout.
+          store.markTotemOffline(devno);
           this.broadcastDashboardUpdate();
         });
       } else {

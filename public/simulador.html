@@ -15,7 +15,7 @@
 
   <header class="navbar">
     <div class="brand">
-      <span class="brand-mark">🧪</span>
+      <span class="brand-mark"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6M10 2v6l-5 9a2 2 0 002 3h10a2 2 0 002-3l-5-9V2"/><path d="M8 15h8"/></svg></span>
       CAPAXERO
       <span class="brand-sub">DEV TOOLS</span>
     </div>
@@ -35,7 +35,7 @@
 
       <div class="simulator-layout">
         <div class="simulator-card">
-          <h4>💳 Terminal Cielo (Pagamento Presencial)</h4>
+          <h4><svg class="i" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg> Terminal Cielo (Pagamento Presencial)</h4>
           <p>Simule a compra de um cliente no totem com Cartão NFC, Chip ou PIX instantâneo.</p>
 
           <form id="form-simulate-cielo">
@@ -47,8 +47,8 @@
               <label>Plano Selecionado:</label>
               <select class="form-control" id="sim-cielo-mode">
                 <option value="BASICA" data-price="13.00">Básica — R$ 13,00 (6 min)</option>
-                <option value="INTERMEDIARIA" data-price="17.00" selected>⭐ Intermediária — R$ 17,00 (7 min)</option>
-                <option value="AVANCADA" data-price="20.00">👑 Avançada — R$ 20,00 (8 min)</option>
+                <option value="INTERMEDIARIA" data-price="17.00" selected>Intermediária — R$ 17,00 (7 min)</option>
+                <option value="AVANCADA" data-price="20.00">Avançada — R$ 20,00 (8 min)</option>
               </select>
             </div>
             <div class="form-group">
@@ -65,26 +65,26 @@
                 <div style="font-size:1.4rem; font-weight:800; margin:6px 0;" id="pos-display-amount">R$ 17,00</div>
                 <div style="font-size:0.75rem; color:#00e676;">APROXIME OU INSIRA O CARTÃO</div>
               </div>
-              <button type="submit" class="btn btn-primary" style="width:100%; padding:12px;">✅ Autorizar Pagamento & Liberar Porta</button>
+              <button type="submit" class="btn btn-primary" style="width:100%; padding:12px;"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg> Autorizar Pagamento & Liberar Porta</button>
             </div>
           </form>
         </div>
 
         <div class="simulator-card">
-          <h4>⚙️ Telemetria & Testes de Atuadores</h4>
+          <h4><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 13a7.97 7.97 0 000-2l2.1-1.6-2-3.4-2.5 1a8 8 0 00-1.7-1L14.9 2h-3.8l-.4 2.9a8 8 0 00-1.7 1l-2.5-1-2 3.4L6.6 10a7.97 7.97 0 000 2l-2.1 1.7 2 3.4 2.5-1a8 8 0 001.7 1l.4 3h3.8l.4-3a8 8 0 001.7-1l2.5 1 2-3.4L19.4 13z"/></svg> Telemetria & Testes de Atuadores</h4>
           <p>Dispare comandos individuais de relé, ciclos automáticos ou teste os endpoints legados.</p>
           <div class="form-group">
             <label>Totem Alvo:</label>
             <select class="form-control" id="sim-hw-totem"></select>
           </div>
           <div style="display:flex; flex-direction:column; gap:10px; margin-top:1rem;">
-            <button class="btn btn-outline" id="btn-sim-run-full-cycle">▶️ Simular Ciclo Completo (UV-C ➔ Névoa ➔ Secador ➔ Ozônio)</button>
-            <button class="btn btn-outline" id="btn-sim-smoke-fogger">💨 Disparar Teste de Névoa Atomizada</button>
-            <button class="btn btn-outline" id="btn-sim-purge-ducts">🚿 Acionar Válvula de Limpeza de Dutos (0x79)</button>
-            <button class="btn btn-outline" id="btn-sim-heartbeat">💓 Enviar Heartbeat com Temperatura Atualizada</button>
-            <button class="btn btn-outline" id="btn-sim-alert-fluid">⚠️ Simular Alerta de Fluido Sanitizante Baixo (&lt; 15%)</button>
-            <button class="btn btn-danger" id="btn-sim-alert-temp">🔥 Simular Alerta de Superaquecimento da Câmara (&gt; 55°C)</button>
-            <button class="btn btn-primary" id="btn-sim-refill">🧪 Reabastecer Tanques de Sanitizante & Perfume (100%)</button>
+            <button class="btn btn-outline" id="btn-sim-run-full-cycle"><svg class="i" viewBox="0 0 24 24"><path d="M6 4l14 8-14 8V4z"/></svg> Simular Ciclo Completo (UV-C → Névoa → Secador → Ozônio)</button>
+            <button class="btn btn-outline" id="btn-sim-smoke-fogger"><svg class="i" viewBox="0 0 24 24"><path d="M3 8h11a3 3 0 100-6M3 12h15a3 3 0 110 6M3 16h9"/></svg> Disparar Teste de Névoa Atomizada</button>
+            <button class="btn btn-outline" id="btn-sim-purge-ducts"><svg class="i" viewBox="0 0 24 24"><path d="M12 2s6 7 6 11a6 6 0 01-12 0c0-4 6-11 6-11z"/></svg> Acionar Válvula de Limpeza de Dutos (0x79)</button>
+            <button class="btn btn-outline" id="btn-sim-heartbeat"><svg class="i" viewBox="0 0 24 24"><path d="M3 12h4l2-7 4 14 2-7h6"/></svg> Enviar Heartbeat de Teste</button>
+            <button class="btn btn-outline" id="btn-sim-alert-fluid"><svg class="i" viewBox="0 0 24 24"><path d="M12 3l10 18H2L12 3z"/><path d="M12 10v4"/><circle cx="12" cy="17" r="1" fill="currentColor" stroke="none"/></svg> Simular Alerta de Fluido Sanitizante Baixo (&lt; 15%)</button>
+            <button class="btn btn-danger" id="btn-sim-alert-temp"><svg class="i" viewBox="0 0 24 24"><path d="M12 22a7 7 0 01-7-7c0-4 3-6 3-9 0 3 2 3 2 6 0-4 2-5 2-8 2 3 4 5 4 11a7 7 0 01-4 7z"/></svg> Simular Alerta de Superaquecimento da Câmara (&gt; 55°C)</button>
+            <button class="btn btn-primary" id="btn-sim-refill"><svg class="i" viewBox="0 0 24 24"><path d="M9 2h6M10 2v6l-5 9a2 2 0 002 3h10a2 2 0 002-3l-5-9V2"/><path d="M8 15h8"/></svg> Reabastecer Tanque de Sanitizante (100%)</button>
           </div>
         </div>
       </div>

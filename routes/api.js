@@ -8,10 +8,12 @@ const express = require('express');
 const router = express.Router();
 const path = require('path');
 const fs = require('fs');
+const crypto = require('crypto');
 const multer = require('multer');
 const QRCode = require('qrcode');
 const store = require('../services/store');
 const wsManager = require('../services/websocket');
+const { sanitizeCpf, isValidCpf, formatCpf, COUPON_CPF_ENABLED } = require('../services/cpf');
 
 // Configuração do Storage para Vídeos de Higienização
 const videoStorage = multer.diskStorage({
@@ -180,9 +182,17 @@ router.get(['/totem/config/:devno', '/totems/:totemId/config'], (req, res) => {
       },
       cleaningVideoUrl: c.cleaningVideoUrl || null,
       coupons: store.getCouponsList(),
+      // Credenciais E-commerce/PIX enviadas ao totem. A fonte principal é o que o painel
+      // grava em config.cielo.ecommerce* — antes só se lia c.cieloMerchantId da raiz, que
+      // o painel nunca preenche, e a máquina acabava recebendo a credencial de sandbox
+      // embutida no código. `environment` vai junto para o totem saber se, no fallback
+      // offline, deve falar com o host de produção ou o de sandbox da Cielo.
       cieloConfig: {
-        merchantId: c.cieloMerchantId || store.getSystemSettings().defaultCieloMerchantId || "5e4fc2b8-11e3-4f9c-ab97-fb7baaea405b",
-        merchantKey: c.cieloMerchantKey || store.getSystemSettings().defaultCieloMerchantKey || "FMnlYedXdu5Xoa5n3hczfHh8yAMbYF7logQQ4qPL"
+        merchantId: (c.cielo && c.cielo.ecommerceMerchantId) || c.cieloMerchantId ||
+          store.getSystemSettings().defaultCieloMerchantId || "5e4fc2b8-11e3-4f9c-ab97-fb7baaea405b",
+        merchantKey: (c.cielo && c.cielo.ecommerceMerchantKey) || c.cieloMerchantKey ||
+          store.getSystemSettings().defaultCieloMerchantKey || "FMnlYedXdu5Xoa5n3hczfHh8yAMbYF7logQQ4qPL",
+        environment: (c.cielo && c.cielo.ecommerceEnvironment) || 'Homologacao'
       },
       serverTime: Date.now()
     }
@@ -292,6 +302,68 @@ router.put(['/totems/:totemId/config', '/totem/config/:devno'], (req, res) => {
 });
 
 /**
+ * GET /api/v1/app/version
+ * Versão publicada do APK do totem, para a atualização pelo botão do Painel do Operador.
+ *
+ * A URL de download é montada a partir do host da própria requisição: assim o totem recebe
+ * o endereço por onde ele já está falando (túnel Cloudflare, IP da LAN, domínio próprio) sem
+ * precisar de nenhuma configuração extra.
+ */
+const APP_DOWNLOAD_DIR = path.join(__dirname, '../public/downloads');
+const appVersionCache = { mtimeMs: 0, sha256: null };
+
+router.get(['/app/version', '/app/latest'], (req, res) => {
+  try {
+    const manifestPath = path.join(APP_DOWNLOAD_DIR, 'app-version.json');
+    if (!fs.existsSync(manifestPath)) {
+      return res.status(404).json({
+        code: -1, success: false,
+        message: 'Nenhuma versão do aplicativo publicada no servidor.'
+      });
+    }
+
+    const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+    const apkName = manifest.apkFile || 'capaxero-totem.apk';
+    const apkPath = path.join(APP_DOWNLOAD_DIR, apkName);
+
+    if (!fs.existsSync(apkPath)) {
+      return res.status(404).json({
+        code: -1, success: false,
+        message: `Manifesto aponta para "${apkName}", mas o arquivo não está em public/downloads.`
+      });
+    }
+
+    const stat = fs.statSync(apkPath);
+
+    // O hash só é recalculado quando o APK muda — são ~48 MB, não dá para reler a cada consulta.
+    if (appVersionCache.mtimeMs !== stat.mtimeMs || !appVersionCache.sha256) {
+      appVersionCache.sha256 = crypto.createHash('sha256').update(fs.readFileSync(apkPath)).digest('hex');
+      appVersionCache.mtimeMs = stat.mtimeMs;
+    }
+
+    // Atrás do túnel/proxy o esquema real vem no cabeçalho; req.protocol diria "http".
+    const proto = (req.headers['x-forwarded-proto'] || '').split(',')[0].trim() || req.protocol || 'http';
+    const host = req.headers['x-forwarded-host'] || req.headers.host;
+
+    return res.json({
+      code: 0,
+      success: true,
+      data: {
+        versionCode: Number(manifest.versionCode) || 0,
+        versionName: manifest.versionName || '0.0.0',
+        notes: manifest.notes || '',
+        downloadUrl: `${proto}://${host}/downloads/${encodeURIComponent(apkName)}`,
+        sizeBytes: stat.size,
+        sha256: appVersionCache.sha256,
+        publishedAt: stat.mtime.toISOString()
+      }
+    });
+  } catch (err) {
+    return res.status(500).json({ code: -1, success: false, message: err.message });
+  }
+});
+
+/**
  * POST /api/v1/telemetry/heartbeat ou /api/v1/totem/heartbeat
  * Recebe a telemetria periódica do totem (sensores, porta, status, níveis) e auto-cadastra a máquina
  */
@@ -302,16 +374,17 @@ router.post(['/telemetry/heartbeat', '/totem/heartbeat'], (req, res) => {
     status,
     machineState,
     currentPhase,
-    temperature,
-    temperatureCelsius,
     doorLocked,
     isDoorClosed,
     liquidLevelPercent,
     isLiquidLevelOk,
-    fragranceLevelPercent,
     currentCycle,
     appVersion
   } = req.body;
+  // Nota: "temperature"/"temperatureCelsius" e "fragranceLevelPercent" chegam do totem, mas a
+  // máquina não tem sensor de temperatura nem de nível de fragrância (só porta e líquido — ver
+  // Upus3Packet.kt no APK) — esses campos são ignorados de propósito para não persistir números
+  // fabricados como se fossem leitura real de sensor.
 
   const id = devno || totemId;
   if (!id) {
@@ -329,10 +402,8 @@ router.post(['/telemetry/heartbeat', '/totem/heartbeat'], (req, res) => {
   const updated = store.updateHeartbeat(id, {
     devno: id,
     status: effectiveStatus,
-    temperature: temperature || temperatureCelsius || 25.0,
     doorLocked: doorState,
     liquidLevelPercent: liquidState !== undefined ? liquidState : 100,
-    fragranceLevelPercent: fragranceLevelPercent !== undefined ? fragranceLevelPercent : 100,
     currentCycle: currentCycle || (currentPhase ? { step: currentPhase } : null),
     appVersion: appVersion || '1.0.0'
   });
@@ -513,7 +584,10 @@ router.get('/coupons', (req, res) => {
  * Cria ou atualiza um cupom com definição de quantidade de usos
  */
 router.post('/coupons', (req, res) => {
-  const { code, description, discountPercent, applicableMode, maxUsages, allowedTotems } = req.body;
+  const {
+    code, description, discountPercent, applicableMode,
+    maxUsages, allowedTotems, maxUsagesPerCpf, requireCpf
+  } = req.body;
 
   if (!code) {
     return res.status(400).json({ success: false, message: 'Código do cupom é obrigatório.' });
@@ -526,7 +600,9 @@ router.post('/coupons', (req, res) => {
       discountPercent,
       applicableMode,
       allowedTotems,
-      maxUsages
+      maxUsages,
+      maxUsagesPerCpf,
+      requireCpf
     });
 
     wsManager.broadcastDashboardUpdate();
@@ -541,6 +617,77 @@ router.post('/coupons', (req, res) => {
   } catch (err) {
     return res.status(400).json({ success: false, message: err.message });
   }
+});
+
+/**
+ * PUT /api/v1/coupons/:code
+ * Edita um cupom existente preservando os usos e os CPFs já registrados
+ */
+router.put('/coupons/:code', (req, res) => {
+  const { code } = req.params;
+  const existing = store.getCoupon(code);
+
+  if (!existing) {
+    return res.status(404).json({ success: false, message: 'Cupom não encontrado para edição.' });
+  }
+
+  const {
+    description, discountPercent, applicableMode,
+    maxUsages, allowedTotems, maxUsagesPerCpf, requireCpf
+  } = req.body;
+
+  try {
+    // Campos omitidos mantêm o valor atual do cupom
+    const coupon = store.addCoupon({
+      code: existing.code,
+      description: description !== undefined ? description : existing.description,
+      discountPercent: discountPercent !== undefined ? discountPercent : existing.discountPercent,
+      applicableMode: applicableMode !== undefined ? applicableMode : existing.applicableMode,
+      allowedTotems: allowedTotems !== undefined ? allowedTotems : existing.allowedTotems,
+      maxUsages: maxUsages !== undefined ? maxUsages : existing.maxUsages,
+      maxUsagesPerCpf: maxUsagesPerCpf !== undefined ? maxUsagesPerCpf : existing.maxUsagesPerCpf,
+      requireCpf: requireCpf !== undefined ? requireCpf : existing.requireCpf
+    });
+
+    wsManager.broadcastDashboardUpdate();
+    wsManager.broadcastToTotems('COUPONS_UPDATED', { coupons: store.getCouponsList() });
+
+    return res.json({
+      code: 0,
+      success: true,
+      message: `Cupom ${coupon.code} atualizado com sucesso!`,
+      data: coupon
+    });
+  } catch (err) {
+    return res.status(400).json({ success: false, message: err.message });
+  }
+});
+
+/**
+ * DELETE /api/v1/coupons/:code/redemptions/:id
+ * Remove o registro de um CPF, liberando-o para utilizar o cupom novamente
+ */
+router.delete('/coupons/:code/redemptions/:id', (req, res) => {
+  const { code, id } = req.params;
+  const updated = store.removeCouponRedemption(code, id);
+
+  if (!updated) {
+    return res.status(404).json({ success: false, message: 'Registro de CPF não encontrado.' });
+  }
+
+  wsManager.broadcastDashboardUpdate();
+  wsManager.broadcastToTotems('COUPONS_UPDATED', { coupons: store.getCouponsList() });
+
+  return res.json({
+    code: 0,
+    success: true,
+    message: 'CPF liberado para utilizar o cupom novamente.',
+    data: {
+      code: updated.code,
+      currentUsages: updated.currentUsages,
+      remainingRedemptions: (updated.redemptions || []).length
+    }
+  });
 });
 
 /**
@@ -625,6 +772,50 @@ router.get('/coupons/:code', (req, res) => {
   const curr = coupon.currentUsages || 0;
   const isUsed = curr >= max || Boolean(coupon.isUsed);
 
+  // ---- Controle por CPF ----
+  // Etapa de CPF desligada em services/cpf.js: nenhum cupom exige CPF enquanto isso.
+  const requireCpf = COUPON_CPF_ENABLED && coupon.requireCpf !== false;
+  const maxUsagesPerCpf = Number(coupon.maxUsagesPerCpf) > 0 ? Number(coupon.maxUsagesPerCpf) : 1;
+  const rawCpf = req.query.cpf || req.query.document || '';
+  const cleanCpf = sanitizeCpf(rawCpf);
+
+  if (requireCpf && !cleanCpf) {
+    return res.status(428).json({
+      code: 428,
+      success: false,
+      error: 'COUPON_CPF_REQUIRED',
+      message: 'Informe o CPF do cliente para validar este cupom.',
+      requireCpf: true,
+      maxUsagesPerCpf
+    });
+  }
+
+  if (cleanCpf && !isValidCpf(cleanCpf)) {
+    return res.status(422).json({
+      code: 422,
+      success: false,
+      error: 'COUPON_CPF_INVALID',
+      message: 'CPF inválido. Confira os números digitados.',
+      requireCpf,
+      maxUsagesPerCpf
+    });
+  }
+
+  const cpfUsages = cleanCpf ? store.countCpfUsages(coupon, cleanCpf) : 0;
+  if (cleanCpf && cpfUsages >= maxUsagesPerCpf) {
+    return res.status(409).json({
+      code: 409,
+      success: false,
+      error: 'COUPON_CPF_LIMIT_REACHED',
+      message: maxUsagesPerCpf === 1
+        ? `O CPF ${formatCpf(cleanCpf)} já utilizou este cupom.`
+        : `O CPF ${formatCpf(cleanCpf)} já utilizou este cupom ${cpfUsages} de ${maxUsagesPerCpf} vezes permitidas.`,
+      requireCpf,
+      maxUsagesPerCpf,
+      cpfUsages
+    });
+  }
+
   let normMode = null;
   if (coupon.applicableMode) {
     const upper = String(coupon.applicableMode).toUpperCase();
@@ -642,7 +833,11 @@ router.get('/coupons/:code', (req, res) => {
     allowedTotems: coupon.allowedTotems || null,
     isUsed: isUsed,
     maxUsages: max,
-    currentUsages: curr
+    currentUsages: curr,
+    requireCpf,
+    maxUsagesPerCpf,
+    cpfUsages,
+    cpfRemaining: Math.max(0, maxUsagesPerCpf - cpfUsages)
   };
 
   return res.json({
@@ -747,12 +942,13 @@ router.get('/coupons/:code/qrcode-data', async (req, res) => {
  */
 router.post('/coupons/:code/redeem', (req, res) => {
   const { code } = req.params;
-  const { totemId, selectedMode, orderId, discountAppliedInCents } = req.body;
+  const { totemId, selectedMode, orderId, discountAppliedInCents, cpf } = req.body;
 
   const result = store.redeemCoupon(code, totemId, {
     selectedMode,
     orderId,
-    discountAppliedInCents
+    discountAppliedInCents,
+    cpf
   });
 
   if (!result) {
@@ -763,7 +959,13 @@ router.post('/coupons/:code/redeem', (req, res) => {
   }
 
   if (result.error) {
-    return res.status(400).json({
+    // Status específicos para o app tratar o bloqueio por CPF
+    const statusByError = {
+      COUPON_CPF_REQUIRED: 428,
+      COUPON_CPF_INVALID: 422,
+      COUPON_CPF_LIMIT_REACHED: 409
+    };
+    return res.status(statusByError[result.error] || 400).json({
       success: false,
       error: result.error,
       message: result.message
@@ -771,6 +973,9 @@ router.post('/coupons/:code/redeem', (req, res) => {
   }
 
   wsManager.broadcastDashboardUpdate();
+  wsManager.broadcastToTotems('COUPONS_UPDATED', { coupons: store.getCouponsList() });
+
+  const cleanCpf = sanitizeCpf(cpf);
 
   return res.json({
     success: true,
@@ -778,7 +983,65 @@ router.post('/coupons/:code/redeem', (req, res) => {
     currentUsages: result.currentUsages,
     maxUsages: result.maxUsages,
     isUsed: result.isUsed,
+    cpf: cleanCpf ? formatCpf(cleanCpf) : null,
+    cpfUsages: cleanCpf ? store.countCpfUsages(result, cleanCpf) : 0,
+    maxUsagesPerCpf: result.maxUsagesPerCpf || 1,
     message: 'Cupom resgatado com sucesso'
+  });
+});
+
+/**
+ * GET /api/v1/coupons/:code/redemptions
+ * Lista os CPFs que já utilizaram o cupom (exibido na aba Cupons do painel)
+ */
+router.get('/coupons/:code/redemptions', (req, res) => {
+  const { code } = req.params;
+  const redemptions = store.getCouponRedemptions(code);
+
+  if (!redemptions) {
+    return res.status(404).json({ success: false, message: 'Cupom não encontrado.' });
+  }
+
+  const coupon = store.getCoupon(code);
+
+  return res.json({
+    code: 0,
+    success: true,
+    data: redemptions.map(r => ({
+      ...r,
+      cpfFormatted: r.cpfFormatted || (r.cpf ? formatCpf(r.cpf) : '—')
+    })),
+    summary: {
+      couponCode: coupon.code,
+      description: coupon.description,
+      discountPercent: coupon.discountPercent,
+      totalRedemptions: redemptions.length,
+      uniqueCpfs: new Set(redemptions.map(r => sanitizeCpf(r.cpf)).filter(Boolean)).size,
+      maxUsages: coupon.maxUsages || 1,
+      maxUsagesPerCpf: coupon.maxUsagesPerCpf || 1,
+      requireCpf: coupon.requireCpf !== false
+    }
+  });
+});
+
+/**
+ * GET /api/v1/coupons-redemptions
+ * Histórico consolidado de todos os CPFs que utilizaram cupons na rede
+ */
+router.get('/coupons-redemptions', (req, res) => {
+  const rows = store.getAllCouponRedemptions().map(r => ({
+    ...r,
+    cpfFormatted: r.cpfFormatted || (r.cpf ? formatCpf(r.cpf) : '—')
+  }));
+
+  return res.json({
+    code: 0,
+    success: true,
+    data: rows,
+    summary: {
+      total: rows.length,
+      uniqueCpfs: new Set(rows.map(r => sanitizeCpf(r.cpf)).filter(Boolean)).size
+    }
   });
 });
 

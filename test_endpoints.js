@@ -16,7 +16,7 @@ async function runTests() {
     const resLogin = await fetch(`${baseUrl}/api/v1/totem/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ devno: 'CPX-001-SP', appVersion: 'v3.3.0' })
+      body: JSON.stringify({ devno: 'CPX-001', appVersion: 'v3.3.0' })
     }).then(r => r.json());
     console.log('✅ [2. Totem Login V1]:', resLogin);
 
@@ -26,7 +26,7 @@ async function runTests() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         orderId: 'ORD-TEST-99',
-        devno: 'CPX-001-SP',
+        devno: 'CPX-001',
         mode: 'INTERMEDIARIA',
         amount: 17.00,
         paymentMethod: 'CIELO_CREDITO_NFC',
@@ -58,7 +58,7 @@ async function runTests() {
     const resUpusDevInfo = await fetch(`${baseUrl}/upus_APP/app/expressbox/devnoinfo`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ devno: 'CPX-001-SP' })
+      body: JSON.stringify({ devno: 'CPX-001' })
     }).then(r => r.json());
     console.log('✅ [6. UPUS expressbox/devnoinfo]:', resUpusDevInfo);
 
@@ -66,7 +66,7 @@ async function runTests() {
     const resUpusSmoke = await fetch(`${baseUrl}/upus_APP/app/device/remote/smoke`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ devno: 'CPX-001-SP' })
+      body: JSON.stringify({ devno: 'CPX-001' })
     }).then(r => r.json());
     console.log('✅ [7. UPUS device/remote/smoke]:', resUpusSmoke);
 

@@ -52,7 +52,7 @@ router.post('/register', (req, res) => {
       });
     }
 
-    const { cnpj, email, password, responsible_name, phone, company_name, username } = req.body;
+    const { cnpj, email, password, responsible_name, phone, company_name, username, franchiseType } = req.body;
 
     if (!email || !password || !responsible_name) {
       return res.status(400).json({
@@ -76,6 +76,7 @@ router.post('/register', (req, res) => {
       phone,
       company_name,
       username,
+      franchiseType,
       role: 'OWNER'
     });
 
