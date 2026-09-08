@@ -7,32 +7,92 @@ const router = express.Router();
 const store = require('../services/store');
 const crypto = require('crypto');
 
-// Sessões em memória (Token -> User)
+// Sessões em memória (Token -> snapshot do usuário)
 const activeSessions = new Map();
+
+/**
+ * Cópia dos campos públicos do usuário guardada na sessão.
+ * Mesma forma que store.getUserById() devolve (nunca inclui password_hash).
+ */
+function snapshotUser(user) {
+  return {
+    id: user.id,
+    username: user.username,
+    email: user.email,
+    role: user.role,
+    cnpj: user.cnpj,
+    responsible_name: user.responsible_name,
+    phone: user.phone,
+    company_name: user.company_name,
+    franchiseType: user.franchiseType,
+    created_at: user.created_at,
+    updated_at: user.updated_at
+  };
+}
 
 function generateSessionToken(user) {
   const token = 'CPX_SESS_' + crypto.randomBytes(32).toString('hex');
   activeSessions.set(token, {
-    userId: user.id,
-    role: user.role,
-    username: user.username,
-    responsible_name: user.responsible_name,
-    email: user.email,
-    cnpj: user.cnpj,
+    user: snapshotUser(user),
     createdAt: Date.now()
   });
   return token;
 }
 
+/**
+ * Resolve o usuário autenticado a partir do token.
+ *
+ * Lê exclusivamente da sessão em memória, sem tocar no banco. Todos os consumidores usam
+ * apenas role/id/responsible_name/username, que já estavam guardados aqui — o getUserById()
+ * que existia antes só servia para "atualizar" os dados.
+ *
+ * Manter esta função síncrona é deliberado: ela é exportada, o admin.js a embrulha em
+ * extractUser(), e praticamente toda rota administrativa começa por aí. Torná-la assíncrona
+ * obrigaria a converter em cascata todo o admin.js sem ganho nenhum.
+ *
+ * A contrapartida é a sessão poder ficar defasada, coberta por refreshSessionsForUser() e
+ * invalidateSessionsForUser() nos dois caminhos que alteram usuário.
+ */
 function getUserFromToken(token) {
   if (!token) return null;
   const cleanToken = token.replace(/^Bearer\s+/i, '').trim();
   const session = activeSessions.get(cleanToken);
   if (!session) return null;
 
-  // Atualiza dados frescos do banco
-  const user = store.getUserById(session.userId);
-  return user || null;
+  // Cópia: evita que um consumidor mute o estado da sessão sem querer
+  return { ...session.user };
+}
+
+/**
+ * Atualiza o snapshot de todas as sessões do usuário após edição de perfil.
+ */
+function refreshSessionsForUser(userId, updatedUser) {
+  if (!userId || !updatedUser) return 0;
+  let count = 0;
+  for (const session of activeSessions.values()) {
+    if (session.user && session.user.id === userId) {
+      session.user = snapshotUser(updatedUser);
+      count++;
+    }
+  }
+  return count;
+}
+
+/**
+ * Encerra todas as sessões do usuário (exclusão de conta).
+ * Reproduz o comportamento anterior, em que getUserById() passava a devolver undefined
+ * e o token deixava de resolver.
+ */
+function invalidateSessionsForUser(userId) {
+  if (!userId) return 0;
+  let count = 0;
+  for (const [token, session] of activeSessions.entries()) {
+    if (session.user && session.user.id === userId) {
+      activeSessions.delete(token);
+      count++;
+    }
+  }
+  return count;
 }
 
 /**
@@ -124,6 +184,9 @@ router.put('/profile', (req, res) => {
       password
     });
 
+    // Mantém o snapshot das sessões em dia — getUserFromToken lê daqui, não do banco
+    refreshSessionsForUser(user.id, updatedUser);
+
     return res.json({
       success: true,
       message: 'Perfil atualizado com sucesso!',
@@ -178,9 +241,22 @@ router.post('/login', (req, res) => {
  */
 router.get('/me', (req, res) => {
   const authHeader = req.headers.authorization || req.query.token;
-  const user = getUserFromToken(authHeader);
+  const session = getUserFromToken(authHeader);
+
+  if (!session) {
+    return res.status(401).json({
+      success: false,
+      message: 'Sessão inválida ou expirada.'
+    });
+  }
+
+  // Única rota que realmente quer o registro fresco do banco, e não o snapshot da sessão:
+  // é o que o painel usa para reidratar o perfil ao recarregar a página.
+  const user = store.getUserById(session.id);
 
   if (!user) {
+    // Conta removida enquanto a sessão ainda existia
+    invalidateSessionsForUser(session.id);
     return res.status(401).json({
       success: false,
       message: 'Sessão inválida ou expirada.'
@@ -205,4 +281,4 @@ router.post('/logout', (req, res) => {
   return res.json({ success: true, message: 'Logout realizado com sucesso.' });
 });
 
-module.exports = { router, getUserFromToken };
+module.exports = { router, getUserFromToken, refreshSessionsForUser, invalidateSessionsForUser };

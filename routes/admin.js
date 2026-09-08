@@ -9,7 +9,7 @@ const fs = require('fs');
 const multer = require('multer');
 const store = require('../services/store');
 const wsManager = require('../services/websocket');
-const { getUserFromToken } = require('./auth');
+const { getUserFromToken, refreshSessionsForUser, invalidateSessionsForUser } = require('./auth');
 
 // Configuração de upload de vídeo para a rota de admin
 const videoStorage = multer.diskStorage({
@@ -267,6 +267,8 @@ router.put('/admin/users/:id', (req, res) => {
       franchiseType,
       password
     });
+    // getUserFromToken lê da sessão, não do banco: sincroniza o snapshot do usuário editado
+    refreshSessionsForUser(id, updated);
     wsManager.broadcastDashboardUpdate();
     return res.json({ success: true, message: 'Cadastro atualizado com sucesso.', data: updated });
   } catch (err) {
@@ -293,6 +295,9 @@ router.delete('/admin/users/:id', (req, res) => {
     if (!deleted) {
       return res.status(404).json({ success: false, message: 'Usuário não encontrado.' });
     }
+    // Derruba as sessões da conta excluída — antes o token deixava de resolver sozinho,
+    // porque getUserFromToken consultava o banco a cada requisição
+    invalidateSessionsForUser(id);
     wsManager.broadcastDashboardUpdate();
     return res.json({ success: true, message: 'Usuário excluído com sucesso.' });
   } catch (err) {
