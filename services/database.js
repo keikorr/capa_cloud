@@ -740,6 +740,19 @@ class RelationalDatabase {
   // ==========================================
 
   addTransaction(tx) {
+    // Evita contar a mesma venda duas vezes quando o mesmo pedido é confirmado
+    // por mais de um caminho (ex.: sync do totem via /telemetry/transactions
+    // e, em paralelo, o webhook/polling de confirmação da Cielo) — ambos chamam
+    // addTransaction() para o mesmo orderId, o que antes duplicava ciclos/faturamento.
+    if (tx.orderId && tx.devno) {
+      const existing = this.tables.transactions.find(t =>
+        t.orderId === tx.orderId && t.devno === tx.devno && t.status === 'APPROVED'
+      );
+      if (existing) {
+        return existing;
+      }
+    }
+
     const newTx = {
       id: "TX-" + Date.now().toString().slice(-6),
       timestamp: new Date().toISOString(),
