@@ -810,26 +810,43 @@ router.post('/cielo/card/reversal', async (req, res) => {
 // transação não pode ficar pela metade — o dinheiro foi debitado do cliente sem o serviço
 // ser prestado. Este sweep periódico fecha essa lacuna, que antes dependia 100% do totem.
 // ─────────────────────────────────────────────────────────────────────────────
+// Guarda de reentrância: hoje o laço é síncrono, mas quando pending_orders virar tabela a
+// varredura passa a fazer I/O. Dois sweeps sobrepostos poderiam emitir dois estornos para
+// o mesmo pedido — a reivindicação por status abaixo cobre o caso, mas não dependemos só dela.
+let reversalSweepRunning = false;
+
 setInterval(() => {
-  const now = Date.now();
-  for (const order of store.pendingOrders.values()) {
-    if (
-      order.status === 'APPROVED' &&
-      order.financeConfirmed === false &&
-      order.authorizedAt &&
-      (now - new Date(order.authorizedAt).getTime()) > CARD_FINISH_WATCHDOG_SECONDS * 1000
-    ) {
-      console.warn(`[CIELO CONECTA][WATCHDOG] Pedido ${order.orderId} aprovado há mais de ${CARD_FINISH_WATCHDOG_SECONDS}s sem confirmação local (/card/finish). Desfazendo automaticamente.`);
-      store.updatePendingOrder(order.orderId, { status: 'REVERSED', financeConfirmed: true, reversalReason: 'WATCHDOG_FINISH_TIMEOUT' });
-      cieloConecta.reverseSale({
-        paymentId: order.paymentId,
-        merchantOrderId: order.merchantOrderId,
-        amount: order.amount,
-        links: order.rawAuthResult && order.rawAuthResult.links
-      }, 'WATCHDOG_FINISH_TIMEOUT').catch(err => {
-        console.error(`[CIELO CONECTA][WATCHDOG] Falha ao desfazer pedido ${order.orderId}:`, err.message);
-      });
+  if (reversalSweepRunning) {
+    console.warn('[CIELO CONECTA][WATCHDOG] Sweep anterior ainda em execução; pulando este ciclo.');
+    return;
+  }
+  reversalSweepRunning = true;
+
+  try {
+    const now = Date.now();
+    for (const order of store.pendingOrders.values()) {
+      if (
+        order.status === 'APPROVED' &&
+        order.financeConfirmed === false &&
+        order.authorizedAt &&
+        (now - new Date(order.authorizedAt).getTime()) > CARD_FINISH_WATCHDOG_SECONDS * 1000
+      ) {
+        console.warn(`[CIELO CONECTA][WATCHDOG] Pedido ${order.orderId} aprovado há mais de ${CARD_FINISH_WATCHDOG_SECONDS}s sem confirmação local (/card/finish). Desfazendo automaticamente.`);
+        store.updatePendingOrder(order.orderId, { status: 'REVERSED', financeConfirmed: true, reversalReason: 'WATCHDOG_FINISH_TIMEOUT' });
+        cieloConecta.reverseSale({
+          paymentId: order.paymentId,
+          merchantOrderId: order.merchantOrderId,
+          amount: order.amount,
+          links: order.rawAuthResult && order.rawAuthResult.links
+        }, 'WATCHDOG_FINISH_TIMEOUT').catch(err => {
+          console.error(`[CIELO CONECTA][WATCHDOG] Falha ao desfazer pedido ${order.orderId}:`, err.message);
+        });
+      }
     }
+  } catch (err) {
+    console.error('[CIELO CONECTA][WATCHDOG] Falha no sweep de desfazimento:', err);
+  } finally {
+    reversalSweepRunning = false;
   }
 }, 30 * 1000);
 

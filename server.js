@@ -96,17 +96,69 @@ wsManager.init(server);
 // WebSocket de forma limpa — sem isso o painel mostraria "Disponível" para sempre.
 const HEARTBEAT_TIMEOUT_MS = 3 * 60 * 1000;
 const OFFLINE_CHECK_INTERVAL_MS = 30 * 1000;
-setInterval(() => {
-  const changedDevnos = store.markStaleTotemsOffline(HEARTBEAT_TIMEOUT_MS);
-  if (changedDevnos.length) {
-    console.log(`[WATCHDOG] Totens marcados como OFFLINE por timeout de heartbeat: ${changedDevnos.join(', ')}`);
-    wsManager.broadcastDashboardUpdate();
+
+// Guarda de reentrância: o corpo é síncrono hoje, mas passa a fazer I/O quando a camada de
+// dados virar assíncrona. Sem isso, um tick lento deixaria dois sweeps se sobrepondo sobre
+// o mesmo conjunto de totens.
+let offlineSweepRunning = false;
+const offlineSweepTimer = setInterval(async () => {
+  if (offlineSweepRunning) {
+    console.warn('[WATCHDOG] Sweep anterior ainda em execução; pulando este ciclo.');
+    return;
+  }
+  offlineSweepRunning = true;
+  try {
+    const changedDevnos = await store.markStaleTotemsOffline(HEARTBEAT_TIMEOUT_MS);
+    if (changedDevnos.length) {
+      console.log(`[WATCHDOG] Totens marcados como OFFLINE por timeout de heartbeat: ${changedDevnos.join(', ')}`);
+      wsManager.broadcastDashboardUpdate();
+    }
+  } catch (err) {
+    console.error('[WATCHDOG] Falha no sweep de totens offline:', err);
+  } finally {
+    offlineSweepRunning = false;
   }
 }, OFFLINE_CHECK_INTERVAL_MS);
 
 // Garante que os tokens de admin/webhook já apareçam no boot
 require('./middleware/auth').getAdminToken();
 require('./middleware/auth').getWebhookToken();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DESLIGAMENTO GRACIOSO
+//
+// Antes não havia handler nenhum: um systemctl restart ou deploy matava o processo no meio
+// de uma escrita, e como save() trunca o arquivo no lugar, isso podia deixar o banco JSON
+// inválido. Quando a camada de dados virar Postgres, este é também o único lugar onde dá
+// para devolver as conexões do pool e drenar a fila de escrita pendente.
+// ─────────────────────────────────────────────────────────────────────────────
+let shuttingDown = false;
+
+async function shutdown(signal) {
+  if (shuttingDown) return;
+  shuttingDown = true;
+  console.log(`\n[SHUTDOWN] Sinal ${signal} recebido. Encerrando com segurança...`);
+
+  clearInterval(offlineSweepTimer);
+
+  // Para de aceitar novas conexões e espera as em andamento terminarem
+  const closeHttp = new Promise(resolve => server.close(() => resolve()));
+
+  try {
+    await Promise.race([
+      Promise.all([closeHttp, wsManager.close()]),
+      new Promise(resolve => setTimeout(resolve, 10000))
+    ]);
+  } catch (err) {
+    console.error('[SHUTDOWN] Erro ao encerrar servidores:', err);
+  }
+
+  console.log('[SHUTDOWN] Encerrado.');
+  process.exit(0);
+}
+
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));
 
 // Inicializa o servidor HTTP
 server.listen(PORT, '0.0.0.0', () => {

@@ -194,6 +194,22 @@ class WebSocketManager {
       return { success: true, deliveredOnline: false, message: 'Totem offline. Execução simulada com sucesso.' };
     }
   }
+
+  /**
+   * Encerra o servidor WebSocket, avisando os clientes com um close frame limpo.
+   * Usado no desligamento gracioso — sem isso os totens só descobrem a queda pelo timeout.
+   */
+  close() {
+    if (!this.wss) return Promise.resolve();
+
+    for (const ws of this.wss.clients) {
+      try {
+        ws.close(1001, 'Servidor reiniciando');
+      } catch (_) { /* socket já morto */ }
+    }
+
+    return new Promise(resolve => this.wss.close(() => resolve()));
+  }
 }
 
 module.exports = new WebSocketManager();
