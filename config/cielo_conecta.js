@@ -1,32 +1,10 @@
 /**
  * Capaxero Cloud — Configuração da Integração Cielo Conecta (Cartão Presente)
  */
-const fs = require('fs');
-const path = require('path');
-
-// Carrega .env se existir
-const envPath = path.join(__dirname, '..', '.env');
-if (fs.existsSync(envPath)) {
-  const envContent = fs.readFileSync(envPath, 'utf8');
-  envContent.split('\n').forEach(line => {
-    const trimmed = line.trim();
-    if (trimmed && !trimmed.startsWith('#')) {
-      const idx = trimmed.indexOf('=');
-      if (idx !== -1) {
-        const key = trimmed.substring(0, idx).trim();
-        const val = trimmed.substring(idx + 1).trim().replace(/^["']|["']$/g, '');
-        if (!process.env[key]) {
-          process.env[key] = val;
-        }
-      }
-    }
-  });
-}
-
-function env(name, fallback) {
-  const value = process.env[name];
-  return value !== undefined && value !== '' ? value : fallback;
-}
+// O .env é carregado por config/env.js, que também é o primeiro require do server.js.
+// Manter o require aqui garante que este módulo funcione mesmo se carregado isoladamente
+// (ex.: por um script), já que loadEnv() é idempotente.
+const { env } = require('./env');
 
 const ENVIRONMENT = env('CIELO_ENVIRONMENT', 'Homologacao');
 

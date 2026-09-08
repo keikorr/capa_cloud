@@ -3,6 +3,10 @@
  * Telemetria, Pagamentos Cielo, Dashboard em Tempo Real, Autenticação e Camada UPUS IoT
  */
 
+// PRIMEIRO require do processo: popula process.env antes que qualquer módulo leia
+// configuração no escopo do módulo. Não mover para baixo.
+require('./config/env');
+
 const express = require('express');
 const http = require('http');
 const path = require('path');
