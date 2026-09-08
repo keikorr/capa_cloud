@@ -1,0 +1,47 @@
+{
+  "name": "admin_depots__owner",
+  "status": 200,
+  "body": {
+    "data": [
+      {
+        "address": "R. Vilebaldo Aguiar, 1701 - Cocó, Fortaleza - CE, 60192-025",
+        "branno": "BR-01",
+        "commissionPercent": 0,
+        "contactPerson": "",
+        "createdAt": "<volatil>",
+        "cyclesToday": "<volatil>",
+        "dailyTrafficMotos": 0,
+        "depotna": "Ponto de Instalação",
+        "depotno": "DEP-1",
+        "devno": "CPX-002",
+        "lat": -3.7447579272127958,
+        "lng": -38.47301602363587,
+        "name": "Merit Offices & Mall",
+        "phone": "",
+        "revenueToday": "<volatil>",
+        "totemOwner": "MAGNO",
+        "totemStatus": "OFFLINE"
+      },
+      {
+        "address": "Rua Marcelino Lopes, Sapiranga / Coité, Fortaleza, Ceará, Região Nordeste, 60833-414, Brasil",
+        "branno": "BR-01",
+        "commissionPercent": 0,
+        "contactPerson": "",
+        "createdAt": "<volatil>",
+        "cyclesToday": "<volatil>",
+        "dailyTrafficMotos": 0,
+        "depotna": "Ponto de Instalação",
+        "depotno": "DEP-13",
+        "devno": "CPX-001",
+        "lat": -3.7916183,
+        "lng": -38.461125,
+        "name": "Casa de Ismael",
+        "phone": "",
+        "revenueToday": "<volatil>",
+        "totemOwner": "MAGNO",
+        "totemStatus": "OFFLINE"
+      }
+    ],
+    "success": true
+  }
+}

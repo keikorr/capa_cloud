@@ -1,0 +1,33 @@
+{
+  "name": "auth_me__owner",
+  "status": 200,
+  "body": {
+    "data": {
+      "cnpj": "08.070.852/0001-67",
+      "company_name": "FAN ENERGY",
+      "created_at": "<volatil>",
+      "email": "fan@gmail.com",
+      "franchiseType": "PROPRIA",
+      "id": "USR-MTCAOMP7",
+      "phone": "73333333333",
+      "responsible_name": "MAGNO",
+      "role": "OWNER",
+      "totems": [
+        {
+          "devno": "CPX-002",
+          "name": "Totem #CPX-002",
+          "status": "OFFLINE"
+        },
+        {
+          "devno": "CPX-001",
+          "name": "Totem #CPX-001",
+          "status": "OFFLINE"
+        }
+      ],
+      "totemsCount": 2,
+      "updated_at": "<volatil>",
+      "username": "fan"
+    },
+    "success": true
+  }
+}

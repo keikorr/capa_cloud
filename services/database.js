@@ -11,9 +11,14 @@ const { sanitizeCpf, isValidCpf, formatCpf, COUPON_CPF_ENABLED } = require('./cp
 const ids = require('./ids');
 const { normalizeMode, normalizeModeOrDefault, modeLabel } = require('./modes');
 
-const DATA_DIR = path.join(__dirname, '..', 'data');
-const DB_FILE = path.join(DATA_DIR, 'capaxero_database.json');
-const LEGACY_DB_FILE = path.join(DATA_DIR, 'capaxero_db.json');
+// CAPAXERO_DB_FILE permite apontar o banco para outro arquivo sem tocar no de produção.
+// Usado pelos golden snapshots e pelos testes, que precisam rodar sobre uma fixture.
+// Sem a variável, o comportamento é exatamente o de antes.
+const DATA_DIR = process.env.CAPAXERO_DATA_DIR || path.join(__dirname, '..', 'data');
+const DB_FILE = process.env.CAPAXERO_DB_FILE || path.join(DATA_DIR, 'capaxero_database.json');
+const LEGACY_DB_FILE = process.env.CAPAXERO_DB_FILE
+  ? `${process.env.CAPAXERO_DB_FILE}.legacy`
+  : path.join(DATA_DIR, 'capaxero_db.json');
 
 // Função segura para hash de senhas usando scrypt
 function hashPassword(password) {
@@ -654,6 +659,16 @@ class RelationalDatabase {
 
   getDepotsList(userFilter = null) {
     let depots = this.tables.depots;
+
+    // Antes o userFilter era aceito e ignorado: qualquer dono enxergava todos os pontos de
+    // instalação da rede, incluindo revenueToday e commissionPercent de máquinas de outros
+    // franqueados. Reusa o mesmo filtro de propriedade do getTotemsList para não haver dois
+    // critérios de RBAC divergentes.
+    if (userFilter && userFilter.role !== 'CRPADMIN') {
+      const ownedDevnos = new Set(this.getTotemsList(userFilter).map(t => t.devno));
+      depots = depots.filter(d => d.devno && ownedDevnos.has(d.devno));
+    }
+
     return depots.map(d => {
       const totem = this.getTotem(d.devno);
       const { revenueToday, cyclesToday } = totem ? this.getTodayMetrics(totem.devno) : { revenueToday: 0, cyclesToday: 0 };

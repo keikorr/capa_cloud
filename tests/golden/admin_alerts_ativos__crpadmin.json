@@ -1,0 +1,1019 @@
+{
+  "name": "admin_alerts_ativos__crpadmin",
+  "status": 200,
+  "body": {
+    "data": [
+      {
+        "devno": "CPX-PARQUELANDIA",
+        "id": "ALT-44359",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-PARQUELANDIA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-PARQUELANDIA",
+        "id": "ALT-44191",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-PARQUELANDIA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-PARQUE",
+        "id": "ALT-43862",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-PARQUE",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-PARQUELANDIA",
+        "id": "ALT-93974",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-PARQUELANDIA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-PARQUELANDIA",
+        "id": "ALT-93804",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-PARQUELANDIA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-PARQUE",
+        "id": "ALT-93527",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-PARQUE",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-PARQUE",
+        "id": "ALT-55031",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-PARQUE",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-PARQUELANDIA",
+        "id": "ALT-53657",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-PARQUELANDIA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-PARQUELANDIA",
+        "id": "ALT-53447",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-PARQUELANDIA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-PARQUE",
+        "id": "ALT-53151",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-PARQUE",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-PARQUE",
+        "id": "ALT-53098",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-PARQUE",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-36059",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-14526",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-84455",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-77209",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-72567",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-72351",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-74474",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-57182",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-72193",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-44723",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-45321",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-19417",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-96109",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-84352",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-86121",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-70122",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-67872",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-66951",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-22214",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-30693",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-41806",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-06510",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-94486",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-94270",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-93798",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-12560",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-87891",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-34815",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-20304",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-37142",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-86315",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-00272",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-98143",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-68755",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-39243",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-16983",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-14496",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-10689",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-09302",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-26322",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-82383",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-93357",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-CAUCAIA",
+        "id": "ALT-80889",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-CAUCAIA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-CAUCAIA",
+        "id": "ALT-72307",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-CAUCAIA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-CAUCAIA",
+        "id": "ALT-66733",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-CAUCAIA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-PARQUE",
+        "id": "ALT-90903",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-PARQUE",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-PARQUE",
+        "id": "ALT-62553",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-PARQUE",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-PARQUE",
+        "id": "ALT-46834",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-PARQUE",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-JOSE",
+        "id": "ALT-90997",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-JOSE",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-JOSE",
+        "id": "ALT-57980",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-JOSE",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-37057",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-59081",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-18605",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-JOAO23",
+        "id": "ALT-12828",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-JOAO23",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-JOAO23",
+        "id": "ALT-08106",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-JOAO23",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-JOAO23",
+        "id": "ALT-96008",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-JOAO23",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-JOAO23",
+        "id": "ALT-92322",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-JOAO23",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-JOAO23",
+        "id": "ALT-86274",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-JOAO23",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-JOAO23",
+        "id": "ALT-81279",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-JOAO23",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-14526",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-71690",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-31950",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-05506",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-PARQUE",
+        "id": "ALT-86825",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-PARQUE",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-PARQUE",
+        "id": "ALT-53899",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-PARQUE",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-70911",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-70106",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-14831",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-94501",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-79139",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-94545",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-76802",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-95257",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-80378",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-93866",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-78369",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-83204",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-76266",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-75556",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-70959",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-86586",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-66328",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-72671",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-48098",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-65954",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-58775",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-MESSEJANA",
+        "id": "ALT-17755",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-MESSEJANA",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "CPX-PARQUE",
+        "id": "ALT-33243",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-PARQUE",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "TOTEM-CPX-001",
+        "id": "ALT-83279",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #TOTEM-CPX-001",
+        "type": "LOW_LIQUID_LEVEL"
+      },
+      {
+        "devno": "TOTEM-CPX-001",
+        "id": "ALT-69367",
+        "message": "Reservatório de sanitizante abaixo do nível mínimo. Reabastecimento necessário.",
+        "resolved": false,
+        "severity": "CRITICAL",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #TOTEM-CPX-001",
+        "type": "LOW_LIQUID_LEVEL"
+      }
+    ],
+    "success": true
+  }
+}

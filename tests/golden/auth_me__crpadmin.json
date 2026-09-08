@@ -1,0 +1,92 @@
+{
+  "name": "auth_me__crpadmin",
+  "status": 200,
+  "body": {
+    "data": {
+      "cnpj": "00.000.000/0001-00",
+      "company_name": "Capaxero Tecnologia",
+      "created_at": "<volatil>",
+      "email": "jonathan@capaxero.com.br",
+      "id": "USR-CRPADMIN",
+      "phone": "(11) 98888-7777",
+      "responsible_name": "Jon Mag",
+      "role": "CRPADMIN",
+      "totems": [
+        {
+          "devno": "TOTEM-CPX-001",
+          "name": "Totem #TOTEM-CPX-001",
+          "status": "OFFLINE"
+        },
+        {
+          "devno": "TOTEM-CPX-02",
+          "name": "Totem #TOTEM-CPX-02",
+          "status": "OFFLINE"
+        },
+        {
+          "devno": "Teste",
+          "name": "Totem #Teste",
+          "status": "OFFLINE"
+        },
+        {
+          "devno": "CPX-MESSEJANA",
+          "name": "Totem #CPX-MESSEJANA",
+          "status": "IDLE"
+        },
+        {
+          "devno": "CPX-LAGOA",
+          "name": "Totem #CPX-LAGOA",
+          "status": "IDLE"
+        },
+        {
+          "devno": "CPX-JANGU",
+          "name": "Totem #CPX-JANGU",
+          "status": "IDLE"
+        },
+        {
+          "devno": "CPX-EXPEDICIONARIOS",
+          "name": "Totem #CPX-EXPEDICIONARIOS",
+          "status": "OFFLINE"
+        },
+        {
+          "devno": "CPX-PARQUE",
+          "name": "Totem #CPX-PARQUE",
+          "status": "IDLE"
+        },
+        {
+          "devno": "CPX-JOSE",
+          "name": "Totem #CPX-JOSE",
+          "status": "IDLE"
+        },
+        {
+          "devno": "CPX-CAUCAIA",
+          "name": "Totem #CPX-CAUCAIA",
+          "status": "IDLE"
+        },
+        {
+          "devno": "CPX-BARRA",
+          "name": "Totem #CPX-BARRA",
+          "status": "OFFLINE"
+        },
+        {
+          "devno": "CPX-JOAO23",
+          "name": "Totem #CPX-JOAO23",
+          "status": "IDLE"
+        },
+        {
+          "devno": "CPX-SANTOS",
+          "name": "Totem #CPX-SANTOS",
+          "status": "OFFLINE"
+        },
+        {
+          "devno": "CPX-PARQUELANDIA",
+          "name": "Totem #CPX-PARQUELANDIA",
+          "status": "OFFLINE"
+        }
+      ],
+      "totemsCount": 14,
+      "updated_at": "<volatil>",
+      "username": "CRPADMIN"
+    },
+    "success": true
+  }
+}

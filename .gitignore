@@ -6,3 +6,8 @@ Thumbs.db
 .env
 .env.*
 !.env.example
+
+# Fixture reconstruída da produção para os golden snapshots.
+# Contém credenciais Cielo por totem (a API as devolve para CRPADMIN) — nunca versionar.
+data/fixture_prod.json
+data/*.bak-*

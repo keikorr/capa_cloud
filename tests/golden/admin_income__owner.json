@@ -1,0 +1,77 @@
+{
+  "name": "admin_income__owner",
+  "status": 200,
+  "body": {
+    "data": {
+      "depotStats": [
+        {
+          "commissionAmount": 0,
+          "commissionPercent": 0,
+          "cycles": 0,
+          "depotna": "Ponto de Instalação",
+          "depotno": "DEP-1",
+          "devno": "CPX-002",
+          "netRevenue": 0,
+          "revenue": 0
+        },
+        {
+          "commissionAmount": 0,
+          "commissionPercent": 0,
+          "cycles": 0,
+          "depotna": "Ponto de Instalação",
+          "depotno": "DEP-13",
+          "devno": "CPX-001",
+          "netRevenue": 0,
+          "revenue": 0
+        }
+      ],
+      "historicalRevenue": [
+        {
+          "cycles": 1,
+          "date": "2026-09-02",
+          "day": "Qua",
+          "revenue": 0.01
+        },
+        {
+          "cycles": 0,
+          "date": "2026-09-03",
+          "day": "Qui",
+          "revenue": 0
+        },
+        {
+          "cycles": 0,
+          "date": "2026-09-04",
+          "day": "Sex",
+          "revenue": 0
+        },
+        {
+          "cycles": 0,
+          "date": "2026-09-05",
+          "day": "Sáb",
+          "revenue": 0
+        },
+        {
+          "cycles": 0,
+          "date": "2026-09-06",
+          "day": "Dom",
+          "revenue": 0
+        },
+        {
+          "cycles": 0,
+          "date": "2026-09-07",
+          "day": "Seg",
+          "revenue": 0
+        },
+        {
+          "cycles": 0,
+          "date": "2026-09-08",
+          "day": "Hoje",
+          "revenue": 0
+        }
+      ],
+      "weekTotalCycles": 1,
+      "weekTotalRevenue": 0.01
+    },
+    "success": true
+  }
+}

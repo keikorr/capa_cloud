@@ -1,0 +1,152 @@
+{
+  "name": "admin_totems__owner",
+  "status": 200,
+  "body": {
+    "data": [
+      {
+        "boxCount": 1,
+        "branno": "BR-01",
+        "config": {
+          "advEnabled": true,
+          "advancedDurationSec": 480,
+          "advancedPrice": 22,
+          "basicDurationSec": 360,
+          "basicEnabled": true,
+          "basicPrice": 0.01,
+          "cieloMerchantId": "<segredo:vazio>",
+          "cleaningVideoUrl": null,
+          "interEnabled": true,
+          "intermediateDurationSec": 420,
+          "intermediatePrice": 14.99,
+          "isCouponsEnabled": false,
+          "isCreditEnabled": true,
+          "isDebitEnabled": true,
+          "isPixEnabled": true,
+          "location": "DEP-1",
+          "modes": {
+            "avancada": {
+              "fragranceSeconds": 5,
+              "isEnabled": true,
+              "mistSaturationSeconds": 45,
+              "mistSpraySeconds": 25,
+              "ozoneExhaustSeconds": 135,
+              "priceInCents": 2200,
+              "thermalDryingSeconds": 180,
+              "uvSeconds": 100
+            },
+            "basica": {
+              "fragranceSeconds": 5,
+              "isEnabled": true,
+              "mistSaturationSeconds": 45,
+              "mistSpraySeconds": 15,
+              "ozoneExhaustSeconds": 115,
+              "priceInCents": 1,
+              "thermalDryingSeconds": 120,
+              "uvSeconds": 70
+            },
+            "intermediaria": {
+              "fragranceSeconds": 2,
+              "isEnabled": true,
+              "mistSaturationSeconds": 45,
+              "mistSpraySeconds": 30,
+              "ozoneExhaustSeconds": 135,
+              "priceInCents": 1499,
+              "thermalDryingSeconds": 180,
+              "uvSeconds": 85
+            }
+          },
+          "paymentMethods": {
+            "isCouponsEnabled": false,
+            "isCreditEnabled": true,
+            "isDebitEnabled": true,
+            "isPixEnabled": true
+          }
+        },
+        "currentCycle": "<volatil>",
+        "depotno": "DEP-1",
+        "devno": "CPX-002",
+        "doorLocked": true,
+        "lastHeartbeat": "<volatil>",
+        "liquidLevelPercent": 100,
+        "location": "R. Vilebaldo Aguiar, 1701 - Cocó, Fortaleza - CE, 60192-025",
+        "name": "Totem #CPX-002",
+        "owner": "MAGNO",
+        "owner_id": "USR-MTCAOMP7",
+        "revenueToday": "<volatil>",
+        "status": "OFFLINE",
+        "totalCyclesToday": "<volatil>"
+      },
+      {
+        "boxCount": 1,
+        "branno": "BR-01",
+        "config": {
+          "advEnabled": false,
+          "advancedDurationSec": 480,
+          "advancedPrice": 20,
+          "basicDurationSec": 360,
+          "basicEnabled": true,
+          "basicPrice": 14,
+          "cieloMerchantId": "<segredo:vazio>",
+          "interEnabled": true,
+          "intermediateDurationSec": 420,
+          "intermediatePrice": 17,
+          "isCouponsEnabled": true,
+          "isCreditEnabled": false,
+          "isDebitEnabled": false,
+          "isPixEnabled": true,
+          "modes": {
+            "avancada": {
+              "fragranceSeconds": 5,
+              "isEnabled": false,
+              "mistSaturationSeconds": 45,
+              "mistSpraySeconds": 25,
+              "ozoneExhaustSeconds": 135,
+              "priceInCents": 2000,
+              "thermalDryingSeconds": 180,
+              "uvSeconds": 90
+            },
+            "basica": {
+              "fragranceSeconds": 5,
+              "isEnabled": true,
+              "mistSaturationSeconds": 45,
+              "mistSpraySeconds": 15,
+              "ozoneExhaustSeconds": 115,
+              "priceInCents": 1400,
+              "thermalDryingSeconds": 120,
+              "uvSeconds": 60
+            },
+            "intermediaria": {
+              "fragranceSeconds": 5,
+              "isEnabled": true,
+              "mistSaturationSeconds": 45,
+              "mistSpraySeconds": 20,
+              "ozoneExhaustSeconds": 125,
+              "priceInCents": 1700,
+              "thermalDryingSeconds": 150,
+              "uvSeconds": 75
+            }
+          },
+          "paymentMethods": {
+            "isCouponsEnabled": true,
+            "isCreditEnabled": false,
+            "isDebitEnabled": false,
+            "isPixEnabled": true
+          }
+        },
+        "depotno": "DEP-13",
+        "devno": "CPX-001",
+        "doorLocked": true,
+        "lastHeartbeat": "<volatil>",
+        "liquidLevelPercent": 100,
+        "location": "Rua Marcelino Lopes, Sapiranga / Coité, Fortaleza, Ceará, Região Nordeste, 60833-414, Brasil",
+        "name": "Totem #CPX-001",
+        "owner": "MAGNO",
+        "owner_id": "USR-MTCAOMP7",
+        "revenueToday": "<volatil>",
+        "status": "OFFLINE",
+        "totalCyclesToday": "<volatil>"
+      }
+    ],
+    "success": true
+  }
+}

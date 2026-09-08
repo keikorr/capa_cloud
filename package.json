@@ -5,7 +5,13 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node --watch server.js"
+    "dev": "node --watch server.js",
+    "test": "node tests/golden.js",
+    "test:update": "node tests/golden.js --update",
+    "fixture": "node scripts/fetch_prod_dataset.js"
+  },
+  "engines": {
+    "node": ">=18.11"
   },
   "keywords": [
     "capaxero",

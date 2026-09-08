@@ -1,0 +1,23 @@
+{
+  "name": "admin_alerts__owner",
+  "status": 200,
+  "body": {
+    "data": [
+      {
+        "assignee": "",
+        "devno": "CPX-002",
+        "id": "ALT-24814",
+        "issueType": "Mecânico",
+        "message": "Problema de junta",
+        "priority": "Média",
+        "resolved": true,
+        "resolvedAt": "<volatil>",
+        "severity": "Média",
+        "timestamp": "<volatil>",
+        "totemName": "Totem #CPX-002",
+        "type": "MAINTENANCE"
+      }
+    ],
+    "success": true
+  }
+}

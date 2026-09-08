@@ -1,0 +1,178 @@
+{
+  "name": "coupons_publico",
+  "status": 200,
+  "body": {
+    "code": 0,
+    "data": [
+      {
+        "allowedTotems": null,
+        "applicableMode": null,
+        "code": "PROMO100",
+        "createdAt": "<volatil>",
+        "currentUsages": 2,
+        "description": "100%",
+        "discountPercent": 100,
+        "isUsed": false,
+        "maxUsages": 100,
+        "maxUsagesPerCpf": 1,
+        "redemptions": [
+          {
+            "cpf": "",
+            "cpfFormatted": "",
+            "discountAppliedInCents": 0,
+            "discountPercent": 100,
+            "id": "c6345b0d-da89-48b5-b9df-c05ed8b3b43a",
+            "orderId": null,
+            "redeemedAt": "<volatil>",
+            "selectedMode": null,
+            "totemId": "CPX-PARQUE"
+          },
+          {
+            "cpf": "",
+            "cpfFormatted": "",
+            "discountAppliedInCents": 0,
+            "discountPercent": 100,
+            "id": "9fbd42f2-900f-408c-bf01-bac37cbde464",
+            "orderId": null,
+            "redeemedAt": "<volatil>",
+            "selectedMode": null,
+            "totemId": "CPX-PARQUE"
+          }
+        ],
+        "requireCpf": true,
+        "updatedAt": "<volatil>",
+        "usedAt": "<volatil>",
+        "usedByTotem": "CPX-PARQUE"
+      },
+      {
+        "allowedTotems": null,
+        "applicableMode": null,
+        "code": "PEDRO50",
+        "createdAt": "<volatil>",
+        "currentUsages": 0,
+        "description": "Desconto para agradar cliente",
+        "discountPercent": 50,
+        "isUsed": false,
+        "maxUsages": 1,
+        "maxUsagesPerCpf": 1,
+        "redemptions": [],
+        "requireCpf": true,
+        "updatedAt": "<volatil>"
+      },
+      {
+        "allowedTotems": null,
+        "applicableMode": null,
+        "code": "DESCONTO100",
+        "createdAt": "<volatil>",
+        "currentUsages": 0,
+        "description": "Desconto",
+        "discountPercent": 100,
+        "isUsed": false,
+        "maxUsages": 1,
+        "maxUsagesPerCpf": 1,
+        "redemptions": [],
+        "requireCpf": true,
+        "updatedAt": "<volatil>"
+      },
+      {
+        "allowedTotems": null,
+        "applicableMode": null,
+        "code": "TESTE",
+        "createdAt": "<volatil>",
+        "currentUsages": 1,
+        "description": "Teste 1",
+        "discountPercent": 100,
+        "isUsed": true,
+        "maxUsages": 1,
+        "maxUsagesPerCpf": 1,
+        "redemptions": [
+          {
+            "cpf": "",
+            "cpfFormatted": "",
+            "discountAppliedInCents": 0,
+            "discountPercent": 100,
+            "id": "336aefc1-623e-4fda-9b70-7811b302493e",
+            "orderId": null,
+            "redeemedAt": "<volatil>",
+            "selectedMode": null,
+            "totemId": "CPX-EXPEDICIONARIOS"
+          }
+        ],
+        "requireCpf": true,
+        "updatedAt": "<volatil>",
+        "usedAt": "<volatil>",
+        "usedByTotem": "CPX-EXPEDICIONARIOS"
+      },
+      {
+        "allowedTotems": null,
+        "applicableMode": null,
+        "code": "D1J2093DJ420",
+        "createdAt": "<volatil>",
+        "currentUsages": 0,
+        "description": "DESCONTO DE 67% PARA OS CLIENTES",
+        "discountPercent": 67,
+        "isUsed": false,
+        "maxUsages": 1,
+        "maxUsagesPerCpf": 1,
+        "redemptions": [],
+        "requireCpf": false,
+        "updatedAt": "<volatil>"
+      },
+      {
+        "allowedTotems": null,
+        "applicableMode": null,
+        "code": "ADQ23DJ8234",
+        "createdAt": "<volatil>",
+        "currentUsages": 0,
+        "description": "DESCONTO DE 67% PARA OS FUNCIONÁRIOS",
+        "discountPercent": 67,
+        "isUsed": false,
+        "maxUsages": 99999,
+        "maxUsagesPerCpf": 1,
+        "redemptions": [],
+        "requireCpf": false,
+        "updatedAt": "<volatil>"
+      },
+      {
+        "applicableMode": null,
+        "code": "GRATIS-CAPAXERO-100",
+        "createdAt": "<volatil>",
+        "currentUsages": 0,
+        "description": "Gratuidade Total (100% OFF)",
+        "discountPercent": 100,
+        "isUsed": false,
+        "maxUsages": 1,
+        "maxUsagesPerCpf": 1,
+        "redemptions": [],
+        "requireCpf": true
+      },
+      {
+        "applicableMode": null,
+        "code": "DESC20-GERAL",
+        "createdAt": "<volatil>",
+        "currentUsages": 0,
+        "description": "Desconto 20% em Qualquer Modalidade",
+        "discountPercent": 20,
+        "isUsed": false,
+        "maxUsages": 1,
+        "maxUsagesPerCpf": 1,
+        "redemptions": [],
+        "requireCpf": true
+      },
+      {
+        "applicableMode": "INTERMEDIARIA",
+        "code": "INTER50-CAPAXERO",
+        "createdAt": "<volatil>",
+        "currentUsages": 0,
+        "description": "Desconto 50% na Higienização Intermediária",
+        "discountPercent": 50,
+        "isUsed": false,
+        "maxUsages": 1,
+        "maxUsagesPerCpf": 1,
+        "redemptions": [],
+        "requireCpf": true
+      }
+    ],
+    "success": true
+  }
+}

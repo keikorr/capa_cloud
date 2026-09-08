@@ -1,0 +1,10 @@
+{
+  "name": "health",
+  "status": 200,
+  "body": {
+    "message": "Backend Capaxero Cloud operacional",
+    "serverTime": "<volatil>",
+    "status": "online",
+    "totemsConnected": 16
+  }
+}
