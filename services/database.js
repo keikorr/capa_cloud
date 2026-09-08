@@ -8,6 +8,8 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const { sanitizeCpf, isValidCpf, formatCpf, COUPON_CPF_ENABLED } = require('./cpf');
+const ids = require('./ids');
+const { normalizeMode, normalizeModeOrDefault, modeLabel } = require('./modes');
 
 const DATA_DIR = path.join(__dirname, '..', 'data');
 const DB_FILE = path.join(DATA_DIR, 'capaxero_database.json');
@@ -227,7 +229,7 @@ class RelationalDatabase {
     }
 
     const newUser = {
-      id: 'USR-' + Date.now().toString(36).toUpperCase(),
+      id: ids.newUserId(),
       username: username ? username.trim() : (cleanEmail.split('@')[0] || 'dono'),
       email: cleanEmail,
       password_hash: hashPassword(password),
@@ -667,7 +669,7 @@ class RelationalDatabase {
 
   addDepot(depotData) {
     const depot = {
-      depotno: depotData.depotno || `DEP-${this.tables.depots.length + 1}`,
+      depotno: depotData.depotno || ids.nextSequentialId('DEP', this.tables.depots.map(d => d.depotno)),
       depotna: depotData.depotna || "Ponto de Instalação",
       branno: depotData.branno || "BR-01",
       address: depotData.address || "",
@@ -698,7 +700,7 @@ class RelationalDatabase {
 
   addBranch(branchData) {
     const branch = {
-      branno: branchData.branno || `BR-${this.tables.branches.length + 1}`,
+      branno: branchData.branno || ids.nextSequentialId('BR', this.tables.branches.map(b => b.branno)),
       branna: branchData.branna || "Filial Regional",
       cocode: branchData.cocode || "CAPAXERO",
       compno: branchData.compno || "87550094",
@@ -754,11 +756,18 @@ class RelationalDatabase {
     }
 
     const newTx = {
-      id: "TX-" + Date.now().toString().slice(-6),
+      id: ids.newTransactionId(),
       timestamp: new Date().toISOString(),
       status: "APPROVED",
       ...tx
     };
+
+    // Modalidade canônica. O mesmo ciclo chegava como 'INTERMEDIARIA' (rotas),
+    // 'Intermediária' (APK) ou 'inter' (simulador), e getStats() só contava a primeira
+    // grafia — o gráfico de modalidades exibia menos ciclos que o total de vendas.
+    // modeLabel guarda a grafia de exibição; mode passa a ser sempre canônico.
+    newTx.modeLabel = modeLabel(tx.mode) || tx.mode || null;
+    newTx.mode = normalizeModeOrDefault(tx.mode);
 
     this.tables.transactions.unshift(newTx);
     if (this.tables.transactions.length > 1000) {
@@ -866,7 +875,7 @@ class RelationalDatabase {
 
   addAlert(alertData) {
     const alert = {
-      id: "ALT-" + Date.now().toString().slice(-5),
+      id: ids.newAlertId(),
       timestamp: new Date().toISOString(),
       resolved: false,
       ...alertData
@@ -909,7 +918,7 @@ class RelationalDatabase {
 
     if (!Array.isArray(alert.comments)) alert.comments = [];
     alert.comments.push({
-      id: "CMT-" + Date.now().toString().slice(-6) + Math.random().toString(36).slice(2, 5),
+      id: ids.newCommentId(),
       text,
       author: data.author || 'Admin',
       timestamp: new Date().toISOString()
@@ -975,10 +984,13 @@ class RelationalDatabase {
 
     const activeAlertsCount = this.getAlerts(true, userFilter).length;
 
+    // Normaliza na leitura também: as linhas gravadas antes da correção ainda têm a
+    // modalidade acentuada ('Intermediária'), que a comparação direta por chave ignorava.
     const modeCounts = { BASICA: 0, INTERMEDIARIA: 0, AVANCADA: 0 };
     todayTxs.forEach(t => {
-      if (t.mode && modeCounts[t.mode] !== undefined) {
-        modeCounts[t.mode]++;
+      const mode = normalizeMode(t.mode);
+      if (mode && modeCounts[mode] !== undefined) {
+        modeCounts[mode]++;
       }
     });
 
