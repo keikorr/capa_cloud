@@ -135,52 +135,9 @@
           "revenue": 0
         }
       ],
-      "historicalRevenue": [
-        {
-          "cycles": 7,
-          "date": "2026-09-02",
-          "day": "Qua",
-          "revenue": 61.01
-        },
-        {
-          "cycles": 2,
-          "date": "2026-09-03",
-          "day": "Qui",
-          "revenue": 9.98
-        },
-        {
-          "cycles": 224,
-          "date": "2026-09-04",
-          "day": "Sex",
-          "revenue": 1333.9400000000014
-        },
-        {
-          "cycles": 248,
-          "date": "2026-09-05",
-          "day": "Sáb",
-          "revenue": 1405.660000000002
-        },
-        {
-          "cycles": 266,
-          "date": "2026-09-06",
-          "day": "Dom",
-          "revenue": 1459.4500000000019
-        },
-        {
-          "cycles": 48,
-          "date": "2026-09-07",
-          "day": "Seg",
-          "revenue": 416.71000000000026
-        },
-        {
-          "cycles": 4,
-          "date": "2026-09-08",
-          "day": "Hoje",
-          "revenue": 60
-        }
-      ],
-      "weekTotalCycles": 799,
-      "weekTotalRevenue": 4746.7500000000055
+      "historicalRevenue": "<volatil>",
+      "weekTotalCycles": "<volatil>",
+      "weekTotalRevenue": "<volatil>"
     },
     "success": true
   }

@@ -6,14 +6,10 @@
       "activeAlertsCount": 0,
       "alertTotems": 0,
       "cleaningTotems": 0,
-      "modeCounts": {
-        "AVANCADA": 0,
-        "BASICA": 0,
-        "INTERMEDIARIA": 0
-      },
+      "modeCounts": "<volatil>",
       "onlineTotems": 0,
       "totalCyclesToday": "<volatil>",
-      "totalRevenueToday": 0,
+      "totalRevenueToday": "<volatil>",
       "totalTotems": 2
     },
     "success": true

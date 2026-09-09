@@ -31,11 +31,21 @@ const SENHA_FIXTURE = process.env.CAPAXERO_FIXTURE_SENHA || 'fixture123';
 const SENHA_SEED_ADMIN = process.env.CAPAXERO_SEED_SENHA || '210602';
 
 // Campos cujo valor muda a cada execução e que não devem participar da comparação.
+//
+// totalRevenueToday/modeCounts/historicalRevenue/weekTotal* são calculados a partir de
+// "agora" contra os timestamps fixos da fixture (defeito nº 2 do MIGRACAO.md: getStats()
+// e getIncomeReport() usam a data corrente, não a data da fixture). Isso significa que
+// rodar o mesmo snapshot em dois dias-calendário diferentes muda "o que é hoje"/"os
+// últimos 7 dias" mesmo sem nenhuma mudança de código — sem mascarar isso, o teste falsa-
+// -positivamente todo santo dia. A correção de verdade (fixar o cálculo no fuso da
+// operação) é da fase 4; até lá, estes campos ficam de fora da comparação.
 const VOLATILE_KEYS = new Set([
   'timestamp', 'serverTime', 'lastHeartbeat', 'createdAt', 'created_at',
   'updatedAt', 'updated_at', 'redeemedAt', 'usedAt', 'resolvedAt',
   'authorizedAt', 'expiresAt', 'token', 'currentCycle', 'elapsedSeconds',
-  'progressPercent', 'revenueToday', 'cyclesToday', 'totalCyclesToday'
+  'progressPercent', 'revenueToday', 'cyclesToday', 'totalCyclesToday',
+  'totalRevenueToday', 'modeCounts', 'historicalRevenue',
+  'weekTotalCycles', 'weekTotalRevenue'
 ]);
 
 // Campos secretos que nunca podem ser gravados em claro — estes snapshots vão para o git.
