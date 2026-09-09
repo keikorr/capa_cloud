@@ -8,7 +8,10 @@
     "dev": "node --watch server.js",
     "test": "node tests/golden.js",
     "test:update": "node tests/golden.js --update",
-    "fixture": "node scripts/fetch_prod_dataset.js"
+    "fixture": "node scripts/fetch_prod_dataset.js",
+    "db:migrate": "node scripts/migrate.js",
+    "db:migrate:status": "node scripts/migrate.js --status",
+    "db:import": "node scripts/import_json.js data/capaxero_database.json --apply"
   },
   "engines": {
     "node": ">=18.11"
@@ -27,7 +30,11 @@
     "cors": "^2.8.5",
     "express": "^4.21.2",
     "multer": "^2.2.0",
+    "pg": "^8.23.0",
     "qrcode": "^1.5.4",
     "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "jscodeshift": "^17.4.0"
   }
 }

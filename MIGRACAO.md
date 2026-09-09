@@ -1,7 +1,7 @@
 # Capaxero Cloud — Diagnóstico, Correções e Migração para PostgreSQL
 
 > Documento de acompanhamento. Registra o que foi investigado, o que já foi corrigido e o
-> que falta fazer. Atualizado em 08/09/2026.
+> que falta fazer. Atualizado em 09/09/2026.
 
 ---
 
@@ -14,9 +14,9 @@ num arquivo JSON, sem constraints, sem tipos e sem transações.
 
 | # | Defeito | Efeito no painel | Situação |
 |---|---|---|---|
-| 1 | Sem constraint em `(orderId, devno)` | Toda venda contada 2× | Corrigido no código, **falta subir na VPS** |
-| 2 | "Hoje" calculado em UTC, operação é UTC-3 | Dia comercial vira às 21h de Fortaleza | Pendente (fase 4) |
-| 3 | `mode` gravado com e sem acento | 61% dos ciclos fora do gráfico de modalidade | Corrigido e no git |
+| 1 | Sem constraint em `(orderId, devno)` | Toda venda contada 2× | Corrigido no JSON (falta confirmar na VPS); virou `UNIQUE` no schema Postgres |
+| 2 | "Hoje" calculado em UTC, operação é UTC-3 | Dia comercial vira às 21h de Fortaleza | View `transactions_business` já existe no Postgres; troca de verdade é fase 4 |
+| 3 | `mode` gravado com e sem acento | 61% dos ciclos fora do gráfico de modalidade | Corrigido no JSON e no git; virou `CHECK` no schema Postgres |
 
 **Evidência dos três somados**, colhida ao vivo da produção: o painel exibia `4 ciclos /
 R$ 60` como faturamento de "hoje". Eram **2 vendas reais** (duplicação ×2) que aconteceram
@@ -134,8 +134,9 @@ Não causaram a queixa original, mas são graves:
 
 ## 3. O que já foi feito
 
-Sete commits, todos em `main`. **Nada de PostgreSQL ainda** — o sistema continua rodando
-sobre o JSON, exatamente como antes.
+Fases 0 e 2 do plano, todas em `main`. **O servidor continua rodando 100% sobre o JSON** —
+o Postgres da Fase 2 existe e está populado num banco local de teste, mas nada em produção
+lê ou escreve nele ainda (isso é a Fase 3).
 
 | Commit | O quê | Verificação feita |
 |---|---|---|
@@ -146,6 +147,7 @@ sobre o JSON, exatamente como antes.
 | `932e3f6` | Shutdown gracioso (SIGTERM/SIGINT) + guardas nos dois watchdogs | Handler encerra limpo com exit 0, sem estourar o timeout |
 | `fe9e09b` | Usuário autenticado resolvido pela sessão, sem tocar no banco | Edição reflete na sessão; exclusão devolve 401; RBAC preservado |
 | `67f2458` | Golden snapshots (18 rotas) + correção do vazamento de pontos | Regressão deliberada foi detectada: "esperado 2, obtido 13", exit 1 |
+| *(este commit)* | Fase 2: schema PostgreSQL, pool, runner de migrations, importador | Ver 3.3 — testado ponta a ponta contra um retrato real da produção |
 
 ### 3.1 Por que o `fe9e09b` importa mais do que parece
 
@@ -179,6 +181,53 @@ Detalhes de projeto que valem registro:
   mascaramento por perfil quebrar, a assinatura muda e o teste acusa.
 - **A fixture fica fora do git** (`data/fixture_prod.json`), porque contém credenciais Cielo
   por totem. Regenerável com `npm run fixture`.
+
+### 3.3 Fase 2 — o banco Postgres existe e foi testado com dados reais
+
+`config/db.js`, `db/pool.js`, `db/migrate.js`, `db/migrations/001_initial_schema.sql`,
+`scripts/migrate.js`, `scripts/import_json.js`. Doze tabelas + a view
+`transactions_business`, detalhadas na seção 5.
+
+Validado de ponta a ponta contra um PostgreSQL local (instalado só para este teste — não é
+o de produção) populado com o retrato real de 08/09/2026: 16 totens, 821 transações, 103
+alertas. Cada garantia do schema foi testada tentando quebrá-la de propósito:
+
+- Duas transações com o mesmo `(orderId, devno)` → a segunda é rejeitada pelo banco.
+- Modalidade fora de `{BASICA, INTERMEDIARIA, AVANCADA}` → rejeitada.
+- Venda às 21h30 de Fortaleza (00h30 UTC) → `transactions_business.business_date` cai no
+  dia local certo, não no dia UTC seguinte.
+- Cupom tentando passar de `max_usages` → rejeitado pela `CHECK`.
+- `NUMERIC`/`BIGINT` voltam como `number` do driver `pg`, não como string (a armadilha da
+  seção 5) — confirmado que `0 + valor` não vira concatenação.
+- Rodar o importador duas vezes contra um banco já populado falha limpo na primeira tabela,
+  sem duplicar nada — é carga única, não sincronização.
+
+**A importação, rodada de verdade contra o retrato da produção, encontrou e corrigiu
+automaticamente quatro problemas de integridade que só apareceram testando com dados reais
+(não teriam sido pegos revisando o schema no papel):**
+
+| Problema encontrado | Como apareceu | Como foi resolvido |
+|---|---|---|
+| `depotno` duplicado | `DEP-3` e `DEP-12` cada um com **dois pontos físicos diferentes** (endereços distintos) — o gerador antigo (`length+1`, corrigido na fase 0) reaproveitou o id depois de uma exclusão | Mantém o mais antigo no id original, cunha id novo para o resto, reporta o endereço de cada renomeação |
+| `id` de alerta duplicado | `ALT-14526` apontando para **dois alertas reais**, dois dias de diferença (`LOW_LIQUID_LEVEL` em `CPX-MESSEJANA`) — o gerador antigo (5 dígitos do epoch, corrigido na fase 0) repetia a cada 100s | Mesma lógica: nunca descarta, cunha id novo pro mais recente |
+| `depotna` genérico | **Todos os 13 pontos** de produção tinham `depotna = "Ponto de Instalação"` (o placeholder) — o nome real ("Merit Offices & Mall", "Parque São José"...) só existia num campo `name` que chegou por acidente via spread de cliente | Prefere o nome real quando `depotna` é só o placeholder |
+| `owner_id` órfão | Verificado contra os 2 usuários reais — nenhum caso nesta base, mas o importador resolve por nome e cai para CRPADMIN reportando o motivo, para não travar numa base com o problema |
+
+Conferência financeira: a soma das transações aprovadas após dedupe bateu **exatamente**
+entre o JSON de origem e o Postgres — 496 transações, R$ 3.305,29, nos dois lados.
+
+**Achado colateral no processo:** os golden snapshots da seção 3.2 tinham uma falha de
+desenho — `totalRevenueToday`, `modeCounts` e a série de 7 dias do `getIncomeReport` são
+calculados contra "agora", não contra a data da fixture, então rodar a suíte em dois dias-
+calendário diferentes os fazia divergir mesmo sem nenhuma mudança de código (exatamente o
+defeito nº 2 em ação). Corrigido mascarando esses campos como voláteis em
+`tests/golden.js` — a correção de verdade do fuso é da fase 4.
+
+Instalação usada para testar (Windows, ambiente de desenvolvimento — a VPS roda Ubuntu):
+PostgreSQL 17 via `winget`, mais um segundo cluster standalone (`initdb`/`pg_ctl` numa
+pasta de scratch, porta 5433) para não depender de privilégio de administrador para
+controlar o serviço. O guia de instalação real, para Ubuntu na VPS, está em
+`deploy_vps_postgresql.md`.
 
 ---
 
@@ -225,18 +274,19 @@ sempre** — `getTotem`, `getTotemsList`, `upsertTotem`, `updateTotemConfig`,
 `updateHeartbeat`, `markTotemOffline`, `markStaleTotemsOffline`, `recordCycleComplete`. São
 ~62 call sites que não precisam ser tocados, incluindo **todos os 19 do WebSocket**.
 
-**Fase 2 — Postgres existe: schema, importação e `pending_orders`.**
+**Fase 2 — Postgres existe: schema, importação e `pending_orders`. ✅ Feita e testada (ver 3.3).**
 `npm i pg`, pool preguiçoso com type parsers, runner de migration com advisory lock, e o
 script de importação do JSON (normalizando modalidade, fazendo backfill de `owner_id`,
 mapeando `DEP-01` → `NULL` e **reportando cada conflito em vez de escolher em silêncio**).
 
-`pending_orders` vira tabela **já nesta fase**, antes de qualquer dual-write, porque não tem
-contrapartida em JSON — nada a importar, nada a comparar, puramente aditivo. E é o que
-corrige o pior modo de falha do sistema: cliente cobrado sem estorno após um crash.
+`pending_orders` já é tabela real desde esta fase, antes de qualquer dual-write, porque não
+tem contrapartida em JSON — nada a importar, nada a comparar, puramente aditivo. É o que vai
+corrigir o pior modo de falha do sistema (cliente cobrado sem estorno após um crash) — mas
+só depois que `routes/cielo.js` passar a gravar nela, o que é trabalho da Fase 3.
 
-Entra também o systemd unit e o cron de `pg_dump`. Hoje não existe process manager nenhum no
-repositório — adicionar dependência de banco a um processo que ninguém reinicia é receita de
-indisponibilidade longa.
+**Ainda falta desta fase:** o systemd unit e o cron de `pg_dump` na VPS real — testados aqui
+só localmente. Hoje não existe process manager nenhum no repositório; adicionar dependência
+de banco a um processo que ninguém reinicia é receita de indisponibilidade longa.
 
 **Fase 3 — `dual-json`: JSON manda, Postgres recebe cópia.**
 Repositórios, fachada async, roteador de modo e o reconciliador que compara os dois bancos a
@@ -271,7 +321,10 @@ dois modos**. É exatamente por isso que existem dois modos duais em vez de um.
 
 ## 5. Schema
 
-Onze tabelas e uma view. Princípios: chave de negócio real como `UNIQUE`, dinheiro em
+Definido em `db/migrations/001_initial_schema.sql`. Doze tabelas (`branches`, `users`,
+`depots`, `totems`, `totem_payment_credentials`, `transactions`, `alerts`,
+`alert_comments`, `coupons`, `coupon_redemptions`, `pending_orders`, `system_settings`) e a
+view `transactions_business`. Princípios: chave de negócio real como `UNIQUE`, dinheiro em
 centavos inteiros (nunca float), tempo em `TIMESTAMPTZ`, e o que hoje é string denormalizada
 vira chave estrangeira.
 
@@ -297,7 +350,18 @@ Decisões que valem explicação:
 faz `Number(t.amount)`. Mas o `getIncomeReport` faz `(revenue * dep.commissionPercent) / 100`,
 e um `SUM(amount)` voltando como `"357.00"` dentro de um `reduce` que começa em `0` produz
 `"0357.00"` — concatenação de string silenciosa **no relatório de comissão dos pontos**.
-Registrar os type parsers na primeira linha do pool, com teste explícito.
+Registrado em `db/pool.js`, na primeira linha depois do `require('pg')`, com teste
+explícito confirmando `0 + valor === 357` (não `"0357"`).
+
+### Problemas de integridade encontrados testando com dados reais
+
+O papel do schema é impedir esses defeitos daqui pra frente; o papel do importador
+(`scripts/import_json.js`) é não deixá-los travar a carga do histórico que já existe. Ver a
+seção 3.3 para a tabela completa — em resumo: `depotno` duplicado apontando para pontos
+físicos diferentes, `id` de alerta colidido entre dois eventos reais, e `depotna` genérico
+escondendo o nome real do ponto em todos os 13 pontos de produção. Nenhum desses três teria
+aparecido só lendo o schema no papel — só apareceram rodando a importação contra o retrato
+real da produção.
 
 ---
 
@@ -332,6 +396,20 @@ npm run fixture      # reconstrói a fixture da API (precisa de CAPAXERO_LOGIN/S
 npm test             # compara com os snapshots; sai com código 1 em qualquer diferença
 npm run test:update  # regrava os snapshots (só quando a mudança for intencional)
 ```
+
+### 6.4 Subir o PostgreSQL (Fase 2)
+
+Passo a passo completo em `deploy_vps_postgresql.md`. Resumo:
+
+```bash
+npm install                                                # instala o driver pg
+npm run db:migrate                                          # aplica db/migrations/*.sql
+node scripts/import_json.js data/capaxero_database.json     # simula, não grava nada
+node scripts/import_json.js data/capaxero_database.json --apply   # aplica de fato
+```
+
+Nada disso muda o que o servidor usa — `server.js` continua lendo o JSON até a Fase 3.
+Seguro de rodar a qualquer momento, contra um Postgres vazio.
 
 ---
 
@@ -380,3 +458,8 @@ contendo os dados** — limpar isso exige reescrever o histórico ou rotacionar 
 | `tests/golden.js` | Rede de segurança de regressão. Rodar após cada mudança |
 | `scripts/dedupe_transactions.js` | Limpeza das duplicatas já gravadas |
 | `scripts/fetch_prod_dataset.js` | Reconstrói a fixture a partir da API |
+| `db/migrations/001_initial_schema.sql` | Schema Postgres — as 3 constraints que resolvem os defeitos originais |
+| `db/pool.js` | Pool de conexão. Os type parsers de `NUMERIC`/`BIGINT` moram aqui |
+| `db/migrate.js` | Runner de migrations, com advisory lock |
+| `scripts/import_json.js` | Importa o JSON para o Postgres, resolvendo as colisões da seção 3.3 |
+| `deploy_vps_postgresql.md` | Passo a passo para instalar o Postgres na VPS (Fase 2) |
