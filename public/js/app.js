@@ -2468,46 +2468,6 @@ class CapaxeroDashboard {
       }
     }
 
-    // 4. Payback por Máquina
-    const elPayback = document.getElementById('dash-payback-list');
-    if (elPayback) {
-      if (filteredStations.length === 0) {
-        elPayback.innerHTML = `<div style="color:#8a97a7; font-size:12px; padding:10px 0;">Nenhuma estação registrada para cálculo de payback.</div>`;
-      } else {
-        elPayback.innerHTML = filteredStations.map(s => {
-          const investido = 18500;
-          const recuperado = s.fatVal || 0;
-          const p = Math.min(100, Math.round((recuperado / investido) * 100));
-          return `
-            <div class="payback-row">
-              <div>
-                <div style="font-size:13px; font-weight:600; color:#fff;">${s.nome}</div>
-                <div style="font-size:11px; color:#6d7a8a;">${s.dono}</div>
-              </div>
-              <div class="payback-bar-cell">
-                <div style="height:8px; border-radius:999px; background:rgba(255,255,255,.07); overflow:hidden;">
-                  <div style="height:100%; width:${Math.max(4, p)}%; background:linear-gradient(90deg, #00C566, rgba(255,255,255,.6)); border-radius:999px;"></div>
-                </div>
-                <div style="display:flex; justify-content:space-between; font-size:10.5px; color:#6d7a8a; margin-top:5px;">
-                  <span>investido ${fmtBRL(investido)}</span>
-                  <span>recuperado ${fmtBRL(recuperado)}</span>
-                </div>
-              </div>
-              <div style="text-align:right; font-family:var(--font-mono); font-size:17px; font-weight:700; color:#00C566;">${p}%</div>
-              <div class="payback-hide-mobile" style="text-align:right;">
-                <div style="font-family:var(--font-mono); font-size:13px; color:#e7edf4;">${fmtBRL(recuperado)}</div>
-                <div style="font-size:10.5px; color:#6d7a8a;">receita total</div>
-              </div>
-              <div class="payback-hide-mobile" style="text-align:right;">
-                <div style="font-family:var(--font-mono); font-size:13px; color:#00C566;">Em operação</div>
-                <div style="font-size:10.5px; color:#6d7a8a;">status atual</div>
-              </div>
-            </div>
-          `;
-        }).join('');
-      }
-    }
-
     // 5. Tabela de OMs
     const elOMs = document.getElementById('dash-oms-tbody');
     if (elOMs) {

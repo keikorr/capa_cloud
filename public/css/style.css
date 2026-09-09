@@ -1250,26 +1250,10 @@ table.data-table .muted { color: var(--text-muted); }
     gap: 10px;
   }
 
-  /* Dashboard Charts & Payback */
+  /* Dashboard Charts */
   #page-dashboard > div > div[style*="grid-template-columns"] {
     grid-template-columns: 1fr !important;
     gap: 14px !important;
-  }
-
-  .payback-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    padding: 12px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  }
-  .payback-bar-cell {
-    grid-column: 1 / -1;
-    order: 3;
-    margin-top: 4px;
-  }
-  .payback-hide-mobile {
-    display: none !important;
   }
 
   /* Tabelas */
