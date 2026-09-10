@@ -483,7 +483,7 @@ class RelationalDatabase {
       t.devno === devno && t.status === 'APPROVED' && t.timestamp && t.timestamp.slice(0, 10) === todayIso
     );
     return {
-      revenueToday: todayTxs.reduce((acc, t) => acc + Number(t.amount || 0), 0),
+      revenueToday: todayTxs.reduce((acc, t) => acc + Number(t.paymentMethod === 'Cupom / Gratuidade' ? 0 : (t.amount || 0)), 0),
       cyclesToday: todayTxs.length
     };
   }
@@ -825,7 +825,7 @@ class RelationalDatabase {
 
     if (totem && newTx.status === "APPROVED") {
       totem.totalCyclesToday = (totem.totalCyclesToday || 0) + 1;
-      totem.revenueToday = (totem.revenueToday || 0) + Number(newTx.amount || 0);
+      totem.revenueToday = (totem.revenueToday || 0) + Number(newTx.paymentMethod === 'Cupom / Gratuidade' ? 0 : (newTx.amount || 0));
     }
 
     this.save();
