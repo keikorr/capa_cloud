@@ -589,6 +589,18 @@
       </div>
 
       <div class="modal-body">
+        <div class="modal-tabs">
+          <button class="modal-tab active" data-station-tab="overview">
+            <svg class="i" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+            Visão geral
+          </button>
+          <button class="modal-tab" data-station-tab="history">
+            <svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+            Histórico (arquivo)
+          </button>
+        </div>
+
+        <div class="modal-pane active" id="station-pane-overview">
         <div class="info-grid-2">
           <div class="info-box">
             <div class="lbl">Dono da máquina</div>
@@ -665,6 +677,54 @@
             <button class="btn btn-primary" id="modal-btn-confirm-owner" style="background:#FDCB24; color:#0c0e11; font-weight:700;">Reatribuir</button>
           </div>
         </div>
+        </div>
+        <!-- /station-pane-overview -->
+
+        <!-- ABA — HISTÓRICO (arquivo Postgres, somente leitura — carregada uma vez por
+             abertura do modal, ver loadStationHistory em app.js) -->
+        <div class="modal-pane" id="station-pane-history">
+          <div id="station-history-notice"></div>
+
+          <div class="cpf-summary-grid" id="station-history-summary" style="margin-top:14px;"></div>
+
+          <div class="table-scroll" style="max-height:34vh; margin-top:14px;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Data / Hora</th>
+                  <th>Modalidade</th>
+                  <th>Forma de pagamento</th>
+                  <th style="text-align:right;">Valor</th>
+                </tr>
+              </thead>
+              <tbody id="station-history-tbody"></tbody>
+            </table>
+          </div>
+
+          <div style="display:flex; justify-content:center; margin-top:12px;">
+            <button class="btn btn-outline" id="station-history-more" style="display:none;">Carregar mais</button>
+          </div>
+
+          <div id="station-history-coupons-block" style="display:none; margin-top:22px;">
+            <div class="table-card-head" style="padding:0 0 10px;">
+              <h2 style="font-size:13px;">Cupons resgatados nesta máquina</h2>
+            </div>
+            <div class="table-scroll" style="max-height:24vh;">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Cupom</th>
+                    <th>CPF</th>
+                    <th>Data / Hora</th>
+                    <th style="text-align:right;">Desconto</th>
+                  </tr>
+                </thead>
+                <tbody id="station-history-coupons-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <!-- /station-pane-history -->
       </div>
     </div>
   </div>

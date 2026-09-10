@@ -1200,6 +1200,10 @@ class CapaxeroDashboard {
       btn.addEventListener('click', () => this.switchCouponEditTab(btn.dataset.editTab));
     });
 
+    document.querySelectorAll('#detail-modal .modal-tab').forEach(btn => {
+      btn.addEventListener('click', () => this.switchStationTab(btn.dataset.stationTab));
+    });
+
     // Configuração dos controles de Upload de Vídeo de Higienização
     this.setupVideoUploadControls();
   }
@@ -1703,6 +1707,11 @@ class CapaxeroDashboard {
     if (!s) return;
     this.selectedStationId = s.devno || s.id;
 
+    // Reseta a guarda de carga única do Histórico: toda abertura de modal é uma "sessão"
+    // nova, mesmo reabrindo a mesma máquina — e toda abertura começa na Visão geral.
+    this.stationHistoryLoadedFor = null;
+    this.switchStationTab('overview');
+
     this.renderStationTelemetry(s);
     this.fillStationForms(s);
     this.openModal('detail-modal');
@@ -1716,6 +1725,11 @@ class CapaxeroDashboard {
    * valor voltar sozinho em segundos, e quem tinha entrado em outro modal era jogado
    * de volta para a tela de detalhes. Uma atualização de fundo só pode repintar
    * telemetria, e só quando o modal já estiver aberto naquela mesma máquina.
+   *
+   * Nunca tocar na aba Histórico daqui: ela é uma foto (arquivo Postgres), carregada uma
+   * única vez por abertura do modal — ver stationHistoryLoadedFor, resetado só em
+   * openStationDetails(). Um heartbeat chegando não deve reconsultar nem apagar o que já
+   * foi carregado ali, por mais vezes que este método rode enquanto o modal está aberto.
    */
   refreshStationDetailsLive(devno) {
     const modal = document.getElementById('detail-modal');
@@ -1776,6 +1790,200 @@ class CapaxeroDashboard {
       uvRing.style.background = `conic-gradient(${liquidColor} ${liquidPct * 3.6}deg, rgba(255,255,255,.09) 0deg)`;
     }
 
+  }
+
+  /** Alterna entre as abas Visão geral / Histórico do modal de detalhes da máquina. */
+  switchStationTab(tab) {
+    document.querySelectorAll('#detail-modal .modal-tab').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.stationTab === tab);
+    });
+    document.querySelectorAll('#detail-modal .modal-pane').forEach(pane => {
+      pane.classList.toggle('active', pane.id === `station-pane-${tab}`);
+    });
+    if (tab === 'history') this.loadStationHistory(this.selectedStationId);
+  }
+
+  /** Monta o aviso de topo da aba Histórico: estado do arquivo + reconciliação com o JSON. */
+  renderStationHistoryNotice(data) {
+    const fmtData = (iso) => iso ? new Date(iso).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }) : '—';
+    const ld = data.liveDelta || { txCount: 0, totalCents: 0 };
+    const ldLine = ld.txCount > 0
+      ? `<br>${ld.txCount} venda${ld.txCount > 1 ? 's' : ''} mais recente${ld.txCount > 1 ? 's' : ''} (${fmtBRL(ld.totalCents / 100)}) ainda não ${ld.txCount > 1 ? 'entraram' : 'entrou'} neste arquivo — aparece${ld.txCount > 1 ? 'm' : ''} na aba Visão geral.`
+      : `<br>Arquivo em dia — nenhuma venda posterior ao arquivo.`;
+
+    if (data.reason === 'NOT_CONFIGURED') {
+      return `<div class="history-notice neutral">
+        <span class="title">${ICONS.clipboard} Arquivo histórico não configurado neste ambiente</span>
+        Mostrando o total conhecido a partir do painel: ${ld.txCount} venda${ld.txCount === 1 ? '' : 's'} (${fmtBRL(ld.totalCents / 100)}).
+      </div>`;
+    }
+
+    if (!data.machineInSnapshot) {
+      return `<div class="history-notice neutral">
+        <span class="title">${ICONS.clipboard} Máquina cadastrada depois do arquivo</span>
+        Esta máquina ainda não existia quando o histórico foi importado (arquivo de ${fmtData(data.snapshot?.importedAt)}).${ldLine}
+      </div>`;
+    }
+
+    if (data.summary.txCount === 0) {
+      return `<div class="history-notice neutral">
+        <span class="title">${ICONS.clipboard} Nenhuma venda no arquivo</span>
+        Arquivo congelado em ${fmtData(data.snapshot.importedAt)}.${ldLine}
+      </div>`;
+    }
+
+    return `<div class="history-notice ${ld.txCount > 0 ? 'neutral' : 'green'}">
+      <span class="title">${ICONS.clipboard} Arquivo congelado em ${fmtData(data.snapshot.importedAt)}</span>
+      Cobre vendas de ${fmtData(data.snapshot.firstSaleAt)} até ${fmtData(data.snapshot.lastSaleAt)}.${ldLine}
+    </div>`;
+  }
+
+  /** Aviso de erro (não migrado / indisponível / RBAC / rede) com botão de repetir. */
+  renderStationHistoryErrorNotice(cor, mensagem) {
+    return `<div class="history-notice ${cor}">
+      <span class="title">${ICONS.warn} ${mensagem}</span>
+      <button class="btn-retry" onclick="window.app.retryStationHistory()">Tentar novamente</button>
+    </div>`;
+  }
+
+  /** Linhas da tabela de vendas do arquivo. */
+  renderStationHistoryRows(transactions) {
+    if (!transactions.length) {
+      return `<tr><td colspan="4" style="text-align:center; padding:28px; color:var(--text-muted); font-size:13px;">Nenhuma venda neste arquivo.</td></tr>`;
+    }
+    return transactions.map(t => `
+      <tr>
+        <td class="mono muted">${new Date(t.occurredAt).toLocaleString('pt-BR')}</td>
+        <td>${t.modeLabel || t.mode}</td>
+        <td class="muted">${t.paymentMethod}</td>
+        <td class="mono" style="text-align:right; color:#00C566;">${fmtBRL(t.amountCents / 100)}</td>
+      </tr>
+    `).join('');
+  }
+
+  /**
+   * Carrega o histórico de vendas (arquivo Postgres) desta máquina. Carregado uma vez por
+   * abertura do modal — stationHistoryLoadedFor é resetado em openStationDetails() e em
+   * qualquer falha (para o botão "Tentar novamente" funcionar), nunca por
+   * refreshStationDetailsLive() (heartbeats não devem reconsultar o arquivo).
+   */
+  async loadStationHistory(devno) {
+    if (!devno || this.stationHistoryLoadedFor === devno) return;
+    this.stationHistoryLoadedFor = devno;
+
+    const notice = document.getElementById('station-history-notice');
+    const summary = document.getElementById('station-history-summary');
+    const tbody = document.getElementById('station-history-tbody');
+    const moreBtn = document.getElementById('station-history-more');
+    const couponsBlock = document.getElementById('station-history-coupons-block');
+
+    if (notice) notice.innerHTML = `<div class="history-notice neutral">Carregando histórico...</div>`;
+    if (summary) summary.innerHTML = '';
+    if (tbody) tbody.innerHTML = '';
+    if (moreBtn) moreBtn.style.display = 'none';
+    if (couponsBlock) couponsBlock.style.display = 'none';
+
+    try {
+      const res = await fetch(`/api/v1/admin/totems/${encodeURIComponent(devno)}/history?limit=50&offset=0`, {
+        headers: { 'Authorization': `Bearer ${this.token}` }
+      }).then(r => r.json());
+
+      if (!res.success) {
+        this.stationHistoryLoadedFor = null;
+        if (notice) notice.innerHTML = this.renderStationHistoryErrorNotice('red', res.message || 'Não foi possível carregar o histórico.');
+        return;
+      }
+
+      const data = res.data;
+      this.stationHistoryData = data;
+      this.stationHistoryDevno = devno;
+
+      if (notice) notice.innerHTML = this.renderStationHistoryNotice(data);
+
+      if (data.available && data.machineInSnapshot && data.summary) {
+        if (summary) {
+          summary.innerHTML = `
+            <div class="cpf-summary-box">
+              <div class="lbl">Vendas no arquivo</div>
+              <div class="val accent">${data.summary.txCount}</div>
+            </div>
+            <div class="cpf-summary-box">
+              <div class="lbl">Faturamento arquivado</div>
+              <div class="val">${fmtBRL(data.summary.totalCents / 100)}</div>
+            </div>
+            <div class="cpf-summary-box">
+              <div class="lbl">Ticket médio</div>
+              <div class="val">${fmtBRL(data.summary.avgTicketCents / 100)}</div>
+            </div>
+            <div class="cpf-summary-box">
+              <div class="lbl">Dias com venda</div>
+              <div class="val">${data.summary.activeDays}</div>
+            </div>
+          `;
+        }
+      }
+
+      if (tbody) tbody.innerHTML = this.renderStationHistoryRows(data.transactions || []);
+
+      if (moreBtn) {
+        if (data.available && data.page && data.page.total > (data.transactions || []).length) {
+          moreBtn.style.display = 'inline-flex';
+          moreBtn.onclick = () => this.loadStationHistoryMore();
+        } else {
+          moreBtn.style.display = 'none';
+        }
+      }
+
+      const couponsTbody = document.getElementById('station-history-coupons-tbody');
+      if (couponsBlock && couponsTbody && data.coupons && data.coupons.count > 0) {
+        couponsBlock.style.display = 'block';
+        couponsTbody.innerHTML = data.coupons.rows.map(r => `
+          <tr>
+            <td><span class="cpf-pill">${ICONS.ticket} ${r.couponCode}</span></td>
+            <td class="mono muted">${r.cpfFormatted || '—'}</td>
+            <td class="mono muted">${new Date(r.redeemedAt).toLocaleString('pt-BR')}</td>
+            <td class="mono accent" style="text-align:right;">${r.discountPercent}%</td>
+          </tr>
+        `).join('');
+      }
+    } catch (err) {
+      this.stationHistoryLoadedFor = null;
+      if (notice) notice.innerHTML = this.renderStationHistoryErrorNotice('red', 'Erro de rede ao carregar o histórico desta máquina.');
+    }
+  }
+
+  /** Busca a próxima página de vendas e acrescenta ao final da tabela (não re-renderiza o resumo). */
+  async loadStationHistoryMore() {
+    const devno = this.stationHistoryDevno;
+    const data = this.stationHistoryData;
+    if (!devno || !data || !data.available) return;
+
+    const tbody = document.getElementById('station-history-tbody');
+    const moreBtn = document.getElementById('station-history-more');
+    const offset = (data.transactions || []).length;
+
+    try {
+      const res = await fetch(`/api/v1/admin/totems/${encodeURIComponent(devno)}/history?limit=50&offset=${offset}`, {
+        headers: { 'Authorization': `Bearer ${this.token}` }
+      }).then(r => r.json());
+      if (!res.success || !res.data.available) return;
+
+      const novas = res.data.transactions || [];
+      data.transactions = [...(data.transactions || []), ...novas];
+      if (tbody) tbody.insertAdjacentHTML('beforeend', this.renderStationHistoryRows(novas));
+
+      if (moreBtn) {
+        moreBtn.style.display = data.page.total > data.transactions.length ? 'inline-flex' : 'none';
+      }
+    } catch (err) {
+      this.showToast('Falha ao carregar mais vendas.', 'err');
+    }
+  }
+
+  /** Botão "Tentar novamente" dos avisos de erro da aba Histórico. */
+  retryStationHistory() {
+    this.stationHistoryLoadedFor = null;
+    this.loadStationHistory(this.selectedStationId);
   }
 
   /** Campos editáveis do modal. Só no abrir explícito — nunca por atualização de fundo. */
