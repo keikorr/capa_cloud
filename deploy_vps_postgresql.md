@@ -1,12 +1,44 @@
-# Guia: subindo o PostgreSQL para o Capaxero Cloud na VPS
+# Guia: atualizar o projeto e subir o PostgreSQL na VPS
 
-Passo a passo para instalar o PostgreSQL 17 na VPS Hostinger (Ubuntu) e rodar o schema +
-a importação dos dados atuais. Corresponde à Fase 2 do plano em `MIGRACAO.md`.
+Passo a passo completo: puxar o código mais recente (correções de duplicidade, fuso
+horário, modalidade, vazamento entre franqueados, e a aba de Histórico por máquina) e
+colocar o PostgreSQL no ar na VPS Hostinger (Ubuntu).
 
-**Importante:** ao final deste guia, o Postgres existe e está populado, mas o servidor
-(`server.js`) continua rodando 100% sobre o JSON em `data/`. Nada muda no app em produção
-até a Fase 3 (dual-write) — este guia é seguro de rodar a qualquer momento, sem risco para
-o que já está no ar.
+**O que muda em produção ao final deste guia:** as vendas do dia, ciclos e estatísticas
+continuam vindo 100% do arquivo JSON, exatamente como hoje — isso só muda na Fase 3
+(dual-write), que ainda não está pronta. A única coisa nova que passa a funcionar é a aba
+**"Histórico (arquivo)"** dentro do modal de cada máquina, que passa a mostrar dados reais
+em vez do aviso "arquivo não configurado". Nada existente é alterado ou arriscado.
+
+---
+
+## 0. Atualizar o projeto
+
+```bash
+cd /caminho/do/capaxero_cloud
+git pull origin main
+npm install
+```
+
+Isso traz, além da parte do Postgres: a correção de vendas duplicadas, a correção do
+fuso horário nos ids, a correção do vazamento de locais entre franqueados, e o
+`package.json` com os comandos `db:migrate` e `db:import` usados abaixo.
+
+**Confirme que a correção de duplicidade está mesmo ativa** (ela foi enviada há alguns
+dias; se a VPS não tinha sido atualizada até agora, pode ser a primeira vez que ela roda):
+
+```bash
+node scripts/dedupe_transactions.js
+```
+
+Modo simulação — não grava nada, só mostra quantas duplicatas existem. Se aparecer um
+número alto, rode com `--apply` para limpar (ele faz backup automático antes):
+
+```bash
+node scripts/dedupe_transactions.js --apply
+```
+
+---
 
 ## 1. Instalar o PostgreSQL na VPS
 
@@ -43,25 +75,20 @@ GRANT ALL ON SCHEMA public TO capaxero;
 \q
 ```
 
+Troque `TROQUE_ESTA_SENHA` por uma senha forte de verdade — vai usar o mesmo valor no
+`.env` no próximo passo.
+
 ## 3. Configurar o `.env` do projeto
 
 ```bash
-cd /caminho/do/capaxero_cloud
-git pull origin main
-npm install
 nano .env
 ```
 
-Adicione (ou ajuste):
+Adicione (ou ajuste) a linha de conexão — use a mesma senha do passo 2:
 
 ```env
 DATABASE_URL=postgresql://capaxero:TROQUE_ESTA_SENHA@localhost:5432/capaxero_db
-STORE_MODE=json
 ```
-
-`STORE_MODE=json` é o valor certo por enquanto — o servidor ainda não lê essa variável em
-runtime (isso é trabalho da Fase 3). Ela existe desde já para os scripts abaixo saberem que
-o Postgres é esperado neste ambiente.
 
 ## 4. Aplicar o schema
 
@@ -69,9 +96,13 @@ o Postgres é esperado neste ambiente.
 npm run db:migrate
 ```
 
-Isso roda `db/migrations/001_initial_schema.sql`, criando as 12 tabelas + a view
-`transactions_business`. Registra o que já foi aplicado em `schema_migrations`, então rodar
-de novo é seguro (não faz nada se já estiver tudo em dia):
+Isso roda, em ordem, as duas migrations que existem hoje:
+- `001_initial_schema.sql` — cria as 12 tabelas e a view `transactions_business`.
+- `002_history_indexes.sql` — cria o índice que a aba de Histórico usa para buscar rápido
+  os cupons resgatados em cada máquina.
+
+Registra o que já foi aplicado em `schema_migrations`, então rodar de novo é seguro (não
+faz nada se já estiver tudo em dia):
 
 ```bash
 npm run db:migrate:status
@@ -93,17 +124,18 @@ node scripts/import_json.js data/capaxero_database.json
 ```
 
 Leia o relatório com atenção. Ele avisa sobre:
-- **Transações duplicadas que serão descartadas** (o defeito nº 1 do `MIGRACAO.md` —
-  espera-se um número alto aqui, é esperado e correto).
-- **depotno duplicado** — se o gerador antigo de id produziu dois pontos físicos diferentes
-  com o mesmo código, o script renomeia o mais recente e reporta qual endereço foi para
-  qual id novo. Confira se os endereços fazem sentido.
-- **id de transação/alerta colidido** — mesma lógica, para o gerador de id antigo (corrigido
-  na Fase 0) que podia produzir o mesmo id para dois registros diferentes.
+- **Transações duplicadas que serão descartadas** — espera-se um número relevante aqui,
+  é esperado e correto (é o mesmo defeito que o `dedupe_transactions.js` do passo 0
+  resolve no JSON; o importador resolve de novo, só na carga para o Postgres).
+- **depotno duplicado** — se o gerador antigo de id produziu dois pontos físicos
+  diferentes com o mesmo código, o script renomeia o mais recente e reporta qual
+  endereço foi para qual id novo. Confira se os endereços fazem sentido.
+- **id de transação/alerta colidido** — mesma lógica, para o gerador de id antigo que
+  podia produzir o mesmo id para dois registros diferentes.
 - **totens com owner_id que não resolveu** — caíram para CRPADMIN; confira se algum
   precisa ser reatribuído manualmente depois.
 
-Se o relatório fizer sentido, aplique de verdade:
+Se o relatório fizer sentido, aplique de verdade (equivalente a `npm run db:import`):
 
 ```bash
 node scripts/import_json.js data/capaxero_database.json --apply
@@ -138,15 +170,44 @@ FROM transactions WHERE status = 'APPROVED';
 SELECT public_id, occurred_at, business_date FROM transactions_business ORDER BY occurred_at DESC LIMIT 5;
 ```
 
+## 7. Reiniciar o processo e ativar a aba de Histórico
+
+O servidor só lê `DATABASE_URL` na inicialização — precisa reiniciar para pegar o que
+foi configurado no passo 3.
+
+```bash
+pm2 restart capaxero_cloud
+# ou, se não usa pm2:
+sudo systemctl restart capaxero
+```
+
+Se não sabe qual dos dois está rodando, confira com `pm2 list` ou
+`systemctl status capaxero`. Se nenhum dos dois existir, o processo provavelmente foi
+iniciado manualmente (`node server.js` num terminal ou `.bat`) — pare e suba de novo do
+mesmo jeito que sempre fez.
+
+**Verificação final, no navegador:** entre no painel, abra qualquer máquina, clique na aba
+"Histórico (arquivo)". Antes deste passo ela mostrava um aviso neutro "arquivo histórico
+não configurado neste ambiente" — agora deve mostrar as vendas de verdade, com o resumo
+(total, ticket médio, dias com venda) e a data em que o arquivo foi importado.
+
+---
+
 ## O que NÃO fazer ainda
 
-- **Não configure o app para ler do Postgres.** `STORE_MODE` não é consumido em runtime
-  ainda — mudar essa variável hoje não tem efeito algum no servidor.
-- **Não apague `data/capaxero_database.json`.** Continua sendo a fonte da verdade do
-  sistema até a Fase 5 do plano.
+- **Não apague `data/capaxero_database.json`.** Continua sendo a fonte de tudo que o site
+  usa no dia a dia — vendas de hoje, ciclos, cupons sendo resgatados agora. Só a aba de
+  Histórico lê do Postgres; todo o resto do painel não muda em nada com este guia.
+- **`STORE_MODE` no `.env` não tem efeito em runtime ainda** (isso é a Fase 3, que ainda
+  não foi construída) — só existe para os scripts deste guia saberem que o Postgres é
+  esperado neste ambiente. Pode deixar como está ou remover, tanto faz.
 
 ## Rollback
 
-Não há o que reverter: nada em produção foi alterado por este guia. O Postgres existe e
-está populado, isolado do que o servidor realmente usa. Se algo saiu errado na importação,
-`DROP DATABASE` e recomece do passo 4 — o JSON de produção nunca foi tocado.
+Se algo saiu errado na importação (passo 5), o JSON de produção nunca foi tocado —
+`DROP DATABASE` e recomece do passo 4.
+
+Se quiser desativar a aba de Histórico depois de já ter ativado (passo 7), sem desfazer
+nada do banco: apague ou comente a linha `DATABASE_URL` no `.env` e reinicie o processo.
+A aba volta a mostrar "arquivo não configurado" e o resto do site continua exatamente
+igual — nenhuma outra rota depende dessa variável.
