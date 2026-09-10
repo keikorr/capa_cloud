@@ -9,5 +9,9 @@ Thumbs.db
 
 # Fixture reconstruída da produção para os golden snapshots.
 # Contém credenciais Cielo por totem (a API as devolve para CRPADMIN) — nunca versionar.
+# .legacy: services/database.js espelha CAPAXERO_DB_FILE em "<arquivo>.legacy" (compat com
+# o LEGACY_DB_FILE de produção) — sem esta linha, rodar comandos apontando CAPAXERO_DB_FILE
+# para a fixture (ex.: testes manuais) grava as mesmas credenciais num segundo arquivo.
 data/fixture_prod.json
+data/fixture_prod.json.legacy
 data/*.bak-*
