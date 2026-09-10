@@ -1,7 +1,7 @@
 # Capaxero Cloud — Diagnóstico, Correções e Migração para PostgreSQL
 
 > Documento de acompanhamento. Registra o que foi investigado, o que já foi corrigido e o
-> que falta fazer. Atualizado em 09/09/2026.
+> que falta fazer. Atualizado em 10/09/2026.
 
 ---
 
@@ -134,9 +134,12 @@ Não causaram a queixa original, mas são graves:
 
 ## 3. O que já foi feito
 
-Fases 0 e 2 do plano, todas em `main`. **O servidor continua rodando 100% sobre o JSON** —
-o Postgres da Fase 2 existe e está populado num banco local de teste, mas nada em produção
-lê ou escreve nele ainda (isso é a Fase 3).
+Fases 0 e 2 do plano, todas em `main`, mais uma feature nova construída sobre a Fase 2 (a
+aba de histórico por máquina, seção 3.4). **O servidor continua rodando 100% sobre o JSON**
+— o Postgres existe e está populado num banco local de teste, mas nada em produção lê ou
+escreve nele para o fluxo de vendas ainda (isso é a Fase 3). A nova aba de histórico é a
+primeira coisa em produção que **lerá** do Postgres, assim que a VPS tiver um banco migrado
+e importado — ver seção 6.4.
 
 | Commit | O quê | Verificação feita |
 |---|---|---|
@@ -147,7 +150,13 @@ lê ou escreve nele ainda (isso é a Fase 3).
 | `932e3f6` | Shutdown gracioso (SIGTERM/SIGINT) + guardas nos dois watchdogs | Handler encerra limpo com exit 0, sem estourar o timeout |
 | `fe9e09b` | Usuário autenticado resolvido pela sessão, sem tocar no banco | Edição reflete na sessão; exclusão devolve 401; RBAC preservado |
 | `67f2458` | Golden snapshots (18 rotas) + correção do vazamento de pontos | Regressão deliberada foi detectada: "esperado 2, obtido 13", exit 1 |
-| *(este commit)* | Fase 2: schema PostgreSQL, pool, runner de migrations, importador | Ver 3.3 — testado ponta a ponta contra um retrato real da produção |
+| `1e815b9` | Fase 2: schema PostgreSQL, pool, runner de migrations, importador | Ver 3.3 — testado ponta a ponta contra um retrato real da produção |
+| `d9b7440` | Rótulos "(hoje)" no modal + índice para histórico por cupom | — |
+| `b4160f2` | Extrai `userOwnsTotem`/`canUserSeeTotem` de `getTotemsList` | Snapshot `admin_totems__owner` não se mexeu; RBAC cruzado testado contra a fixture |
+| `bce038d` | Repositório de histórico por máquina (`db/repositories/transactions.repo.js`) | Ver 3.4 — 4 bugs reais encontrados testando contra Postgres de verdade |
+| `5a43204` | Endpoint `GET /admin/totems/:devno/history` + rotas golden novas | Matriz de RBAC completa, paginação via HTTP, prova de segurança assíncrona |
+| `ecc7284` | `.gitignore` cobre o `.legacy` que a fixture espelha ao lado | — |
+| `be11721` | Aba "Histórico (arquivo)" no modal da máquina (frontend) | Testado num navegador real (Playwright); ver 3.4 |
 
 ### 3.1 Por que o `fe9e09b` importa mais do que parece
 
@@ -228,6 +237,70 @@ PostgreSQL 17 via `winget`, mais um segundo cluster standalone (`initdb`/`pg_ctl
 pasta de scratch, porta 5433) para não depender de privilégio de administrador para
 controlar o serviço. O guia de instalação real, para Ubuntu na VPS, está em
 `deploy_vps_postgresql.md`.
+
+### 3.4 Aba "Histórico (arquivo)" no modal da máquina
+
+Pedido do usuário: popular o banco com as vendas e cupons de cada máquina, e mostrar esse
+histórico no site. Implementado como **leitura somente do Postgres** — o histórico é a foto
+congelada no momento da importação (seção 3.3), não dado ao vivo. Vendas novas continuam
+indo só para o JSON, exatamente como hoje.
+
+**A tensão que isso cria, e como foi resolvida:** o modal passa a ter duas abas lendo de
+fontes diferentes — "Visão geral" mostra o faturamento de hoje vindo do JSON, "Histórico"
+mostra a foto do Postgres. Uma venda de hoje aparece numa aba e não na outra. Em vez de
+deixar isso virar uma contradição em silêncio, a rota nova (`GET
+/api/v1/admin/totems/:devno/history`) calcula um `liveDelta`: conta, a partir do JSON,
+exatamente quantas vendas daquela máquina ficaram de fora do corte do arquivo, e a aba
+mostra os dois números juntos — *"Arquivo: 94 vendas (R$ 505,09). Fora do arquivo: 3
+vendas (R$ 45,00) — aparecem na aba Visão geral."* Zero vendas fora do corte renderiza em
+verde, "arquivo em dia".
+
+Cogitei tornar o importador (`scripts/import_json.js`) re-executável para manter o arquivo
+sempre atualizado, e descartei: os resolvedores de colisão de id (seção 3.3) cunham ids
+novos de forma não-determinística a cada execução, então uma segunda rodada reinseriria as
+mesmas linhas físicas sob ids diferentes — `ON CONFLICT` não ajuda, porque não há conflito
+algum, a chave é nova. Fazer isso direito precisa de uma tabela de mapeamento de ids e uma
+passagem de validação prévia; ficou registrado como trabalho futuro, fora de escopo.
+
+**Quatro bugs reais, encontrados só ao testar com Postgres de verdade** (nenhum apareceria
+revisando o SQL no papel):
+
+| Bug | Causa | Correção |
+|---|---|---|
+| Aviso de depreciação do driver `pg` | `Promise.all` rodando 3 queries concorrentes no mesmo `client` de uma transação — um `Client` do pg processa uma por vez nessa conexão | Sequencial, com `await` |
+| Data da venda saindo errada | O driver `pg` converte o tipo `DATE` usando o fuso **local do processo Node**, não UTC — coincidiu por acaso nesta máquina (UTC-3), mas quebraria numa VPS com outro fuso | `::text` explícito no SQL, elimina a ambiguidade |
+| Total da página zerava com offset além do fim | `count(*) OVER()` só aparece nas linhas que sobrevivem ao `LIMIT/OFFSET` — offset grande, zero linhas, total some junto | Total vem do `tx_count` da query de resumo, que não tem `LIMIT/OFFSET` |
+| Data do arquivo vinha `null` numa máquina sem vendas | `max(created_at)` escopado por `devno` — sobre conjunto vazio é `NULL`, justamente no caso em que mostrar essa data mais importa | Data do arquivo é global (a importação inteira roda numa transação, um instante só), não por máquina |
+
+**Um quinto bug, só no frontend, só apareceu clicando de verdade num navegador:** a barra
+de abas usava `data-station-tab="historico"` (português) mas o id do painel era
+`station-pane-history` (inglês) — mismatch silencioso, o clique trocava a classe `.active`
+mas nunca no elemento certo, então a aba nunca aparecia. HTML e JS bem formados não
+detectam isso — só testando a interação real. Instalei Playwright + Chromium num diretório
+isolado do scratchpad (não virou dependência do projeto) para poder clicar de verdade,
+tirar screenshot e ler o DOM renderizado. Também assim apareceu que `.data-table` carrega
+`min-width:1050px` (pensado para páginas de largura cheia) — dentro do modal (~850px
+úteis) isso empurrava a coluna "Valor", a mais importante da tabela, para fora da área
+visível.
+
+**Controle de acesso: a autoridade é sempre o JSON, nunca o Postgres.** Se uma máquina
+trocou de dono depois da importação, checar a propriedade no banco frio daria ao
+ex-franqueado acesso ao livro de vendas de um concorrente. `canUserSeeTotem()`
+(`services/database.js`, commit `b4160f2`) resolve contra o JSON, e é a mesma função que
+`getTotemsList()` já usava — as duas nunca podem divergir. Testado invertendo o dono de uma
+máquina no painel (escrita só no JSON) e confirmando que o acesso à rota muda no mesmo
+instante, sem o Postgres saber de nada.
+
+Testado ponta a ponta: matriz de RBAC completa (CRPADMIN, dono na própria máquina, dono em
+máquina alheia → 403, sem token → 401, devno inexistente → 404), paginação real via HTTP
+(50 + 44 = 94 linhas, sem repetição), os três estados de indisponibilidade do arquivo (sem
+`DATABASE_URL`, schema não migrado, porta morta — todos respondem em menos de 1s, nunca
+pendura), e uma prova deliberada de que a rota assíncrona nunca deixa uma requisição sem
+resposta (um `throw` de teste no meio do handler devolveu erro em JSON em 0,34s). No
+navegador: login, troca de aba disparando exatamente uma requisição (nunca mais de uma,
+mesmo com o WebSocket mandando heartbeats o tempo todo), paginação por clique, e os quatro
+estados visuais (neutro, verde, âmbar, vermelho) conferidos por cor computada. Zero erros
+de console em todas as rodadas.
 
 ---
 
@@ -397,7 +470,7 @@ npm test             # compara com os snapshots; sai com código 1 em qualquer d
 npm run test:update  # regrava os snapshots (só quando a mudança for intencional)
 ```
 
-### 6.4 Subir o PostgreSQL (Fase 2)
+### 6.4 Subir o PostgreSQL (Fase 2) e ativar a aba de Histórico
 
 Passo a passo completo em `deploy_vps_postgresql.md`. Resumo:
 
@@ -408,8 +481,14 @@ node scripts/import_json.js data/capaxero_database.json     # simula, não grava
 node scripts/import_json.js data/capaxero_database.json --apply   # aplica de fato
 ```
 
-Nada disso muda o que o servidor usa — `server.js` continua lendo o JSON até a Fase 3.
-Seguro de rodar a qualquer momento, contra um Postgres vazio.
+Isso não muda o que o servidor usa para vendas/ciclos/estatísticas — `server.js` continua
+lendo o JSON até a Fase 3, e é seguro rodar a qualquer momento contra um Postgres vazio.
+
+**Mas ativa a aba "Histórico (arquivo)" do modal da máquina (seção 3.4).** Ela é a primeira
+coisa em produção que lê do Postgres. Sem `DATABASE_URL` configurada, a aba mostra um
+painel neutro "arquivo não configurado" — o site continua funcionando normalmente, só essa
+aba fica vazia. Depois do `--apply` acima, defina `DATABASE_URL` no `.env` da VPS e
+reinicie o processo (seção 6.1) para os dados aparecerem.
 
 ---
 
@@ -459,7 +538,11 @@ contendo os dados** — limpar isso exige reescrever o histórico ou rotacionar 
 | `scripts/dedupe_transactions.js` | Limpeza das duplicatas já gravadas |
 | `scripts/fetch_prod_dataset.js` | Reconstrói a fixture a partir da API |
 | `db/migrations/001_initial_schema.sql` | Schema Postgres — as 3 constraints que resolvem os defeitos originais |
+| `db/migrations/002_history_indexes.sql` | Índice de cupons por máquina (`coupon_redemptions.totem_devno`) |
 | `db/pool.js` | Pool de conexão. Os type parsers de `NUMERIC`/`BIGINT` moram aqui |
 | `db/migrate.js` | Runner de migrations, com advisory lock |
+| `db/repositories/transactions.repo.js` | Consultas do histórico por máquina — página, resumo, cupons resgatados |
 | `scripts/import_json.js` | Importa o JSON para o Postgres, resolvendo as colisões da seção 3.3 |
+| `routes/admin.js` | `GET /admin/totems/:devno/history` — primeira rota assíncrona do código |
+| `public/js/app.js` | `switchStationTab`/`loadStationHistory` — aba de histórico no modal da máquina |
 | `deploy_vps_postgresql.md` | Passo a passo para instalar o Postgres na VPS (Fase 2) |
