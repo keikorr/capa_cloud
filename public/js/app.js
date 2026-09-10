@@ -382,12 +382,17 @@ class CapaxeroDashboard {
         const idx = this.stations.findIndex(s => s.code === devno || s.devno === devno);
         if (idx !== -1) {
           this.stations[idx] = this.normalizeTotem(data.totem);
-        } else {
-          this.stations.unshift(this.normalizeTotem(data.totem));
+          this.renderEstacoes();
+          this.renderDashboard();
+          this.refreshStationDetailsLive(devno);
         }
-        this.renderEstacoes();
-        this.renderDashboard();
-        this.refreshStationDetailsLive(devno);
+        // Se a máquina não estava na lista, ignora — nunca adiciona. Este evento vai
+        // para TODO dashboard conectado, sem filtro de dono (broadcast de rede inteira).
+        // Adicionar às cegas mostrava a máquina de outro franqueado no painel de quem
+        // não é dono dela, assim que ela mandasse um heartbeat ou tick de ciclo (o que
+        // acontece a cada ~60s). A lista completa e corretamente filtrada por dono só
+        // vem do fetchBackendData() — que já roda de novo a cada DASHBOARD_UPDATE (ex.:
+        // quando um admin reatribui a máquina para este usuário).
       }
     } else if (msg.type === 'NEW_ALERT') {
       this.fetchBackendData();

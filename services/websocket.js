@@ -102,7 +102,10 @@ class WebSocketManager {
       case 'HEARTBEAT':
         if (devno) {
           const updated = store.updateHeartbeat(devno, data || {});
-          this.broadcastToDashboard('TOTEM_HEARTBEAT', { devno, totem: updated });
+          // Mascarado: este broadcast vai para TODO dashboard conectado, sem saber qual
+          // perfil está do outro lado — sem isto, a chave da Cielo ia sem máscara em
+          // todo heartbeat (a cada 60s por máquina) para qualquer navegador aberto.
+          this.broadcastToDashboard('TOTEM_HEARTBEAT', { devno, totem: store.maskTotemCredentials(updated) });
         }
         break;
 
@@ -121,7 +124,7 @@ class WebSocketManager {
           if (totem) {
             totem.status = "CLEANING";
             totem.currentCycle = data;
-            this.broadcastToDashboard('CYCLE_PROGRESS', { devno, currentCycle: data, totem });
+            this.broadcastToDashboard('CYCLE_PROGRESS', { devno, currentCycle: data, totem: store.maskTotemCredentials(totem) });
           }
         }
         break;
@@ -129,7 +132,7 @@ class WebSocketManager {
       case 'CYCLE_COMPLETED':
         if (devno) {
           const totem = store.recordCycleComplete(devno, data);
-          this.broadcastToDashboard('CYCLE_COMPLETED', { devno, totem, stats: store.getStats() });
+          this.broadcastToDashboard('CYCLE_COMPLETED', { devno, totem: store.maskTotemCredentials(totem), stats: store.getStats() });
         }
         break;
 

@@ -436,22 +436,37 @@ class RelationalDatabase {
     return this.userOwnsTotem(user, totem);
   }
 
+  /**
+   * Devolve uma CÓPIA do totem com as credenciais Cielo mascaradas, a menos que
+   * isAdmin seja true. Nunca muta o totem original — quem chama isto às vezes tem em
+   * mãos a referência viva da tabela (ex.: services/websocket.js antes de transmitir um
+   * totem bruto por heartbeat/progresso de ciclo), e apagar `config.cielo` do objeto
+   * real apagaria a credencial de verdade do banco.
+   *
+   * Extraído de getTotemsList() — antes só essa rota mascarava; o WebSocket transmitia
+   * o totem cru (merchant key/secret da Cielo inclusos) para todo dashboard conectado,
+   * em todo heartbeat e progresso de ciclo, independente do perfil de quem estava logado.
+   */
+  maskTotemCredentials(totem, isAdmin = false) {
+    const config = { ...(totem.config || {}) };
+    if (!isAdmin) {
+      delete config.cieloMerchantKey;
+      delete config.cielo;
+      if (config.cieloMerchantId) {
+        config.cieloMerchantId = config.cieloMerchantId.slice(0, 4) + '****-****-' + config.cieloMerchantId.slice(-4);
+      }
+    }
+    return { ...totem, config };
+  }
+
   getTotemsList(userFilter = null) {
     let totems = this.tables.totems.filter(t => this.userOwnsTotem(userFilter, t));
 
-    // Mascara credenciais Cielo para quem não for CRPADMIN
     return totems.map(t => {
       const isOwner = userFilter && userFilter.role === 'CRPADMIN';
-      const config = { ...(t.config || {}) };
-      if (!isOwner) {
-        delete config.cieloMerchantKey;
-        delete config.cielo;
-        if (config.cieloMerchantId) {
-          config.cieloMerchantId = config.cieloMerchantId.slice(0, 4) + '****-****-' + config.cieloMerchantId.slice(-4);
-        }
-      }
+      const masked = this.maskTotemCredentials(t, isOwner);
       const { revenueToday, cyclesToday } = this.getTodayMetrics(t.devno);
-      return { ...t, config, revenueToday, totalCyclesToday: cyclesToday };
+      return { ...masked, revenueToday, totalCyclesToday: cyclesToday };
     });
   }
 

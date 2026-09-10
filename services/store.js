@@ -63,6 +63,7 @@ class StoreFacade {
   getTotemsList(userFilter) { return this.db.getTotemsList(userFilter); }
   getTotem(devno) { return this.db.getTotem(devno); }
   canUserSeeTotem(user, devno) { return this.db.canUserSeeTotem(user, devno); }
+  maskTotemCredentials(totem, isAdmin) { return this.db.maskTotemCredentials(totem, isAdmin); }
   upsertTotem(data) { return this.db.upsertTotem(data); }
   deleteTotem(devno) { return this.db.deleteTotem(devno); }
   updateTotemConfig(devno, config, userRole) { return this.db.updateTotemConfig(devno, config, userRole); }
