@@ -1451,14 +1451,15 @@ class CapaxeroDashboard {
     try {
       const headers = this.token ? { 'Authorization': `Bearer ${this.token}` } : {};
 
-      const [resTotems, resDepots, resUsers, resAlerts, resTransactions, resCoupons, resStats] = await Promise.all([
+      const [resTotems, resDepots, resUsers, resAlerts, resTransactions, resCoupons, resStats, resHistorySummary] = await Promise.all([
         fetch('/api/v1/admin/totems', { headers }).then(r => r.json()).catch(() => ({ success: false })),
         fetch('/api/v1/admin/depots', { headers }).then(r => r.json()).catch(() => ({ success: false })),
         fetch('/api/v1/admin/users', { headers }).then(r => r.json()).catch(() => ({ success: false })),
         fetch('/api/v1/admin/alerts', { headers }).then(r => r.json()).catch(() => ({ success: false })),
         fetch('/api/v1/admin/transactions?limit=5000', { headers }).then(r => r.json()).catch(() => ({ success: false })),
         fetch('/api/v1/coupons').then(r => r.json()).catch(() => ({ success: false })),
-        fetch('/api/v1/admin/stats', { headers }).then(r => r.json()).catch(() => ({ success: false }))
+        fetch('/api/v1/admin/stats', { headers }).then(r => r.json()).catch(() => ({ success: false })),
+        fetch('/api/v1/admin/history-summary', { headers }).then(r => r.json()).catch(() => ({ success: false }))
       ]);
 
       if (resTotems.success && Array.isArray(resTotems.data)) {
@@ -1492,6 +1493,10 @@ class CapaxeroDashboard {
 
       if (resStats.success && resStats.data) {
         this.state.stats = resStats.data;
+      }
+
+      if (resHistorySummary && resHistorySummary.success && resHistorySummary.data) {
+        this.state.historySummary = resHistorySummary.data;
       }
 
       this.renderAll();
@@ -2554,8 +2559,20 @@ class CapaxeroDashboard {
     const elOpenOms = document.getElementById('dash-open-oms-count');
     const elPeriodTotal = document.getElementById('dash-chart-period-total');
 
-    if (elTotalRev) elTotalRev.textContent = fmtBRL(totalRev);
-    if (elTotalCycles) elTotalCycles.textContent = totalCyc;
+    if (elTotalRev) {
+      if (this.state.historySummary) {
+        elTotalRev.textContent = fmtBRL((this.state.historySummary.totalCents || 0) / 100);
+      } else {
+        elTotalRev.textContent = fmtBRL(totalRev);
+      }
+    }
+    if (elTotalCycles) {
+      if (this.state.historySummary) {
+        elTotalCycles.textContent = this.state.historySummary.txCount || 0;
+      } else {
+        elTotalCycles.textContent = totalCyc;
+      }
+    }
     if (elActiveTotems) elActiveTotems.innerHTML = `${activeTotems}<span style="color:#8a97a7">/${filteredStations.length}</span>`;
     if (elOpenOms) elOpenOms.textContent = openOms;
     if (elPeriodTotal) elPeriodTotal.textContent = `${fmtBRL(totalRev)} no período`;

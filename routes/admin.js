@@ -96,6 +96,21 @@ router.get('/admin/stats', (req, res) => {
 });
 
 /**
+ * GET /api/v1/admin/history-summary
+ * Retorna o faturamento e ciclos vitais globais oficiais a partir do histórico do PostgreSQL
+ */
+router.get('/admin/history-summary', async (req, res) => {
+  const user = extractUser(req);
+  try {
+    const data = await historyRepo.getGlobalHistorySummary(user);
+    return res.json({ success: true, data });
+  } catch (error) {
+    console.error('[API] Erro ao buscar resumo histórico global:', error);
+    return res.status(500).json({ success: false, error: 'Erro ao buscar dados do histórico.' });
+  }
+});
+
+/**
  * GET /api/v1/admin/branches
  * Lista todas as filiais
  */

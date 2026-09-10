@@ -211,4 +211,44 @@ async function getMachineHistory(devno, { limit = 50, offset = 0, couponLimit = 
   });
 }
 
-module.exports = { getMachineHistory };
+/**
+ * Resumo global histórico do faturamento de todas as máquinas (ou apenas as máquinas 
+ * pertencentes ao usuário, caso não seja admin). Retorna a soma de vendas e o total de 
+ * faturamento da tabela transactions.
+ */
+async function getGlobalHistorySummary(userFilter = null) {
+  return withTx(async (client) => {
+    await client.query(`SET LOCAL statement_timeout = ${STATEMENT_TIMEOUT_MS}`);
+    
+    let query = `
+      SELECT 
+        count(*)::bigint AS tx_count,
+        coalesce(sum(CASE WHEN t.payment_method = 'Cupom / Gratuidade' THEN 0 ELSE t.amount_cents END), 0)::bigint AS total_cents
+      FROM transactions t
+      WHERE t.status = 'APPROVED'
+    `;
+    let params = [];
+
+    if (userFilter && userFilter.role !== 'CRPADMIN' && userFilter.id) {
+      query = `
+        SELECT 
+          count(*)::bigint AS tx_count,
+          coalesce(sum(CASE WHEN t.payment_method = 'Cupom / Gratuidade' THEN 0 ELSE t.amount_cents END), 0)::bigint AS total_cents
+        FROM transactions t
+        INNER JOIN totems m ON m.devno = t.devno
+        WHERE t.status = 'APPROVED' AND m.owner_id = $1
+      `;
+      params.push(userFilter.id);
+    }
+
+    const res = await client.query(query, params);
+    const row = res.rows[0];
+
+    return {
+      txCount: Number(row.tx_count || 0),
+      totalCents: Number(row.total_cents || 0)
+    };
+  });
+}
+
+module.exports = { getMachineHistory, getGlobalHistorySummary };
