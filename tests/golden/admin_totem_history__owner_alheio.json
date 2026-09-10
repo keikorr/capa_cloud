@@ -1,0 +1,8 @@
+{
+  "name": "admin_totem_history__owner_alheio",
+  "status": 403,
+  "body": {
+    "message": "Você não tem acesso ao histórico desta máquina.",
+    "success": false
+  }
+}

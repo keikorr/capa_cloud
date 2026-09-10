@@ -1,0 +1,33 @@
+{
+  "name": "admin_totem_history__owner_proprio",
+  "status": 200,
+  "body": {
+    "data": {
+      "available": false,
+      "byMode": [],
+      "byPayment": [],
+      "coupons": {
+        "count": 0,
+        "discountCents": 0,
+        "rows": []
+      },
+      "devno": "CPX-002",
+      "liveDelta": {
+        "since": null,
+        "totalCents": 27092,
+        "txCount": 23
+      },
+      "machineInSnapshot": false,
+      "page": {
+        "limit": 50,
+        "offset": 0,
+        "total": 0
+      },
+      "reason": "NOT_CONFIGURED",
+      "snapshot": null,
+      "summary": null,
+      "transactions": []
+    },
+    "success": true
+  }
+}

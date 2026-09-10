@@ -10,6 +10,8 @@ const multer = require('multer');
 const store = require('../services/store');
 const wsManager = require('../services/websocket');
 const { getUserFromToken, refreshSessionsForUser, invalidateSessionsForUser } = require('./auth');
+const { getDatabaseUrl } = require('../config/db');
+const historyRepo = require('../db/repositories/transactions.repo');
 
 // Configuração de upload de vídeo para a rota de admin
 const videoStorage = multer.diskStorage({
@@ -609,6 +611,116 @@ router.get('/admin/transactions', (req, res) => {
     success: true,
     data: store.getTransactions(limit, user)
   });
+});
+
+/**
+ * Vendas desta máquina que aconteceram DEPOIS do corte do arquivo Postgres (ou o
+ * histórico inteiro da máquina, se o arquivo nem existir neste ambiente). O histórico é
+ * uma foto congelada; em vez de deixar a aba "Visão geral" (JSON, hoje) e a aba
+ * "Histórico" (Postgres, até {sinceIso}) se contradizerem em silêncio, esta função conta
+ * exatamente o que ficou de fora e a UI presta contas dos dois números juntos.
+ */
+function buildLiveDelta(devno, sinceIso) {
+  const sinceMs = sinceIso ? new Date(sinceIso).getTime() : 0;
+  const rows = store.transactions.filter(t =>
+    t.devno === devno && t.status === 'APPROVED' && t.timestamp && new Date(t.timestamp).getTime() > sinceMs
+  );
+  return {
+    since: sinceIso || null,
+    txCount: rows.length,
+    totalCents: rows.reduce((acc, t) => acc + Math.round(Number(t.amount || 0) * 100), 0)
+  };
+}
+
+/**
+ * Classifica um erro do driver pg em algo que a UI consegue agir. '42P01' (undefined_table)
+ * significa que a migration não rodou; qualquer outra coisa (porta morta, timeout,
+ * autenticação) vira "indisponível". Nunca devolvemos err.message ao cliente — erros de
+ * conexão do pg carregam host e usuário da connection string.
+ */
+function classifyDbError(err) {
+  return err && err.code === '42P01' ? 'NOT_MIGRATED' : 'UNAVAILABLE';
+}
+
+/**
+ * GET /api/v1/admin/totems/:devno/history
+ * Histórico de vendas arquivado desta máquina (foto Postgres, somente leitura) + cupons
+ * resgatados nela + o que ficou de fora do arquivo (liveDelta, ver buildLiveDelta acima).
+ *
+ * Async safety (Express 4 não observa a promise devolvida por um handler — se ela rejeita
+ * sem isto, o request pendura pra sempre sem resposta): try/catch cobrindo o corpo inteiro,
+ * de propósito sem um wrapper genérico — este handler já precisa ramificar por tipo de
+ * erro (NOT_CONFIGURED / NOT_MIGRATED / UNAVAILABLE), então o catch faz trabalho real, não
+ * é boilerplate. Um asyncRoute genérico só se justifica quando várias rotas convertem
+ * juntas (fase 3 do plano de migração).
+ *
+ * Desvio deliberado do idioma da casa: falha fechada com 401 quando `user` é null. Em
+ * toda outra rota admin, `user && user.role !== 'CRPADMIN'` deixa um chamador sem token
+ * passar como se fosse CRPADMIN — aceitável hoje porque nenhuma delas expõe um livro
+ * financeiro por máquina endereçável por um devno adivinhável. Esta expõe.
+ */
+router.get('/admin/totems/:devno/history', async (req, res) => {
+  const user = extractUser(req);
+  const { devno } = req.params;
+
+  if (!user) {
+    return res.status(401).json({ success: false, message: 'Sessão expirada. Entre novamente.' });
+  }
+
+  const totem = store.getTotem(devno);
+  if (!totem) {
+    return res.status(404).json({ success: false, message: 'Máquina não encontrada.' });
+  }
+  if (!store.canUserSeeTotem(user, devno)) {
+    return res.status(403).json({ success: false, message: 'Você não tem acesso ao histórico desta máquina.' });
+  }
+
+  const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 50, 1), 200);
+  const offset = Math.max(parseInt(req.query.offset, 10) || 0, 0);
+
+  if (!getDatabaseUrl()) {
+    return res.json({
+      success: true,
+      data: {
+        devno,
+        available: false,
+        reason: 'NOT_CONFIGURED',
+        machineInSnapshot: false,
+        snapshot: null,
+        summary: null,
+        byMode: [],
+        byPayment: [],
+        page: { limit, offset, total: 0 },
+        transactions: [],
+        coupons: { count: 0, discountCents: 0, rows: [] },
+        liveDelta: buildLiveDelta(devno, null)
+      }
+    });
+  }
+
+  try {
+    const history = await historyRepo.getMachineHistory(devno, { limit, offset });
+    return res.json({
+      success: true,
+      data: {
+        devno,
+        available: true,
+        reason: null,
+        ...history,
+        liveDelta: buildLiveDelta(devno, history.snapshot.lastSaleAt)
+      }
+    });
+  } catch (err) {
+    const reason = classifyDbError(err);
+    console.error(`[HISTORICO] devno=${devno} ${reason}:`, err.code || '', err.message);
+    return res.status(503).json({
+      success: false,
+      reason,
+      message: reason === 'NOT_MIGRATED'
+        ? 'O banco de histórico ainda não foi migrado. Rode "npm run db:migrate" na VPS.'
+        : 'O banco de histórico não respondeu. Tente novamente em instantes.'
+    });
+  }
 });
 
 /**

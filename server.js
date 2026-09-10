@@ -74,6 +74,19 @@ app.use('/api/v1', adminRoutes);
 // Camada de Compatibilidade UPUS IoT (Para o APK original e ferramentas do upusiot_site)
 app.use('/upus_APP/app', upusCompatRoutes);
 
+// Middleware de erro (4 argumentos — é isso que faz o Express tratar como error handler,
+// não um app.use comum). Sem isto, uma rota síncrona que lança recebia o HTML padrão do
+// Express com stack trace, quebrando o contrato {success, message} que todo
+// `.then(r => r.json())` do front depende. Não resolve sozinho o perigo de uma rota
+// assíncrona que rejeita — Express 4 nunca chama next(err) nesse caso, o handler async
+// precisa do próprio try/catch (ver routes/admin.js, rota de histórico por máquina) —
+// mas cobre toda rota síncrona existente que ainda não tinha essa rede.
+app.use((err, req, res, next) => {
+  if (res.headersSent) return next(err);
+  console.error('[HTTP ERRO]', req.method, req.path, err);
+  return res.status(500).json({ success: false, message: 'Erro interno no servidor.' });
+});
+
 // Rota de Health Check
 app.get('/health', (req, res) => {
   res.json({

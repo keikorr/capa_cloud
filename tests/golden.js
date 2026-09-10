@@ -45,7 +45,11 @@ const VOLATILE_KEYS = new Set([
   'authorizedAt', 'expiresAt', 'token', 'currentCycle', 'elapsedSeconds',
   'progressPercent', 'revenueToday', 'cyclesToday', 'totalCyclesToday',
   'totalRevenueToday', 'modeCounts', 'historicalRevenue',
-  'weekTotalCycles', 'weekTotalRevenue'
+  'weekTotalCycles', 'weekTotalRevenue',
+  // Data em que o arquivo Postgres foi importado (max(created_at) global) — só teria valor
+  // não-nulo se DATABASE_URL vazasse para o processo do servidor, o que a variável acima
+  // já impede; mascarado por via das dúvidas, sem custo.
+  'importedAt'
 ]);
 
 // Campos secretos que nunca podem ser gravados em claro — estes snapshots vão para o git.
@@ -147,7 +151,13 @@ async function main() {
   fs.copyFileSync(FIXTURE, tmpDb);
 
   const server = spawn(process.execPath, [path.join(ROOT, 'server.js')], {
-    env: { ...process.env, PORT: String(PORT), CAPAXERO_DB_FILE: tmpDb },
+    // DATABASE_URL removida de propósito: esta suíte prova o comportamento 100% JSON
+    // (é o próprio ponto dela). Sem isto, DATABASE_URL vazando do shell de quem roda
+    // `npm test` (ex.: alguém testando a fase 2 do Postgres, como nesta sessão) faria a
+    // rota de histórico bater no banco real, tornando o snapshot dependente do estado do
+    // Postgres em vez de determinístico — herdar process.env aqui é exatamente o oposto
+    // do que essa suíte deve garantir.
+    env: { ...process.env, DATABASE_URL: '', PORT: String(PORT), CAPAXERO_DB_FILE: tmpDb },
     stdio: ['ignore', 'pipe', 'pipe']
   });
   let serverLog = '';
@@ -166,9 +176,18 @@ async function main() {
     if (!admToken) throw new Error('login CRPADMIN falhou na fixture e com a senha semeada');
 
     // Um OWNER da fixture, para exercitar o caminho de RBAC
-    const usuarios = JSON.parse(fs.readFileSync(FIXTURE, 'utf-8')).users;
+    const fixtureData = JSON.parse(fs.readFileSync(FIXTURE, 'utf-8'));
+    const usuarios = fixtureData.users;
     const owner = usuarios.find(u => u.role !== 'CRPADMIN');
     const ownerToken = owner ? await login(owner.email, SENHA_FIXTURE) : null;
+
+    // Mesmo predicado de userOwnsTotem (services/database.js) — duplicado aqui de propósito,
+    // é só seleção de fixture para o teste, não lógica de produção. Devnos lidos da fixture,
+    // nunca hardcoded: a fixture é regenerada da API e os devnos reais mudam com o tempo.
+    const ownsTotem = (totem) => !owner ? false :
+      totem.owner_id === owner.id || (totem.owner && (totem.owner === owner.responsible_name || totem.owner === owner.username));
+    const totemProprio = owner ? (fixtureData.totems || []).find(t => ownsTotem(t)) : null;
+    const totemAlheio = owner ? (fixtureData.totems || []).find(t => !ownsTotem(t)) : null;
 
     const rotas = [
       ['health', '/health', null],
@@ -184,6 +203,12 @@ async function main() {
       ['auth_me__crpadmin', '/api/v1/auth/me', admToken]
     ];
 
+    // Histórico por máquina como CRPADMIN — qualquer devno serve, ele vê tudo.
+    const algumDevno = (fixtureData.totems || [])[0]?.devno;
+    if (algumDevno) {
+      rotas.push(['admin_totem_history__crpadmin', `/api/v1/admin/totems/${algumDevno}/history`, admToken]);
+    }
+
     if (ownerToken) {
       rotas.push(
         ['admin_totems__owner', '/api/v1/admin/totems', ownerToken],
@@ -194,6 +219,19 @@ async function main() {
         ['admin_income__owner', '/api/v1/admin/income-report', ownerToken],
         ['auth_me__owner', '/api/v1/auth/me', ownerToken]
       );
+
+      // Matriz de RBAC do histórico por máquina: OWNER na própria máquina (200) e numa
+      // máquina alheia (403) — a prova de que canUserSeeTotem nega corretamente.
+      if (totemProprio) {
+        rotas.push(['admin_totem_history__owner_proprio', `/api/v1/admin/totems/${totemProprio.devno}/history`, ownerToken]);
+      } else {
+        console.warn('AVISO: OWNER da fixture não tem nenhuma máquina própria — caminho "próprio" do histórico não coberto.');
+      }
+      if (totemAlheio) {
+        rotas.push(['admin_totem_history__owner_alheio', `/api/v1/admin/totems/${totemAlheio.devno}/history`, ownerToken]);
+      } else {
+        console.warn('AVISO: OWNER da fixture é dono de todas as máquinas — caminho "alheio" do histórico não coberto.');
+      }
     } else {
       console.warn('AVISO: nenhum usuário OWNER na fixture — caminho de RBAC não coberto.');
     }
