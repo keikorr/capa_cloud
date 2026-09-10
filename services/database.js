@@ -414,16 +414,30 @@ class RelationalDatabase {
     return this.tables.totems.length < initialLen;
   }
 
-  getTotemsList(userFilter = null) {
-    let totems = this.tables.totems;
+  /**
+   * Predicado de propriedade do RBAC: donos normais só enxergam as próprias máquinas.
+   * userFilter ausente ou CRPADMIN vê tudo. Extraído de getTotemsList para que uma rota
+   * nova (ex.: histórico por máquina) nunca precise reimplementar este três-vias e
+   * divergir dele — as duas checagens usam exatamente a mesma fonte de verdade.
+   */
+  userOwnsTotem(userFilter, totem) {
+    if (!userFilter || userFilter.role === 'CRPADMIN') return true;
+    return totem.owner_id === userFilter.id ||
+      (totem.owner && (totem.owner === userFilter.responsible_name || totem.owner === userFilter.username));
+  }
 
-    if (userFilter && userFilter.role !== 'CRPADMIN') {
-      // Donos normais só veem suas próprias máquinas
-      totems = totems.filter(t =>
-        t.owner_id === userFilter.id ||
-        (t.owner && (t.owner === userFilter.responsible_name || t.owner === userFilter.username))
-      );
-    }
+  /**
+   * Este usuário pode ver os dados desta máquina específica? Usada por rotas que recebem
+   * um devno único (não uma lista já filtrada) e precisam de uma checagem 403/404.
+   */
+  canUserSeeTotem(user, devno) {
+    const totem = this.getTotem(devno);
+    if (!totem) return false;
+    return this.userOwnsTotem(user, totem);
+  }
+
+  getTotemsList(userFilter = null) {
+    let totems = this.tables.totems.filter(t => this.userOwnsTotem(userFilter, t));
 
     // Mascara credenciais Cielo para quem não for CRPADMIN
     return totems.map(t => {
