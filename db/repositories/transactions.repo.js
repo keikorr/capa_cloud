@@ -19,7 +19,7 @@ const SQL_PAGE = `
     order_id,
     mode,
     mode_label,
-    amount_cents,
+    CASE WHEN payment_method = 'Cupom / Gratuidade' THEN 0 ELSE amount_cents END AS amount_cents,
     payment_method,
     card_brand,
     nsu,
@@ -49,7 +49,7 @@ const SQL_PAGE = `
 
 const SQL_SUMMARY = `
   WITH base AS (
-    SELECT mode, mode_label, amount_cents, payment_method, occurred_at, created_at
+    SELECT mode, mode_label, CASE WHEN payment_method = 'Cupom / Gratuidade' THEN 0 ELSE amount_cents END AS amount_cents, payment_method, occurred_at, created_at
     FROM transactions
     WHERE devno = $1 AND status = 'APPROVED'
   ),
