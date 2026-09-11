@@ -1859,8 +1859,39 @@ class CapaxeroDashboard {
              s.dono.toLowerCase().includes(q);
     });
 
-    const totalRevenueToday = list.reduce((acc, s) => acc + (s.fatVal || 0), 0);
-    const totalCyclesToday = list.reduce((acc, s) => acc + (s.ciclos || 0), 0);
+    // Garante o cálculo estritamente das transações do dia atual (00:00 às 23:59 em horário local)
+    const now = new Date();
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+
+    const todayTxs = (this.transactions || []).filter(t => {
+      if (t.status && t.status !== 'APPROVED') return false;
+      if (!t.timestamp) return false;
+      const d = new Date(t.timestamp);
+      return d >= startOfDay && d < endOfDay;
+    });
+
+    const todayRevByDevno = {};
+    const todayCyclesByDevno = {};
+
+    todayTxs.forEach(t => {
+      const devno = t.devno;
+      if (!devno) return;
+      const amt = Number(t.paymentMethod === 'Cupom / Gratuidade' ? 0 : (t.amount || 0));
+      todayRevByDevno[devno] = (todayRevByDevno[devno] || 0) + amt;
+      todayCyclesByDevno[devno] = (todayCyclesByDevno[devno] || 0) + 1;
+    });
+
+    list.forEach(s => {
+      // Prioriza transações locais do frontend ou valor retornado pelo backend para HOJE
+      const hasTodayTx = todayRevByDevno[s.devno] !== undefined || todayCyclesByDevno[s.devno] !== undefined;
+      s.fatValToday = hasTodayTx ? (todayRevByDevno[s.devno] || 0) : (s.fatVal || 0);
+      s.ciclosToday = hasTodayTx ? (todayCyclesByDevno[s.devno] || 0) : (s.ciclos || 0);
+      s.fatToday = fmtBRL(s.fatValToday);
+    });
+
+    const totalRevenueToday = list.reduce((acc, s) => acc + (s.fatValToday || 0), 0);
+    const totalCyclesToday = list.reduce((acc, s) => acc + (s.ciclosToday || 0), 0);
     const activeCount = list.filter(s => s.status === 'IDLE' || s.status === 'CLEANING').length;
     const cleaningCount = list.filter(s => s.status === 'CLEANING').length;
     const alertsCount = list.filter(s => s.status === 'ERROR' || s.status === 'MAINTENANCE').length;
@@ -1903,7 +1934,7 @@ class CapaxeroDashboard {
         grupos[locKey] = { nome: locKey, stations: [], soma: 0 };
       }
       grupos[locKey].stations.push(s);
-      grupos[locKey].soma += s.fatVal || 0;
+      grupos[locKey].soma += s.fatValToday;
     });
 
     container.innerHTML = Object.values(grupos).map(g => `
@@ -1943,8 +1974,8 @@ class CapaxeroDashboard {
                   </div>
                 </div>
                 <div class="totem-card-foot">
-                  <span class="rev">${s.fat}</span>
-                  <span>${s.ciclos} ciclos</span>
+                  <span class="rev">${s.fatToday}</span>
+                  <span>${s.ciclosToday} ciclo${s.ciclosToday === 1 ? '' : 's'}</span>
                 </div>
               </div>
             `;
@@ -2011,8 +2042,8 @@ class CapaxeroDashboard {
     document.getElementById('modal-cycle-bar').style.width = isRun ? `${s.pct}%` : (s.status === 'IDLE' ? '100%' : '0%');
     document.getElementById('modal-stat-door').textContent = s.trava;
     document.getElementById('modal-stat-door').style.color = s.trava === 'Travada' ? '#00C566' : '#FF9100';
-    document.getElementById('modal-stat-rev').textContent = s.fat;
-    document.getElementById('modal-stat-cycles').textContent = s.ciclos;
+    document.getElementById('modal-stat-rev').textContent = s.fatToday || s.fat || fmtBRL(0);
+    document.getElementById('modal-stat-cycles').textContent = s.ciclosToday !== undefined ? s.ciclosToday : (s.ciclos || 0);
     document.getElementById('modal-current-owner-lbl').textContent = `Dono atual: ${s.dono}`;
 
     // Status Pill

@@ -462,6 +462,7 @@ class RelationalDatabase {
    * em todo heartbeat e progresso de ciclo, independente do perfil de quem estava logado.
    */
   maskTotemCredentials(totem, isAdmin = false) {
+    if (!totem) return null;
     const config = { ...(totem.config || {}) };
     if (!isAdmin) {
       delete config.cieloMerchantKey;
@@ -470,7 +471,8 @@ class RelationalDatabase {
         config.cieloMerchantId = config.cieloMerchantId.slice(0, 4) + '****-****-' + config.cieloMerchantId.slice(-4);
       }
     }
-    return { ...totem, config };
+    const { revenueToday, cyclesToday } = this.getTodayMetrics(totem.devno);
+    return { ...totem, config, revenueToday, totalCyclesToday: cyclesToday };
   }
 
   getTotemsList(userFilter = null) {
@@ -478,24 +480,28 @@ class RelationalDatabase {
 
     return totems.map(t => {
       const isOwner = userFilter && userFilter.role === 'CRPADMIN';
-      const masked = this.maskTotemCredentials(t, isOwner);
-      const { revenueToday, cyclesToday } = this.getTodayMetrics(t.devno);
-      return { ...masked, revenueToday, totalCyclesToday: cyclesToday };
+      return this.maskTotemCredentials(t, isOwner);
     });
   }
 
   getTotem(devno) {
-    return this.tables.totems.find(t => t.devno === devno);
+    const t = this.tables.totems.find(st => st.devno === devno);
+    if (!t) return null;
+    return this.maskTotemCredentials(t, true);
   }
 
   // Faturamento e ciclos realmente de HOJE, calculados a partir do histórico de transações
-  // (t.revenueToday/t.totalCyclesToday no registro do totem são contadores que só somam e nunca
-  // zeram — não servem para exibir "hoje", só para o total histórico da máquina).
   getTodayMetrics(devno) {
-    const todayIso = new Date().toISOString().slice(0, 10);
-    const todayTxs = this.tables.transactions.filter(t =>
-      t.devno === devno && t.status === 'APPROVED' && t.timestamp && t.timestamp.slice(0, 10) === todayIso
-    );
+    const now = new Date();
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+
+    const todayTxs = (this.tables.transactions || []).filter(t => {
+      if (t.devno !== devno || (t.status && t.status !== 'APPROVED') || !t.timestamp) return false;
+      const d = new Date(t.timestamp);
+      return d >= startOfDay && d < endOfDay;
+    });
+
     return {
       revenueToday: todayTxs.reduce((acc, t) => acc + Number(t.paymentMethod === 'Cupom / Gratuidade' ? 0 : (t.amount || 0)), 0),
       cyclesToday: todayTxs.length
@@ -1112,15 +1118,19 @@ class RelationalDatabase {
     const cleaningTotems = totemsList.filter(t => t.status === "CLEANING").length;
     const alertTotems = totemsList.filter(t => t.status === "ERROR" || (t.liquidLevelPercent <= 20)).length;
 
-    const todayIso = new Date().toISOString().slice(0, 10);
+    const now = new Date();
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
     const ownedDevnos = new Set(totemsList.map(t => t.devno));
 
-    const todayTxs = this.tables.transactions.filter(t =>
-      t.timestamp && t.timestamp.slice(0, 10) === todayIso && t.status === 'APPROVED' &&
-      (userFilter && userFilter.role !== 'CRPADMIN' ? ownedDevnos.has(t.devno) : true)
-    );
+    const todayTxs = this.tables.transactions.filter(t => {
+      if (!t.timestamp || (t.status && t.status !== 'APPROVED')) return false;
+      if (userFilter && userFilter.role !== 'CRPADMIN' && !ownedDevnos.has(t.devno)) return false;
+      const d = new Date(t.timestamp);
+      return d >= startOfDay && d < endOfDay;
+    });
 
-    const totalRevenueToday = todayTxs.reduce((acc, t) => acc + Number(t.amount || 0), 0);
+    const totalRevenueToday = todayTxs.reduce((acc, t) => acc + Number(t.paymentMethod === 'Cupom / Gratuidade' ? 0 : (t.amount || 0)), 0);
     const totalCyclesToday = todayTxs.length;
 
     const activeAlertsCount = this.getAlerts(true, userFilter).length;
