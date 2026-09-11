@@ -92,6 +92,13 @@ class StoreFacade {
   addMaintenanceComment(alertId, data) { return this.db.addMaintenanceComment(alertId, data); }
   getAlerts(activeOnly, userFilter) { return this.db.getAlerts(activeOnly, userFilter); }
   resolveAlert(id) { return this.db.resolveAlert(id); }
+  clearAllMaintenanceOrders(userFilter) { return this.db.clearAllMaintenanceOrders(userFilter); }
+
+  getWeeklyRoute(userFilter) { return this.db.getWeeklyRoute(userFilter); }
+  addWeeklyRouteStop(data) { return this.db.addWeeklyRouteStop(data); }
+  updateWeeklyRouteOrder(orderedIds) { return this.db.updateWeeklyRouteOrder(orderedIds); }
+  deleteWeeklyRouteStop(id) { return this.db.deleteWeeklyRouteStop(id); }
+  clearWeeklyRoute() { return this.db.clearWeeklyRoute(); }
 
   getStats(userFilter) { return this.db.getStats(userFilter); }
   getIncomeReport(userFilter) { return this.db.getIncomeReport(userFilter); }

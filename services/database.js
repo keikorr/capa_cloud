@@ -106,6 +106,7 @@ class RelationalDatabase {
     if (!Array.isArray(this.tables.transactions)) this.tables.transactions = [];
     if (!Array.isArray(this.tables.alerts)) this.tables.alerts = [];
     if (!Array.isArray(this.tables.coupons)) this.tables.coupons = [];
+    if (!Array.isArray(this.tables.weeklyRoute)) this.tables.weeklyRoute = [];
 
     // Migração: cupons criados antes do controle por CPF
     for (const cp of this.tables.coupons) {
@@ -1015,6 +1016,89 @@ class RelationalDatabase {
       this.save();
     }
     return alert;
+  }
+
+  clearAllMaintenanceOrders(userFilter = null) {
+    const devnosToReset = new Set();
+    if (userFilter && userFilter.role !== 'CRPADMIN') {
+      const ownedDevnos = new Set(this.getTotemsList(userFilter).map(t => t.devno));
+      this.tables.alerts = (this.tables.alerts || []).filter(a => {
+        if (ownedDevnos.has(a.devno)) {
+          devnosToReset.add(a.devno);
+          return false;
+        }
+        return true;
+      });
+    } else {
+      (this.tables.alerts || []).forEach(a => { if (a.devno) devnosToReset.add(a.devno); });
+      this.tables.alerts = [];
+    }
+
+    (this.tables.totems || []).forEach(t => {
+      if ((devnosToReset.has(t.devno) || userFilter?.role === 'CRPADMIN') && (t.status === 'MAINTENANCE' || t.status === 'ERROR')) {
+        t.status = 'IDLE';
+      }
+    });
+
+    this.save();
+    return true;
+  }
+
+  getWeeklyRoute(userFilter = null) {
+    let route = this.tables.weeklyRoute || [];
+    if (userFilter && userFilter.role !== 'CRPADMIN') {
+      const ownedDevnos = new Set(this.getTotemsList(userFilter).map(t => t.devno));
+      route = route.filter(r => !r.devno || ownedDevnos.has(r.devno));
+    }
+    return route;
+  }
+
+  addWeeklyRouteStop(data = {}) {
+    if (!Array.isArray(this.tables.weeklyRoute)) this.tables.weeklyRoute = [];
+    const totem = data.devno ? this.getTotem(data.devno) : null;
+    const newStop = {
+      id: 'ROUTE-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
+      devno: data.devno || '',
+      title: data.title || (totem ? totem.name : 'Nova Parada'),
+      location: data.location || (totem ? totem.location : 'Local não informado'),
+      priority: data.priority || 'Média',
+      dayOfWeek: data.dayOfWeek || 'Segunda-feira',
+      technician: data.technician || 'Técnico Responsável',
+      notes: data.notes || '',
+      createdAt: new Date().toISOString()
+    };
+    this.tables.weeklyRoute.push(newStop);
+    this.save();
+    return newStop;
+  }
+
+  updateWeeklyRouteOrder(orderedIds = []) {
+    if (!Array.isArray(this.tables.weeklyRoute)) this.tables.weeklyRoute = [];
+    const map = new Map(this.tables.weeklyRoute.map(r => [r.id, r]));
+    const reordered = [];
+    orderedIds.forEach(id => {
+      if (map.has(id)) {
+        reordered.push(map.get(id));
+        map.delete(id);
+      }
+    });
+    map.forEach(item => reordered.push(item));
+    this.tables.weeklyRoute = reordered;
+    this.save();
+    return this.tables.weeklyRoute;
+  }
+
+  deleteWeeklyRouteStop(id) {
+    if (!Array.isArray(this.tables.weeklyRoute)) this.tables.weeklyRoute = [];
+    this.tables.weeklyRoute = this.tables.weeklyRoute.filter(r => r.id !== id);
+    this.save();
+    return true;
+  }
+
+  clearWeeklyRoute() {
+    this.tables.weeklyRoute = [];
+    this.save();
+    return true;
   }
 
   // ==========================================

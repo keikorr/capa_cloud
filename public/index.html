@@ -255,7 +255,12 @@
           <h1>CONTROLE DE MANUTENÇÃO</h1>
           <p>Ordens de manutenção e máquinas fora de operação</p>
         </div>
-        <button class="btn btn-primary" id="btn-open-new-om" style="background:#FF9100; color:#1a1206; font-weight:700;">+ Nova Ordem de Manutenção</button>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn btn-outline" id="btn-clear-all-oms" style="border-color:#FF3D57; color:#FF3D57; font-weight:700;">
+            <svg class="i" viewBox="0 0 24 24" style="width:15px;height:15px;margin-right:4px;vertical-align:-2px;"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg> Esvaziar OMs
+          </button>
+          <button class="btn btn-primary" id="btn-open-new-om" style="background:#FF9100; color:#1a1206; font-weight:700;">+ Nova Ordem de Manutenção</button>
+        </div>
       </div>
 
       <div class="kpi-grid">
@@ -276,12 +281,18 @@
         </div>
       </div>
 
-      <!-- Rota Semanal do Técnico — fila de visitas ordenada por prioridade e tempo em aberto -->
+      <!-- Rota Semanal do Técnico — roteiro manual de visitas -->
       <div class="table-card" style="border-color: rgba(85,135,179,.3);">
-        <div class="table-card-head">
-          <h2>Rota semanal do técnico</h2>
-          <span class="sub" style="font-size:11.5px; color:#8a97a7;">fila de OMs em aberto, ordenada por prioridade</span>
-          <span class="count" id="manut-route-count" style="margin-left:auto;">0 paradas</span>
+        <div class="table-card-head" style="flex-wrap:wrap; gap:10px; align-items:center;">
+          <div>
+            <h2>Rota semanal do técnico</h2>
+            <span class="sub" style="font-size:11.5px; color:#8a97a7;">Roteiro manual de visitas e manutenção configurado por você</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; margin-left:auto;">
+            <span class="count" id="manut-route-count">0 paradas</span>
+            <button class="btn btn-primary" id="btn-add-route-stop" style="background:#5587B3; color:#fff; font-weight:700; padding:6px 12px; font-size:12px;">+ Adicionar Parada</button>
+            <button class="btn btn-outline" id="btn-clear-route" style="border-color:rgba(255,255,255,.2); color:#8a97a7; padding:6px 10px; font-size:12px;">Limpar Rota</button>
+          </div>
         </div>
         <div style="padding:4px 20px 18px;" id="manut-route-list"></div>
       </div>
@@ -1503,6 +1514,69 @@
         <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:20px;">
           <button type="button" class="btn btn-outline" id="edit-owner-cancel">Cancelar</button>
           <button type="submit" class="btn btn-primary" style="background:var(--brand-yellow); color:#000; font-weight:800;">Salvar Alterações</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL — Adicionar Parada na Rota Semanal
+       ============================================================ -->
+  <div class="modal-overlay" id="modal-add-route-stop">
+    <div class="modal-box compact" style="width:min(520px,96vw);">
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:18px;">
+        <h2 style="font-family: var(--font-display); font-weight: 900; font-size: 20px; margin:0; color:#5587B3;"><svg class="i" viewBox="0 0 24 24"><path d="M12 2a8 8 0 00-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 00-8-8z"/><circle cx="12" cy="10" r="3"/></svg> ADICIONAR PARADA NA ROTA</h2>
+        <button class="modal-close" id="add-route-stop-close" style="margin-left:auto;">✕</button>
+      </div>
+      <p style="margin:0 0 16px; font-size:12.5px; color:#8a97a7;">Monte seu roteiro semanal de manutenção técnica adicionando pontos de parada.</p>
+      <form id="form-add-route-stop">
+        <div class="form-group">
+          <label class="field-label">Vincular a uma Máquina (opcional)</label>
+          <select class="form-control" id="ars-totem-select">
+            <option value="">Selecione uma máquina ou digite abaixo...</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="field-label">Título da Parada / Motivo *</label>
+          <input type="text" class="form-control" id="ars-title" placeholder="Ex: Manutenção Preventiva - Totem #CPX-002" required>
+        </div>
+        <div class="form-group">
+          <label class="field-label">Endereço / Local</label>
+          <input type="text" class="form-control" id="ars-location" placeholder="Ex: R. Vilebaldo Aguiar, 1701 - Cocó, Fortaleza - CE">
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+          <div class="form-group">
+            <label class="field-label">Dia da Semana</label>
+            <select class="form-control" id="ars-day">
+              <option value="Segunda-feira">Segunda-feira</option>
+              <option value="Terça-feira">Terça-feira</option>
+              <option value="Quarta-feira">Quarta-feira</option>
+              <option value="Quinta-feira">Quinta-feira</option>
+              <option value="Sexta-feira">Sexta-feira</option>
+              <option value="Sábado">Sábado</option>
+              <option value="Domingo">Domingo</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="field-label">Prioridade</label>
+            <select class="form-control" id="ars-priority">
+              <option value="Alta">Alta</option>
+              <option value="Média" selected>Média</option>
+              <option value="Baixa">Baixa</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="field-label">Técnico Responsável</label>
+          <input type="text" class="form-control" id="ars-technician" placeholder="Ex: Técnico Silva">
+        </div>
+        <div class="form-group">
+          <label class="field-label">Observações / Tarefas</label>
+          <textarea class="form-control" id="ars-notes" rows="2" placeholder="Ex: Troca de filtro de água, reposição de sanitizante e calibração de bomba"></textarea>
+        </div>
+        <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:20px;">
+          <button type="button" class="btn btn-outline" id="add-route-stop-cancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary" style="background:#5587B3; color:#fff; font-weight:800;">+ Adicionar à Rota</button>
         </div>
       </form>
     </div>

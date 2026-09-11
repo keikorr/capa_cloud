@@ -120,6 +120,135 @@
       "currentCycle": {
         "step": "Higienização finalizada com sucesso! Retire seu capacete."
       }
+    },
+    {
+      "devno": "CPX-001",
+      "name": "Totem #CPX-001",
+      "location": "Ponto a Cadastrar",
+      "depotno": "DEP-01",
+      "branno": "BR-01",
+      "owner_id": "USR-CRPADMIN",
+      "owner": "Jonathan",
+      "boxCount": 1,
+      "status": "IDLE",
+      "totalCyclesToday": 0,
+      "revenueToday": 0,
+      "liquidLevelPercent": 100,
+      "doorLocked": true,
+      "config": {
+        "basicPrice": 14,
+        "intermediatePrice": 17,
+        "advancedPrice": 20,
+        "basicDurationSec": 360,
+        "intermediateDurationSec": 420,
+        "advancedDurationSec": 480,
+        "isPixEnabled": true,
+        "isCreditEnabled": true,
+        "isDebitEnabled": true,
+        "isCouponsEnabled": true,
+        "modes": {
+          "basica": {
+            "isEnabled": true,
+            "priceInCents": 1400,
+            "uvSeconds": 60,
+            "mistSpraySeconds": 15,
+            "mistSaturationSeconds": 45,
+            "thermalDryingSeconds": 120,
+            "ozoneExhaustSeconds": 115,
+            "fragranceSeconds": 5
+          },
+          "intermediaria": {
+            "isEnabled": true,
+            "priceInCents": 1700,
+            "uvSeconds": 75,
+            "mistSpraySeconds": 20,
+            "mistSaturationSeconds": 45,
+            "thermalDryingSeconds": 150,
+            "ozoneExhaustSeconds": 125,
+            "fragranceSeconds": 5
+          },
+          "avancada": {
+            "isEnabled": true,
+            "priceInCents": 2000,
+            "uvSeconds": 90,
+            "mistSpraySeconds": 25,
+            "mistSaturationSeconds": 45,
+            "thermalDryingSeconds": 180,
+            "ozoneExhaustSeconds": 135,
+            "fragranceSeconds": 5
+          }
+        },
+        "cieloMerchantId": "",
+        "cieloMerchantKey": ""
+      },
+      "appVersion": "v3.3.0",
+      "macAddress": "00:00:00:00:00:00",
+      "ip": "127.0.0.1",
+      "lastHeartbeat": "2026-09-11T13:39:08.400Z"
+    },
+    {
+      "devno": "CPX-002-RDV",
+      "name": "Totem #CPX-002-RDV",
+      "location": "Ponto a Cadastrar",
+      "depotno": "DEP-01",
+      "branno": "BR-01",
+      "owner_id": "USR-CRPADMIN",
+      "owner": "Jonathan",
+      "boxCount": 1,
+      "status": "IDLE",
+      "totalCyclesToday": 0,
+      "revenueToday": 0,
+      "liquidLevelPercent": 100,
+      "doorLocked": true,
+      "config": {
+        "basicPrice": 14,
+        "intermediatePrice": 17,
+        "advancedPrice": 20,
+        "basicDurationSec": 360,
+        "intermediateDurationSec": 420,
+        "advancedDurationSec": 480,
+        "isPixEnabled": true,
+        "isCreditEnabled": true,
+        "isDebitEnabled": true,
+        "isCouponsEnabled": true,
+        "modes": {
+          "basica": {
+            "isEnabled": true,
+            "priceInCents": 1400,
+            "uvSeconds": 60,
+            "mistSpraySeconds": 15,
+            "mistSaturationSeconds": 45,
+            "thermalDryingSeconds": 120,
+            "ozoneExhaustSeconds": 115,
+            "fragranceSeconds": 5
+          },
+          "intermediaria": {
+            "isEnabled": true,
+            "priceInCents": 1700,
+            "uvSeconds": 75,
+            "mistSpraySeconds": 20,
+            "mistSaturationSeconds": 45,
+            "thermalDryingSeconds": 150,
+            "ozoneExhaustSeconds": 125,
+            "fragranceSeconds": 5
+          },
+          "avancada": {
+            "isEnabled": true,
+            "priceInCents": 2000,
+            "uvSeconds": 90,
+            "mistSpraySeconds": 25,
+            "mistSaturationSeconds": 45,
+            "thermalDryingSeconds": 180,
+            "ozoneExhaustSeconds": 135,
+            "fragranceSeconds": 5
+          }
+        },
+        "cieloMerchantId": "",
+        "cieloMerchantKey": ""
+      },
+      "appVersion": "v3.2.7",
+      "macAddress": "00:00:00:00:00:00",
+      "lastHeartbeat": "2026-09-11T13:39:08.432Z"
     }
   ],
   "depots": [
@@ -593,21 +722,7 @@
       "authCode": "AUT658094"
     }
   ],
-  "alerts": [
-    {
-      "id": "ALT-24814",
-      "timestamp": "2026-08-30T20:18:44.814Z",
-      "resolved": false,
-      "devno": "CPX-002",
-      "totemName": "Totem #CPX-002",
-      "type": "MAINTENANCE",
-      "severity": "Média",
-      "priority": "Média",
-      "issueType": "Mecânico",
-      "assignee": "",
-      "message": "Problema de junta"
-    }
-  ],
+  "alerts": [],
   "coupons": [
     {
       "code": "CENTERBOX",
@@ -740,5 +855,6 @@
       "pinpadComm": "USB",
       "updatedAt": "2026-08-29T02:34:40.347Z"
     }
-  }
+  },
+  "weeklyRoute": []
 }

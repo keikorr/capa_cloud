@@ -971,6 +971,154 @@ class CapaxeroDashboard {
       });
     }
 
+    const btnClearAllOMs = document.getElementById('btn-clear-all-oms');
+    if (btnClearAllOMs) {
+      btnClearAllOMs.addEventListener('click', async () => {
+        if (!confirm('Deseja realmente esvaziar TODAS as Ordens de Manutenção?\n\nTodas as OMs serão removidas e as máquinas em manutenção retornarão ao status operacional.')) {
+          return;
+        }
+        try {
+          const res = await fetch('/api/v1/admin/maintenance/clear-all', {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${this.token}` }
+          }).then(r => r.json());
+
+          if (res.success) {
+            this.showToast('Todas as OMs foram esvaziadas com sucesso.', 'ok');
+            await this.fetchBackendData();
+          } else {
+            this.showToast(res.message || 'Erro ao esvaziar OMs.', 'err');
+          }
+        } catch (_) {
+          this.showToast('Falha na comunicação com o servidor.', 'err');
+        }
+      });
+    }
+
+    const btnAddRouteStop = document.getElementById('btn-add-route-stop');
+    if (btnAddRouteStop) {
+      btnAddRouteStop.addEventListener('click', () => {
+        const sel = document.getElementById('ars-totem-select');
+        if (sel) {
+          const options = (this.stations || []).map(s => `<option value="${s.devno}">${s.nome} (${s.devno}) — ${s.local}</option>`).join('');
+          sel.innerHTML = `<option value="">Selecione uma máquina ou digite abaixo...</option>${options}`;
+        }
+        this.openModal('add-route-stop-modal');
+      });
+    }
+
+    const arsTotemSelect = document.getElementById('ars-totem-select');
+    if (arsTotemSelect) {
+      arsTotemSelect.addEventListener('change', () => {
+        const devno = arsTotemSelect.value;
+        if (!devno) return;
+        const station = (this.stations || []).find(s => s.devno === devno);
+        if (station) {
+          const titleInput = document.getElementById('ars-title');
+          const locInput = document.getElementById('ars-location');
+          if (titleInput) titleInput.value = `Visita Técnica - ${station.nome}`;
+          if (locInput) locInput.value = station.local || '';
+        }
+      });
+    }
+
+    const formAddRouteStop = document.getElementById('form-add-route-stop');
+    if (formAddRouteStop) {
+      formAddRouteStop.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const devno = document.getElementById('ars-totem-select').value;
+        const title = document.getElementById('ars-title').value.trim();
+        const location = document.getElementById('ars-location').value.trim();
+        const dayOfWeek = document.getElementById('ars-day').value;
+        const priority = document.getElementById('ars-priority').value;
+        const technician = document.getElementById('ars-technician').value.trim();
+        const notes = document.getElementById('ars-notes').value.trim();
+
+        try {
+          const res = await fetch('/api/v1/admin/maintenance/weekly-route', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.token}` },
+            body: JSON.stringify({ devno, title, location, dayOfWeek, priority, technician, notes })
+          }).then(r => r.json());
+
+          if (res.success) {
+            document.getElementById('add-route-stop-modal').classList.remove('open');
+            formAddRouteStop.reset();
+            this.showToast('Parada adicionada à rota semanal com sucesso.');
+            await this.fetchBackendData();
+          } else {
+            this.showToast(res.message || 'Erro ao adicionar parada.', 'err');
+          }
+        } catch (_) {
+          this.showToast('Falha na comunicação com o servidor.', 'err');
+        }
+      });
+    }
+
+    const btnClearRoute = document.getElementById('btn-clear-route');
+    if (btnClearRoute) {
+      btnClearRoute.addEventListener('click', async () => {
+        if (!confirm('Deseja realmente esvaziar a rota semanal do técnico?')) return;
+        try {
+          const res = await fetch('/api/v1/admin/maintenance/weekly-route/clear-all', {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${this.token}` }
+          }).then(r => r.json());
+          if (res.success) {
+            this.showToast('Rota semanal esvaziada.');
+            await this.fetchBackendData();
+          }
+        } catch (_) {
+          this.showToast('Falha ao esvaziar rota.', 'err');
+        }
+      });
+    }
+
+    const routeListEl = document.getElementById('manut-route-list');
+    if (routeListEl) {
+      routeListEl.addEventListener('click', async (e) => {
+        const btn = e.target.closest('[data-route-action]');
+        if (!btn) return;
+        const action = btn.dataset.routeAction;
+        const id = btn.dataset.routeId;
+        const route = this.weeklyRoute || [];
+
+        if (action === 'delete') {
+          try {
+            const res = await fetch(`/api/v1/admin/maintenance/weekly-route/${encodeURIComponent(id)}`, {
+              method: 'DELETE',
+              headers: { 'Authorization': `Bearer ${this.token}` }
+            }).then(r => r.json());
+            if (res.success) {
+              this.weeklyRoute = route.filter(r => r.id !== id);
+              this.renderManutRoute();
+              this.showToast('Parada removida da rota.');
+            }
+          } catch (_) {
+            this.showToast('Erro ao remover parada.', 'err');
+          }
+        } else if (action === 'up' || action === 'down') {
+          const idx = route.findIndex(r => r.id === id);
+          if (idx === -1) return;
+          const targetIdx = action === 'up' ? idx - 1 : idx + 1;
+          if (targetIdx < 0 || targetIdx >= route.length) return;
+
+          const temp = route[idx];
+          route[idx] = route[targetIdx];
+          route[targetIdx] = temp;
+          this.renderManutRoute();
+
+          try {
+            await fetch('/api/v1/admin/maintenance/weekly-route/reorder', {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.token}` },
+              body: JSON.stringify({ orderedIds: route.map(r => r.id) })
+            });
+          } catch (_) {}
+        }
+      });
+    }
+
     const manutTbody = document.getElementById('manut-tbody');
     if (manutTbody) {
       manutTbody.addEventListener('click', async (e) => {
@@ -1477,7 +1625,7 @@ class CapaxeroDashboard {
     try {
       const headers = this.token ? { 'Authorization': `Bearer ${this.token}` } : {};
 
-      const [resTotems, resDepots, resUsers, resAlerts, resTransactions, resCoupons, resStats, resHistorySummary] = await Promise.all([
+      const [resTotems, resDepots, resUsers, resAlerts, resTransactions, resCoupons, resStats, resHistorySummary, resWeeklyRoute] = await Promise.all([
         fetch('/api/v1/admin/totems', { headers }).then(r => r.json()).catch(() => ({ success: false })),
         fetch('/api/v1/admin/depots', { headers }).then(r => r.json()).catch(() => ({ success: false })),
         fetch('/api/v1/admin/users', { headers }).then(r => r.json()).catch(() => ({ success: false })),
@@ -1485,7 +1633,8 @@ class CapaxeroDashboard {
         fetch('/api/v1/admin/transactions?limit=5000', { headers }).then(r => r.json()).catch(() => ({ success: false })),
         fetch('/api/v1/coupons').then(r => r.json()).catch(() => ({ success: false })),
         fetch('/api/v1/admin/stats', { headers }).then(r => r.json()).catch(() => ({ success: false })),
-        fetch('/api/v1/admin/history-summary', { headers }).then(r => r.json()).catch(() => ({ success: false }))
+        fetch('/api/v1/admin/history-summary', { headers }).then(r => r.json()).catch(() => ({ success: false })),
+        fetch('/api/v1/admin/maintenance/weekly-route', { headers }).then(r => r.json()).catch(() => ({ success: false }))
       ]);
 
       if (resTotems.success && Array.isArray(resTotems.data)) {
@@ -1523,6 +1672,10 @@ class CapaxeroDashboard {
 
       if (resHistorySummary && resHistorySummary.success && resHistorySummary.data) {
         this.state.historySummary = resHistorySummary.data;
+      }
+
+      if (resWeeklyRoute && resWeeklyRoute.success && Array.isArray(resWeeklyRoute.data)) {
+        this.weeklyRoute = resWeeklyRoute.data;
       }
 
       this.renderAll();
@@ -2534,40 +2687,41 @@ class CapaxeroDashboard {
     const countEl = document.getElementById('manut-route-count');
     if (!el) return;
 
-    const priorityRank = { 'Alta': 0, 'Média': 1, 'Baixa': 2 };
-    const priorityColor = { 'Alta': '#FF3D57', 'Média': '#FF9100', 'Baixa': '#5587B3' };
+    const route = this.weeklyRoute || [];
+    if (countEl) countEl.textContent = `${route.length} parada${route.length === 1 ? '' : 's'}`;
 
-    const stops = (this.oms || [])
-      .filter(o => !o.resolved)
-      .slice()
-      .sort((a, b) => {
-        const pa = priorityRank[a.priority] ?? 1;
-        const pb = priorityRank[b.priority] ?? 1;
-        if (pa !== pb) return pa - pb;
-        return new Date(a.timestamp) - new Date(b.timestamp);
-      });
-
-    if (countEl) countEl.textContent = `${stops.length} parada${stops.length === 1 ? '' : 's'}`;
-
-    if (stops.length === 0) {
-      el.innerHTML = `<div style="text-align:center; padding:20px; color:#8a97a7; font-size:12.5px;">Nenhuma ordem em aberto — rota livre esta semana.</div>`;
+    if (route.length === 0) {
+      el.innerHTML = `
+        <div style="text-align:center; padding:24px 12px; color:#8a97a7; font-size:12.5px;">
+          Nenhuma parada cadastrada na rota semanal.<br>
+          <span style="font-size:11.5px; opacity:.75;">Clique em "+ Adicionar Parada" para criar o seu roteiro manual de manutenção técnica.</span>
+        </div>`;
       return;
     }
 
-    el.innerHTML = stops.map((o, i) => {
-      const station = this.stations.find(s => s.devno === o.devno);
-      const daysOpen = Math.max(0, Math.floor((Date.now() - new Date(o.timestamp).getTime()) / (24 * 60 * 60 * 1000)));
-      const color = priorityColor[o.priority] || '#7fb2dd';
+    const priorityColor = { 'Alta': '#FF3D57', 'Média': '#FF9100', 'Baixa': '#5587B3' };
+
+    el.innerHTML = route.map((item, i) => {
+      const color = priorityColor[item.priority] || '#7fb2dd';
       return `
-        <div style="display:flex; align-items:center; gap:14px; padding:11px 0; border-bottom:1px solid var(--border);">
-          <div style="width:26px; height:26px; border-radius:50%; background:rgba(255,255,255,.06); display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-size:12px; color:#8a97a7; flex-shrink:0;">${i + 1}</div>
+        <div style="display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid var(--border);" data-route-id="${item.id}">
+          <div style="width:28px; height:28px; border-radius:50%; background:rgba(85,135,179,.15); border:1px solid rgba(85,135,179,.3); display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-size:12px; font-weight:700; color:#7fb2dd; flex-shrink:0;">${i + 1}</div>
           <div style="flex:1; min-width:0;">
-            <div style="font-weight:600; color:#fff; font-size:13px;">${o.totemName || station?.nome || o.devno}</div>
-            <div style="font-size:11.5px; color:#8a97a7; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${station?.local || 'Local não informado'}</div>
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+              <div style="font-weight:700; color:#fff; font-size:13.5px;">${item.title || 'Parada'}</div>
+              <span style="padding:2px 8px; border-radius:999px; font-size:10.5px; font-weight:700; background:${color}22; color:${color}; border:1px solid ${color}44;">${item.priority || 'Média'}</span>
+              ${item.dayOfWeek ? `<span style="padding:2px 8px; border-radius:999px; font-size:10.5px; font-weight:600; background:rgba(255,255,255,.07); color:#9cc6e8;">${item.dayOfWeek}</span>` : ''}
+            </div>
+            <div style="font-size:11.5px; color:#8a97a7; margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+              ${item.location || 'Local não informado'}
+              ${item.technician ? ` · <span style="color:#e7edf4;">Técnico: ${item.technician}</span>` : ''}
+              ${item.notes ? ` · <span style="color:#FFB454;">Obs: ${item.notes}</span>` : ''}
+            </div>
           </div>
-          <div style="text-align:right; flex-shrink:0;">
-            <span style="padding:3px 9px; border-radius:999px; font-size:10.5px; font-weight:700; background:${color}22; color:${color};">${o.priority || 'Média'}</span>
-            <div style="font-size:10.5px; color:#5f7186; margin-top:3px;">${daysOpen === 0 ? 'aberta hoje' : `${daysOpen}d em aberto`}${o.assignee ? ` · ${o.assignee}` : ''}</div>
+          <div style="display:flex; align-items:center; gap:4px; flex-shrink:0;">
+            ${i > 0 ? `<button class="btn btn-outline" style="padding:3px 8px; font-size:11px; border-color:rgba(255,255,255,.15);" data-route-action="up" data-route-id="${item.id}" title="Subir na rota">▲</button>` : ''}
+            ${i < route.length - 1 ? `<button class="btn btn-outline" style="padding:3px 8px; font-size:11px; border-color:rgba(255,255,255,.15);" data-route-action="down" data-route-id="${item.id}" title="Descer na rota">▼</button>` : ''}
+            <button class="btn btn-danger" style="padding:3px 8px; font-size:11px; margin-left:4px;" data-route-action="delete" data-route-id="${item.id}" title="Remover parada">✕</button>
           </div>
         </div>
       `;

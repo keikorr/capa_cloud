@@ -830,4 +830,86 @@ router.post('/admin/alerts/:id/resolve', (req, res) => {
   });
 });
 
+/**
+ * DELETE /api/v1/admin/maintenance/clear-all
+ * Esvazia todas as Ordens de Manutenção e restaura status das máquinas para IDLE
+ */
+router.delete('/admin/maintenance/clear-all', (req, res) => {
+  const user = extractUser(req);
+  store.clearAllMaintenanceOrders(user);
+  wsManager.broadcastDashboardUpdate();
+  return res.json({
+    success: true,
+    message: 'Todas as Ordens de Manutenção foram esvaziadas.'
+  });
+});
+
+/**
+ * GET /api/v1/admin/maintenance/weekly-route
+ * Lista as paradas da Rota Semanal do Técnico
+ */
+router.get('/admin/maintenance/weekly-route', (req, res) => {
+  const user = extractUser(req);
+  return res.json({
+    success: true,
+    data: store.getWeeklyRoute(user)
+  });
+});
+
+/**
+ * POST /api/v1/admin/maintenance/weekly-route
+ * Adiciona uma parada manual à Rota Semanal
+ */
+router.post('/admin/maintenance/weekly-route', (req, res) => {
+  const stop = store.addWeeklyRouteStop(req.body);
+  wsManager.broadcastDashboardUpdate();
+  return res.json({
+    success: true,
+    message: 'Parada adicionada à Rota Semanal com sucesso.',
+    data: stop
+  });
+});
+
+/**
+ * PUT /api/v1/admin/maintenance/weekly-route/reorder
+ * Reordena as paradas da Rota Semanal
+ */
+router.put('/admin/maintenance/weekly-route/reorder', (req, res) => {
+  const { orderedIds } = req.body;
+  const route = store.updateWeeklyRouteOrder(orderedIds || []);
+  wsManager.broadcastDashboardUpdate();
+  return res.json({
+    success: true,
+    message: 'Ordem da rota atualizada.',
+    data: route
+  });
+});
+
+/**
+ * DELETE /api/v1/admin/maintenance/weekly-route/clear-all
+ * Esvazia toda a Rota Semanal
+ */
+router.delete('/admin/maintenance/weekly-route/clear-all', (req, res) => {
+  store.clearWeeklyRoute();
+  wsManager.broadcastDashboardUpdate();
+  return res.json({
+    success: true,
+    message: 'Rota semanal esvaziada.'
+  });
+});
+
+/**
+ * DELETE /api/v1/admin/maintenance/weekly-route/:id
+ * Remove uma parada da Rota Semanal
+ */
+router.delete('/admin/maintenance/weekly-route/:id', (req, res) => {
+  const { id } = req.params;
+  store.deleteWeeklyRouteStop(id);
+  wsManager.broadcastDashboardUpdate();
+  return res.json({
+    success: true,
+    message: 'Parada removida da rota.'
+  });
+});
+
 module.exports = router;
