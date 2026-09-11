@@ -15,3 +15,6 @@ Thumbs.db
 data/fixture_prod.json
 data/fixture_prod.json.legacy
 data/*.bak-*
+data/capaxero_database.json
+data/capaxero_db.json
+
