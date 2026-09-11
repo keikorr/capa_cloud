@@ -2918,7 +2918,9 @@ class CapaxeroDashboard {
 
     if (elYAxis) {
       const steps = [1, 0.75, 0.5, 0.25, 0];
+      const hasRev = serieRaw.some(v => v > 0);
       elYAxis.innerHTML = steps.map(pct => {
+        if (!hasRev) return `<span>0</span>`;
         const val = minS + pct * (maxS - minS);
         return `<span>${val === 0 ? '0' : (val >= 1000 ? (val / 1000).toFixed(1) + 'k' : Math.round(val))}</span>`;
       }).join('');
@@ -2963,7 +2965,7 @@ class CapaxeroDashboard {
               <span class="rank-val">${fmtBRL(m.fat)}</span>
             </div>
             <div class="rank-bar-bg">
-              <div class="rank-bar-fill" style="width:${Math.max(6, Math.round((m.fat / maxVal) * 100))}%;"></div>
+              <div class="rank-bar-fill" style="width:${m.fat > 0 ? Math.max(6, Math.round((m.fat / maxVal) * 100)) : 0}%;"></div>
             </div>
           </div>
         `).join('');
@@ -2999,7 +3001,7 @@ class CapaxeroDashboard {
               <span style="font-family:var(--font-mono); color:#FDCB24; font-weight:700;">${fmtBRL(d.fat)}</span>
             </div>
             <div style="height:8px; border-radius:999px; background:rgba(255,255,255,.07); overflow:hidden;">
-              <div style="height:100%; width:${Math.max(8, Math.round((d.fat / maxD) * 100))}%; background:linear-gradient(90deg,#8a6a00,#FDCB24); border-radius:999px;"></div>
+              <div style="height:100%; width:${d.fat > 0 ? Math.max(8, Math.round((d.fat / maxD) * 100)) : 0}%; background:linear-gradient(90deg,#8a6a00,#FDCB24); border-radius:999px;"></div>
             </div>
             <div style="font-size:11px; color:#6d7a8a; margin-top:4px;">${d.totemCount || 1} máquina(s) · ${d.txCount} lavagem(ns)</div>
           </div>
@@ -3017,7 +3019,7 @@ class CapaxeroDashboard {
         else if (m.includes('INTERMED') || m.includes('INTER')) interCount++;
         else basicCount++;
       });
-      const totalModeCyc = basicCount + interCount + advCount || 1;
+      const totalModeCyc = basicCount + interCount + advCount;
       const maxModeCyc = Math.max(basicCount, interCount, advCount, 1);
 
       const plans = [
@@ -3027,8 +3029,8 @@ class CapaxeroDashboard {
       ];
 
       elPlanoBars.innerHTML = plans.map(p => {
-        const pct = Math.round((p.count / totalModeCyc) * 100);
-        const heightPct = Math.max(8, Math.round((p.count / maxModeCyc) * 100));
+        const pct = totalModeCyc > 0 ? Math.round((p.count / totalModeCyc) * 100) : 0;
+        const heightPct = (totalModeCyc > 0 && p.count > 0) ? Math.max(8, Math.round((p.count / maxModeCyc) * 100)) : 0;
         return `
           <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:8px; height:100%; justify-content:flex-end;">
             <div style="font-family:var(--font-mono); font-size:12px; font-weight:700; color:#fff;">${p.count} <span style="font-size:10.5px; color:#8a97a7;">(${pct}%)</span></div>
