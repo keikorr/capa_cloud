@@ -422,7 +422,28 @@ class CapaxeroDashboard {
     } else if (msg.type === 'NEW_TRANSACTION') {
       this.fetchBackendData();
       if (msg.data?.transaction) {
-        this.showToast(`Venda aprovada: ${fmtBRL(msg.data.transaction.amount)} em ${msg.data.transaction.totemName}`, 'ok');
+        const tx = msg.data.transaction;
+        this.showToast(`Venda aprovada: ${fmtBRL(tx.amount)} em ${tx.totemName}`, 'ok');
+
+        // Atualização em Tempo Real (0ms) no histórico do modal se estiver aberto para esta máquina
+        if (this.selectedStationId && (tx.devno === this.selectedStationId || tx.totemId === this.selectedStationId)) {
+          const tbody = document.getElementById('station-history-tbody');
+          if (tbody) {
+            const newRow = `
+              <tr style="background:rgba(0,197,102,.14); transition:background 2s ease;">
+                <td class="mono muted">${new Date(tx.timestamp || Date.now()).toLocaleString('pt-BR')}</td>
+                <td>${tx.mode || 'INTERMEDIARIA'}</td>
+                <td class="muted">${tx.paymentMethod || 'PIX Instantâneo'}</td>
+                <td class="mono" style="text-align:right; color:#00C566;">${fmtBRL(tx.amount)}</td>
+              </tr>
+            `;
+            if (tbody.textContent.includes('Nenhuma venda') || tbody.textContent.includes('Carregando')) {
+              tbody.innerHTML = newRow;
+            } else {
+              tbody.insertAdjacentHTML('afterbegin', newRow);
+            }
+          }
+        }
       }
     }
   }
@@ -2180,9 +2201,51 @@ class CapaxeroDashboard {
     const moreBtn = document.getElementById('station-history-more');
     const couponsBlock = document.getElementById('station-history-coupons-block');
 
-    if (notice) notice.innerHTML = `<div class="history-notice neutral">Carregando histórico...</div>`;
-    if (summary) summary.innerHTML = '';
-    if (tbody) tbody.innerHTML = '';
+    // Pré-renderização INSTANTÂNEA (0ms latência) com dados locais disponíveis na memória
+    const localTxs = (this.transactions || [])
+      .filter(t => (t.devno === devno || t.totemId === devno) && !(t.status && t.status !== 'APPROVED'))
+      .map(t => ({
+        occurredAt: t.timestamp,
+        modeLabel: t.mode,
+        mode: t.mode,
+        paymentMethod: t.paymentMethod,
+        amountCents: Math.round(Number(t.amount || 0) * 100)
+      }));
+
+    if (localTxs.length > 0) {
+      const localTotalCents = localTxs.reduce((acc, t) => acc + t.amountCents, 0);
+      const localAvgCents = Math.round(localTotalCents / localTxs.length);
+      const activeDaysSet = new Set(localTxs.map(t => t.occurredAt ? t.occurredAt.slice(0, 10) : ''));
+      activeDaysSet.delete('');
+
+      if (summary) {
+        summary.innerHTML = `
+          <div class="cpf-summary-box">
+            <div class="lbl">Vendas registradas</div>
+            <div class="val accent">${localTxs.length}</div>
+          </div>
+          <div class="cpf-summary-box">
+            <div class="lbl">Faturamento total</div>
+            <div class="val">${fmtBRL(localTotalCents / 100)}</div>
+          </div>
+          <div class="cpf-summary-box">
+            <div class="lbl">Ticket médio</div>
+            <div class="val">${fmtBRL(localAvgCents / 100)}</div>
+          </div>
+          <div class="cpf-summary-box">
+            <div class="lbl">Dias com venda</div>
+            <div class="val">${activeDaysSet.size}</div>
+          </div>
+        `;
+      }
+      if (tbody) tbody.innerHTML = this.renderStationHistoryRows(localTxs);
+      if (notice) notice.innerHTML = `<div class="history-notice green"><span class="title">Histórico em tempo real</span>Exibindo vendas gravadas para esta máquina.</div>`;
+    } else {
+      if (notice) notice.innerHTML = `<div class="history-notice neutral">Carregando histórico...</div>`;
+      if (summary) summary.innerHTML = '';
+      if (tbody) tbody.innerHTML = '';
+    }
+
     if (moreBtn) moreBtn.style.display = 'none';
     if (couponsBlock) couponsBlock.style.display = 'none';
 
