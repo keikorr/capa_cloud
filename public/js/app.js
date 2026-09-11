@@ -3063,7 +3063,15 @@ class CapaxeroDashboard {
 
   // 6. Análise de Tendências — comparativos de lavagens e mapa de calor de horários de pico
   renderDashboardTrends() {
-    const approved = (this.transactions || []).filter(t => !(t.status && t.status !== 'APPROVED'));
+    const filteredStations = this.getFilteredStations();
+    const filteredDevnos = new Set(filteredStations.map(s => s.devno));
+
+    const approved = (this.transactions || []).filter(t => {
+      if (t.status && t.status !== 'APPROVED') return false;
+      if (!filteredDevnos.has(t.devno)) return false;
+      return true;
+    });
+
     const dayMs = 24 * 60 * 60 * 1000;
     const startOfDay = d => new Date(d.getFullYear(), d.getMonth(), d.getDate());
     const wk = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
@@ -3080,6 +3088,7 @@ class CapaxeroDashboard {
     const semAnteriorByDay = [0, 0, 0, 0, 0, 0, 0];
     let semAtualTotal = 0, semAnteriorTotal = 0;
     approved.forEach(t => {
+      if (!t.timestamp) return;
       const d = new Date(t.timestamp);
       if (d >= semAtualStart && d < semAtualEnd) { semAtualByDay[d.getDay()]++; semAtualTotal++; }
       else if (d >= semAnteriorStart && d < semAnteriorEnd) { semAnteriorByDay[d.getDay()]++; semAnteriorTotal++; }
@@ -3093,8 +3102,8 @@ class CapaxeroDashboard {
       elWeekBars.innerHTML = orderedIdx.map(i => `
         <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:8px; height:100%; justify-content:flex-end;">
           <div style="display:flex; align-items:flex-end; gap:4px; height:100%;">
-            <div style="width:11px; border-radius:3px 3px 0 0; background:#5587B3; opacity:.55; height:${Math.max(4, Math.round(semAnteriorByDay[i] / semMax * 100))}%;" title="Semana anterior: ${semAnteriorByDay[i]}"></div>
-            <div style="width:11px; border-radius:3px 3px 0 0; background:#00C566; height:${Math.max(4, Math.round(semAtualByDay[i] / semMax * 100))}%;" title="Semana atual: ${semAtualByDay[i]}"></div>
+            <div style="width:11px; border-radius:3px 3px 0 0; background:#5587B3; opacity:.55; height:${semAnteriorByDay[i] > 0 ? Math.max(4, Math.round(semAnteriorByDay[i] / semMax * 100)) : 0}%;" title="Semana anterior: ${semAnteriorByDay[i]}"></div>
+            <div style="width:11px; border-radius:3px 3px 0 0; background:#00C566; height:${semAtualByDay[i] > 0 ? Math.max(4, Math.round(semAtualByDay[i] / semMax * 100)) : 0}%;" title="Semana atual: ${semAtualByDay[i]}"></div>
           </div>
           <span style="font-size:9.5px; color:#6d7a8a; font-weight:600;">${wk[i]}</span>
         </div>
@@ -3120,6 +3129,7 @@ class CapaxeroDashboard {
 
     let mesAtualTotal = 0, mesAnteriorTotal = 0;
     approved.forEach(t => {
+      if (!t.timestamp) return;
       const d = new Date(t.timestamp);
       if (d >= mesAtualStart) mesAtualTotal++;
       else if (d >= mesAnteriorStart && d < mesAnteriorEnd) mesAnteriorTotal++;
@@ -3132,8 +3142,8 @@ class CapaxeroDashboard {
     const elMesAnteriorBar = document.getElementById('dash-trend-month-previous-bar');
     if (elMesAtual) elMesAtual.textContent = `${mesAtualTotal} lavagens`;
     if (elMesAnterior) elMesAnterior.textContent = `${mesAnteriorTotal} lavagens`;
-    if (elMesAtualBar) elMesAtualBar.style.width = `${Math.round(mesAtualTotal / mesMax * 100)}%`;
-    if (elMesAnteriorBar) elMesAnteriorBar.style.width = `${Math.round(mesAnteriorTotal / mesMax * 100)}%`;
+    if (elMesAtualBar) elMesAtualBar.style.width = `${mesAtualTotal > 0 ? Math.round(mesAtualTotal / mesMax * 100) : 0}%`;
+    if (elMesAnteriorBar) elMesAnteriorBar.style.width = `${mesAnteriorTotal > 0 ? Math.round(mesAnteriorTotal / mesMax * 100) : 0}%`;
 
     const mesDelta = mesAnteriorTotal > 0 ? Math.round((mesAtualTotal - mesAnteriorTotal) / mesAnteriorTotal * 100) : (mesAtualTotal > 0 ? 100 : 0);
     const mesBadge = document.getElementById('dash-trend-month-badge');
@@ -3147,13 +3157,14 @@ class CapaxeroDashboard {
     const heatHoras = ['00h', '02h', '04h', '06h', '08h', '10h', '12h', '14h', '16h', '18h', '20h', '22h'];
     const heatMatrix = wk.map(() => new Array(heatHoras.length).fill(0));
     approved.forEach(t => {
+      if (!t.timestamp) return;
       const d = new Date(t.timestamp);
       heatMatrix[d.getDay()][Math.floor(d.getHours() / 2)]++;
     });
 
     const heatOrder = [1, 2, 3, 4, 5, 6, 0]; // Seg..Dom
     const heatMax = Math.max(1, ...heatMatrix.flat());
-    let peak = { day: heatOrder[0], hourIdx: 0, v: -1 };
+    let peak = { day: heatOrder[0], hourIdx: 0, v: 0 };
     heatOrder.forEach(dow => {
       heatMatrix[dow].forEach((v, hi) => { if (v > peak.v) peak = { day: dow, hourIdx: hi, v }; });
     });
