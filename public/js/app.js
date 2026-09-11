@@ -995,14 +995,67 @@ class CapaxeroDashboard {
       });
     }
 
+    const selectMachineForRouteStop = (devno) => {
+      const sel = document.getElementById('ars-totem-select');
+      if (sel) sel.value = devno;
+
+      const station = (this.stations || []).find(s => s.devno === devno);
+      if (station) {
+        const titleInput = document.getElementById('ars-title');
+        const locInput = document.getElementById('ars-location');
+        if (titleInput) titleInput.value = `Visita Técnica - ${station.nome}`;
+        if (locInput) locInput.value = station.local || '';
+      }
+
+      const cards = document.querySelectorAll('.ars-machine-card');
+      cards.forEach(card => {
+        const isTarget = card.dataset.devno === devno;
+        card.style.borderColor = isTarget ? '#5587B3' : 'var(--border)';
+        card.style.background = isTarget ? 'rgba(85,135,179,.2)' : 'rgba(255,255,255,.04)';
+      });
+    };
+
     const btnAddRouteStop = document.getElementById('btn-add-route-stop');
     if (btnAddRouteStop) {
       btnAddRouteStop.addEventListener('click', () => {
         const sel = document.getElementById('ars-totem-select');
+        const grid = document.getElementById('ars-machines-quick-grid');
+        const stations = this.stations || [];
+
         if (sel) {
-          const options = (this.stations || []).map(s => `<option value="${s.devno}">${s.nome} (${s.devno}) — ${s.local}</option>`).join('');
-          sel.innerHTML = `<option value="">Selecione uma máquina ou digite abaixo...</option>${options}`;
+          const options = stations.map(s => `<option value="${s.devno}">${s.nome} (${s.devno}) — ${s.local}</option>`).join('');
+          sel.innerHTML = `<option value="">Selecione uma máquina da lista...</option>${options}`;
         }
+
+        if (grid) {
+          if (stations.length === 0) {
+            grid.innerHTML = `<div style="font-size:12px; color:#8a97a7; padding:10px; text-align:center;">Nenhuma máquina cadastrada na plataforma.</div>`;
+          } else {
+            grid.innerHTML = stations.map(s => {
+              const m = this.meta[s.status] || this.meta.IDLE;
+              return `
+                <div class="ars-machine-card" data-devno="${s.devno}" style="display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 12px; background:rgba(255,255,255,.04); border:1px solid var(--border); border-radius:10px; cursor:pointer; transition:all .15s ease;">
+                  <div style="min-width:0; flex:1;">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                      <span style="width:8px; height:8px; border-radius:50%; background:${m.color}; display:inline-block;"></span>
+                      <strong style="font-size:13px; color:#fff;">${s.nome}</strong>
+                      <span style="font-size:10.5px; color:#8a97a7; font-family:var(--font-mono);">${s.devno}</span>
+                    </div>
+                    <div style="font-size:11.5px; color:#8a97a7; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-top:2px;">${s.local}</div>
+                  </div>
+                  <button type="button" class="btn btn-blue" style="padding:5px 11px; font-size:11.5px; flex-shrink:0;">+ Escolher</button>
+                </div>
+              `;
+            }).join('');
+
+            grid.querySelectorAll('.ars-machine-card').forEach(card => {
+              card.addEventListener('click', () => {
+                selectMachineForRouteStop(card.dataset.devno);
+              });
+            });
+          }
+        }
+
         this.openModal('add-route-stop-modal');
       });
     }
@@ -1010,14 +1063,8 @@ class CapaxeroDashboard {
     const arsTotemSelect = document.getElementById('ars-totem-select');
     if (arsTotemSelect) {
       arsTotemSelect.addEventListener('change', () => {
-        const devno = arsTotemSelect.value;
-        if (!devno) return;
-        const station = (this.stations || []).find(s => s.devno === devno);
-        if (station) {
-          const titleInput = document.getElementById('ars-title');
-          const locInput = document.getElementById('ars-location');
-          if (titleInput) titleInput.value = `Visita Técnica - ${station.nome}`;
-          if (locInput) locInput.value = station.local || '';
+        if (arsTotemSelect.value) {
+          selectMachineForRouteStop(arsTotemSelect.value);
         }
       });
     }

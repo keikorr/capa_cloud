@@ -1523,22 +1523,26 @@
        MODAL — Adicionar Parada na Rota Semanal
        ============================================================ -->
   <div class="modal-overlay" id="modal-add-route-stop">
-    <div class="modal-box compact" style="width:min(520px,96vw);">
-      <div style="display:flex; align-items:center; gap:12px; margin-bottom:18px;">
+    <div class="modal-box compact" style="width:min(560px,96vw);">
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px;">
         <h2 style="font-family: var(--font-display); font-weight: 900; font-size: 20px; margin:0; color:#5587B3;"><svg class="i" viewBox="0 0 24 24"><path d="M12 2a8 8 0 00-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 00-8-8z"/><circle cx="12" cy="10" r="3"/></svg> ADICIONAR PARADA NA ROTA</h2>
         <button class="modal-close" id="add-route-stop-close" style="margin-left:auto;">✕</button>
       </div>
-      <p style="margin:0 0 16px; font-size:12.5px; color:#8a97a7;">Monte seu roteiro semanal de manutenção técnica adicionando pontos de parada.</p>
+      <p style="margin:0 0 16px; font-size:12.5px; color:#8a97a7;">Escolha uma das máquinas cadastradas na plataforma para incluir no roteiro técnico.</p>
       <form id="form-add-route-stop">
         <div class="form-group">
-          <label class="field-label">Vincular a uma Máquina (opcional)</label>
-          <select class="form-control" id="ars-totem-select">
-            <option value="">Selecione uma máquina ou digite abaixo...</option>
+          <label class="field-label" style="color:var(--brand-yellow); font-weight:700;">Selecione a Máquina para a Parada *</label>
+          <select class="form-control" id="ars-totem-select" style="font-weight:600; padding:10px 12px; margin-bottom:10px; border-color:var(--border-strong);">
+            <option value="">Selecione uma máquina...</option>
           </select>
+
+          <div style="font-size:11.5px; color:#8a97a7; margin-bottom:6px; font-weight:600;">ou escolha diretamente na lista abaixo:</div>
+          <div id="ars-machines-quick-grid" style="display:flex; flex-direction:column; gap:8px; max-height:190px; overflow-y:auto; padding-right:4px; margin-bottom:14px;"></div>
         </div>
+
         <div class="form-group">
           <label class="field-label">Título da Parada / Motivo *</label>
-          <input type="text" class="form-control" id="ars-title" placeholder="Ex: Manutenção Preventiva - Totem #CPX-002" required>
+          <input type="text" class="form-control" id="ars-title" placeholder="Ex: Visita Técnica - Totem #CPX-002" required>
         </div>
         <div class="form-group">
           <label class="field-label">Endereço / Local</label>

@@ -184,7 +184,7 @@
       "appVersion": "v3.3.0",
       "macAddress": "00:00:00:00:00:00",
       "ip": "127.0.0.1",
-      "lastHeartbeat": "2026-09-11T13:39:08.400Z"
+      "lastHeartbeat": "2026-09-11T13:48:29.044Z"
     },
     {
       "devno": "CPX-002-RDV",
@@ -248,7 +248,7 @@
       },
       "appVersion": "v3.2.7",
       "macAddress": "00:00:00:00:00:00",
-      "lastHeartbeat": "2026-09-11T13:39:08.432Z"
+      "lastHeartbeat": "2026-09-11T13:48:29.072Z"
     }
   ],
   "depots": [
