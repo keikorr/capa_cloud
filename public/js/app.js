@@ -2823,33 +2823,24 @@ class CapaxeroDashboard {
     const totalRev = txsPeriod.reduce((acc, t) => acc + (Number(t.amount) || 0), 0);
     const totalCyc = txsPeriod.length;
     const activeTotems = filteredStations.filter(s => s.status === 'IDLE' || s.status === 'CLEANING').length;
-    const openOms = this.oms.length;
+    const openOmsList = (this.oms || []).filter(o => !o.resolved);
+    const openOms = openOmsList.length;
 
     const elTotalRev = document.getElementById('dash-total-revenue');
     const elTotalCycles = document.getElementById('dash-total-cycles');
     const elActiveTotems = document.getElementById('dash-active-totems-count');
     const elOpenOms = document.getElementById('dash-open-oms-count');
     const elPeriodTotal = document.getElementById('dash-chart-period-total');
+    const elOmsCountHead = document.getElementById('dash-oms-count');
 
-    if (elTotalRev) {
-      if (this.state.historySummary && this.selectedOwner === 'all' && this.ownershipFilter === 'all' && this.periodoKey === 'all') {
-        elTotalRev.textContent = fmtBRL((this.state.historySummary.totalCents || 0) / 100);
-      } else {
-        elTotalRev.textContent = fmtBRL(totalRev);
-      }
-    }
-    if (elTotalCycles) {
-      if (this.state.historySummary && this.selectedOwner === 'all' && this.ownershipFilter === 'all' && this.periodoKey === 'all') {
-        elTotalCycles.textContent = this.state.historySummary.txCount || 0;
-      } else {
-        elTotalCycles.textContent = totalCyc;
-      }
-    }
+    if (elTotalRev) elTotalRev.textContent = fmtBRL(totalRev);
+    if (elTotalCycles) elTotalCycles.textContent = totalCyc;
     if (elActiveTotems) elActiveTotems.innerHTML = `${activeTotems}<span style="color:#8a97a7">/${filteredStations.length}</span>`;
     if (elOpenOms) elOpenOms.textContent = openOms;
+    if (elOmsCountHead) elOmsCountHead.textContent = `${openOms} em aberto`;
     if (elPeriodTotal) elPeriodTotal.textContent = `${fmtBRL(totalRev)} no período`;
 
-    // 1. Gráfico SVG — faturamento real agregado por dia, dentro do período selecionado
+    // 1. Gráfico SVG & Eixo Y dinâmico — faturamento real agregado por dia
     const dayMs = 24 * 60 * 60 * 1000;
     const dayKey = (d) => `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
     const totalsByDay = {};
@@ -2871,7 +2862,7 @@ class CapaxeroDashboard {
 
     const dias = dayList.map(d => `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`);
     const serieRaw = dayList.map(d => totalsByDay[dayKey(d)] || 0);
-    const maxS = Math.max(...serieRaw, 100);
+    const maxS = Math.max(...serieRaw, 10);
     const minS = 0;
     const W = 720, H = 210, pad = 8;
 
@@ -2892,6 +2883,15 @@ class CapaxeroDashboard {
     const elSvgGrid = document.getElementById('dash-svg-grid-lines');
     const elSvgPts = document.getElementById('dash-svg-points');
     const elXAxis = document.getElementById('dash-chart-x-axis');
+    const elYAxis = document.getElementById('dash-chart-y-axis');
+
+    if (elYAxis) {
+      const steps = [1, 0.75, 0.5, 0.25, 0];
+      elYAxis.innerHTML = steps.map(pct => {
+        const val = minS + pct * (maxS - minS);
+        return `<span>${val === 0 ? '0' : (val >= 1000 ? (val / 1000).toFixed(1) + 'k' : Math.round(val))}</span>`;
+      }).join('');
+    }
 
     if (elSvgLine) elSvgLine.setAttribute('d', linePath);
     if (elSvgArea) elSvgArea.setAttribute('d', areaPath);
@@ -2902,13 +2902,13 @@ class CapaxeroDashboard {
       }).join('');
     }
     if (elSvgPts) {
-      elSvgPts.innerHTML = pts.map(p => `<circle cx="${p.x}" cy="${p.y}" r="3" fill="#0c0e11" stroke="#00C566" stroke-width="2"></circle>`).join('');
+      elSvgPts.innerHTML = pts.map(p => `<circle cx="${p.x}" cy="${p.y}" r="3.5" fill="#0c0e11" stroke="#00C566" stroke-width="2"><title>${p.label}: ${fmtBRL(p.v)}</title></circle>`).join('');
     }
     if (elXAxis) {
       elXAxis.innerHTML = pts.map(p => `<span>${p.label}</span>`).join('');
     }
 
-    // 2. Ranking por Máquina — faturamento real do período, por transação
+    // 2. Ranking por Máquina — faturamento real do período
     const elRankMaq = document.getElementById('dash-ranking-maquinas');
     if (elRankMaq) {
       const maqMap = {};
@@ -2921,7 +2921,7 @@ class CapaxeroDashboard {
       });
       const sorted = Object.values(maqMap).sort((a, b) => b.fat - a.fat);
       if (sorted.length === 0) {
-        elRankMaq.innerHTML = `<div style="color:#8a97a7; font-size:12px;">Nenhuma transação no período selecionado.</div>`;
+        elRankMaq.innerHTML = `<div style="color:#8a97a7; font-size:12.5px; padding:12px; text-align:center;">Nenhuma transação no período selecionado.</div>`;
       } else {
         const maxVal = sorted[0]?.fat || 1;
         elRankMaq.innerHTML = sorted.map((m, idx) => `
@@ -2932,58 +2932,96 @@ class CapaxeroDashboard {
               <span class="rank-val">${fmtBRL(m.fat)}</span>
             </div>
             <div class="rank-bar-bg">
-              <div class="rank-bar-fill" style="width:${Math.max(8, Math.round((m.fat / maxVal) * 100))}%;"></div>
+              <div class="rank-bar-fill" style="width:${Math.max(6, Math.round((m.fat / maxVal) * 100))}%;"></div>
             </div>
           </div>
         `).join('');
       }
     }
 
-    // 3. Ranking por Dono — faturamento real do período, por transação
+    // 3. Ranking por Dono — faturamento real e contagem de máquinas atribuídas
     const elRankDono = document.getElementById('dash-ranking-donos');
     if (elRankDono) {
       const donosMap = {};
       txsPeriod.forEach(t => {
         const st = this.stations.find(s => s.devno === t.devno);
         const nome = st?.dono || 'Desconhecido';
-        if (!donosMap[nome]) donosMap[nome] = { name: nome, fat: 0, count: 0 };
+        if (!donosMap[nome]) donosMap[nome] = { name: nome, fat: 0, txCount: 0 };
         donosMap[nome].fat += Number(t.amount) || 0;
-        donosMap[nome].count += 1;
+        donosMap[nome].txCount += 1;
       });
+
+      Object.keys(donosMap).forEach(ownerName => {
+        const ownedTotems = this.stations.filter(s => s.dono === ownerName || s.raw?.owner === ownerName);
+        donosMap[ownerName].totemCount = ownedTotems.length;
+      });
+
       const donosArr = Object.values(donosMap).sort((a, b) => b.fat - a.fat);
       if (donosArr.length === 0) {
-        elRankDono.innerHTML = `<div style="color:#8a97a7; font-size:12px;">Nenhuma transação no período selecionado.</div>`;
+        elRankDono.innerHTML = `<div style="color:#8a97a7; font-size:12.5px; padding:12px; text-align:center;">Nenhuma transação no período selecionado.</div>`;
       } else {
         const maxD = Math.max(...donosArr.map(d => d.fat), 1);
         elRankDono.innerHTML = donosArr.map(d => `
           <div class="rank-item">
-            <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:5px;">
-              <span style="color:#c8d2de;">${d.name}</span>
-              <span style="font-family:var(--font-mono); color:#FDCB24;">${fmtBRL(d.fat)}</span>
+            <div style="display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:5px;">
+              <span style="color:#c8d2de; font-weight:600;">${d.name}</span>
+              <span style="font-family:var(--font-mono); color:#FDCB24; font-weight:700;">${fmtBRL(d.fat)}</span>
             </div>
             <div style="height:8px; border-radius:999px; background:rgba(255,255,255,.07); overflow:hidden;">
-              <div style="height:100%; width:${Math.max(10, Math.round((d.fat / maxD) * 100))}%; background:linear-gradient(90deg,#8a6a00,#FDCB24); border-radius:999px;"></div>
+              <div style="height:100%; width:${Math.max(8, Math.round((d.fat / maxD) * 100))}%; background:linear-gradient(90deg,#8a6a00,#FDCB24); border-radius:999px;"></div>
             </div>
-            <div style="font-size:11px; color:#6d7a8a; margin-top:4px;">${d.count} máquina(s) atribuída(s)</div>
+            <div style="font-size:11px; color:#6d7a8a; margin-top:4px;">${d.totemCount || 1} máquina(s) · ${d.txCount} lavagem(ns)</div>
           </div>
         `).join('');
       }
     }
 
+    // 4. Ciclos por Plano — dados reais extraídos das transações
+    const elPlanoBars = document.getElementById('dash-ciclos-plano-bars');
+    if (elPlanoBars) {
+      let basicCount = 0, interCount = 0, advCount = 0;
+      txsPeriod.forEach(t => {
+        const m = String(t.modeLabel || t.mode || '').toUpperCase();
+        if (m.includes('ADVANC') || m.includes('AVANÇ') || m.includes('AVANC')) advCount++;
+        else if (m.includes('INTERMED') || m.includes('INTER')) interCount++;
+        else basicCount++;
+      });
+      const totalModeCyc = basicCount + interCount + advCount || 1;
+      const maxModeCyc = Math.max(basicCount, interCount, advCount, 1);
+
+      const plans = [
+        { label: 'Básica', count: basicCount, color: '#5587B3' },
+        { label: 'Intermediária', count: interCount, color: '#1B3864' },
+        { label: 'Avançada', count: advCount, color: '#FDCB24' }
+      ];
+
+      elPlanoBars.innerHTML = plans.map(p => {
+        const pct = Math.round((p.count / totalModeCyc) * 100);
+        const heightPct = Math.max(8, Math.round((p.count / maxModeCyc) * 100));
+        return `
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:8px; height:100%; justify-content:flex-end;">
+            <div style="font-family:var(--font-mono); font-size:12px; font-weight:700; color:#fff;">${p.count} <span style="font-size:10.5px; color:#8a97a7;">(${pct}%)</span></div>
+            <div style="width:100%; max-width:54px; border-radius:6px 6px 0 0; background:${p.color}; height:${heightPct}%; transition:height .3s ease;"></div>
+            <span style="font-size:11.5px; color:#b7c2d0; font-weight:600;">${p.label}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
     // 5. Tabela de OMs
     const elOMs = document.getElementById('dash-oms-tbody');
     if (elOMs) {
-      if (this.oms.length === 0) {
-        elOMs.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:18px; color:#8a97a7;">Nenhum alerta ou ordem de manutenção aberta.</td></tr>`;
+      if (openOmsList.length === 0) {
+        elOMs.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:20px; color:#8a97a7; font-size:12.5px;">Nenhuma ordem de manutenção aberta no momento.</td></tr>`;
       } else {
-        elOMs.innerHTML = this.oms.map(o => `
+        elOMs.innerHTML = openOmsList.map(o => `
           <tr>
             <td style="font-weight:600; color:#fff;">${o.totemName || o.devno}</td>
-            <td class="muted">${o.message || o.type}</td>
-            <td><span style="padding:4px 9px; border-radius:999px; font-size:11px; font-weight:700; background:rgba(255,145,0,.16); color:#FFB454;">${o.severity || 'MÉDIA'}</span></td>
+            <td class="muted">${o.message || o.issueType || o.type}</td>
+            <td><span style="padding:4px 9px; border-radius:999px; font-size:11px; font-weight:700; background:rgba(255,145,0,.16); color:#FFB454;">${o.priority || o.severity || 'MÉDIA'}</span></td>
             <td class="mono muted">${o.timestamp ? new Date(o.timestamp).toLocaleDateString() : 'Hoje'}</td>
-            <td class="muted">${o.resolved ? 'Resolvido' : 'Equipe Técnica'}</td>
-            <td style="color:#e7edf4;">${o.resolved ? 'Concluída' : 'Aberta'}</td>
+            <td class="muted">${o.assignee || 'Equipe Técnica'}</td>
+            <td><span class="status-chip active">Aberta</span></td>
           </tr>
         `).join('');
       }
@@ -3024,10 +3062,10 @@ class CapaxeroDashboard {
       elWeekBars.innerHTML = orderedIdx.map(i => `
         <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:8px; height:100%; justify-content:flex-end;">
           <div style="display:flex; align-items:flex-end; gap:4px; height:100%;">
-            <div style="width:11px; border-radius:3px 3px 0 0; background:#5587B3; opacity:.55; height:${Math.round(semAnteriorByDay[i] / semMax * 100)}%;"></div>
-            <div style="width:11px; border-radius:3px 3px 0 0; background:#00C566; height:${Math.round(semAtualByDay[i] / semMax * 100)}%;"></div>
+            <div style="width:11px; border-radius:3px 3px 0 0; background:#5587B3; opacity:.55; height:${Math.max(4, Math.round(semAnteriorByDay[i] / semMax * 100))}%;" title="Semana anterior: ${semAnteriorByDay[i]}"></div>
+            <div style="width:11px; border-radius:3px 3px 0 0; background:#00C566; height:${Math.max(4, Math.round(semAtualByDay[i] / semMax * 100))}%;" title="Semana atual: ${semAtualByDay[i]}"></div>
           </div>
-          <span style="font-size:9.5px; color:#6d7a8a;">${wk[i]}</span>
+          <span style="font-size:9.5px; color:#6d7a8a; font-weight:600;">${wk[i]}</span>
         </div>
       `).join('');
     }
@@ -3091,16 +3129,17 @@ class CapaxeroDashboard {
 
     const theadRow = document.getElementById('dash-heatmap-head');
     if (theadRow) {
-      theadRow.innerHTML = '<th></th>' + heatHoras.map(h => `<th style="font-weight:600; font-size:9.5px; color:#6d7a8a; font-family:var(--font-mono); padding-bottom:2px;">${h}</th>`).join('');
+      theadRow.innerHTML = '<th></th>' + heatHoras.map(h => `<th style="font-weight:600; font-size:9.5px; color:#6d7a8a; font-family:var(--font-mono); padding-bottom:4px;">${h}</th>`).join('');
     }
     const tbody = document.getElementById('dash-heatmap-body');
     if (tbody) {
       tbody.innerHTML = heatOrder.map(dow => `
         <tr>
-          <td style="font-size:10.5px; color:#8a97a7; padding-right:8px; white-space:nowrap;">${wk[dow]}</td>
+          <td style="font-size:10.5px; color:#8a97a7; padding-right:8px; white-space:nowrap; font-weight:600;">${wk[dow]}</td>
           ${heatMatrix[dow].map((v, hi) => {
-            const inten = v / heatMax;
-            return `<td title="${wk[dow]} ${heatHoras[hi]} — ${v} lavagens" style="width:26px; height:22px; border-radius:5px; background:rgba(0,197,102,${(0.08 + inten * 0.82).toFixed(2)});"></td>`;
+            const inten = v > 0 ? (v / heatMax) : 0;
+            const bg = v > 0 ? `rgba(0,197,102,${(0.12 + inten * 0.78).toFixed(2)})` : 'rgba(255,255,255,.03)';
+            return `<td title="${wk[dow]} ${heatHoras[hi]} — ${v} lavagem(ns)" style="width:26px; height:22px; border-radius:5px; background:${bg}; border:1px solid rgba(255,255,255,.04);"></td>`;
           }).join('')}
         </tr>
       `).join('');
