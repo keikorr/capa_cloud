@@ -376,24 +376,43 @@ class CapaxeroDashboard {
   handleWebSocketMessage(msg) {
     if (msg.type === 'INIT_STATE' || msg.type === 'DASHBOARD_UPDATE') {
       this.fetchBackendData();
-    } else if (msg.type === 'TOTEM_HEARTBEAT' || msg.type === 'TOTEM_UPDATE' || msg.type === 'CYCLE_PROGRESS') {
+    } else if (
+      msg.type === 'TOTEM_HEARTBEAT' ||
+      msg.type === 'TOTEM_UPDATE' ||
+      msg.type === 'TOTEM_STATUS' ||
+      msg.type === 'STATUS_UPDATE' ||
+      msg.type === 'UPDATE_STATUS' ||
+      msg.type === 'CYCLE_PROGRESS' ||
+      msg.type === 'CYCLE_COMPLETED' ||
+      msg.type === 'STATE_CHANGE'
+    ) {
       const data = msg.data || msg;
-      if (data.totem) {
-        const devno = data.devno || data.totem.devno;
+      const devno = data.devno || data.totem?.devno;
+      if (devno) {
         const idx = this.stations.findIndex(s => s.code === devno || s.devno === devno);
         if (idx !== -1) {
-          this.stations[idx] = this.normalizeTotem(data.totem);
-          this.renderEstacoes();
-          this.renderDashboard();
+          if (data.totem) {
+            this.stations[idx] = this.normalizeTotem(data.totem);
+          } else {
+            if (data.status) {
+              let sKey = String(data.status).toUpperCase();
+              if (sKey === 'RUNNING' || sKey === 'WORKING' || sKey === 'BUSY') sKey = 'CLEANING';
+              if (sKey === 'ONLINE' || sKey === 'READY') sKey = 'IDLE';
+              this.stations[idx].status = sKey;
+            }
+            if (data.currentCycle !== undefined) this.stations[idx].currentCycle = data.currentCycle;
+            if (msg.type === 'CYCLE_COMPLETED') {
+              this.stations[idx].status = 'IDLE';
+              this.stations[idx].currentCycle = null;
+            }
+          }
+          this.renderAll();
           this.refreshStationDetailsLive(devno);
+        } else if (data.totem) {
+          this.fetchBackendData();
         }
-        // Se a máquina não estava na lista, ignora — nunca adiciona. Este evento vai
-        // para TODO dashboard conectado, sem filtro de dono (broadcast de rede inteira).
-        // Adicionar às cegas mostrava a máquina de outro franqueado no painel de quem
-        // não é dono dela, assim que ela mandasse um heartbeat ou tick de ciclo (o que
-        // acontece a cada ~60s). A lista completa e corretamente filtrada por dono só
-        // vem do fetchBackendData() — que já roda de novo a cada DASHBOARD_UPDATE (ex.:
-        // quando um admin reatribui a máquina para este usuário).
+      } else {
+        this.fetchBackendData();
       }
     } else if (msg.type === 'NEW_ALERT') {
       this.fetchBackendData();
@@ -2593,9 +2612,11 @@ class CapaxeroDashboard {
 
     withCoords.forEach(l => {
       const hasTotem = Boolean(l.devno);
-      const statusMeta = hasTotem ? (this.meta[l.totemStatus] || this.meta.OFFLINE) : null;
+      const station = hasTotem ? this.stations.find(s => s.devno === l.devno) : null;
+      const currentStatus = station ? station.status : (l.totemStatus || 'OFFLINE');
+      const statusMeta = hasTotem ? (this.meta[currentStatus] || this.meta.OFFLINE) : null;
       const pinColor = statusMeta ? statusMeta.color : '#FDCB24';
-      const isCleaning = hasTotem && l.totemStatus === 'CLEANING';
+      const isCleaning = hasTotem && currentStatus === 'CLEANING';
 
       const icon = L.divIcon({
         className: '',

@@ -100,12 +100,20 @@ class WebSocketManager {
 
     switch (type) {
       case 'HEARTBEAT':
+      case 'PING':
         if (devno) {
           const updated = store.updateHeartbeat(devno, data || {});
-          // Mascarado: este broadcast vai para TODO dashboard conectado, sem saber qual
-          // perfil está do outro lado — sem isto, a chave da Cielo ia sem máscara em
-          // todo heartbeat (a cada 60s por máquina) para qualquer navegador aberto.
           this.broadcastToDashboard('TOTEM_HEARTBEAT', { devno, totem: store.maskTotemCredentials(updated) });
+        }
+        break;
+
+      case 'STATUS_UPDATE':
+      case 'TOTEM_STATUS':
+      case 'UPDATE_STATUS':
+      case 'STATE_CHANGE':
+        if (devno) {
+          const updated = store.updateHeartbeat(devno, data || {});
+          this.broadcastToDashboard('TOTEM_STATUS', { devno, totem: store.maskTotemCredentials(updated) });
         }
         break;
 
