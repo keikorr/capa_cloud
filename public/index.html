@@ -327,6 +327,9 @@
           <p>Consolidado da rede — <span id="dash-periodo-label" style="color:#FDCB24; font-weight:600;">últimos 7 dias</span></p>
         </div>
         <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <select class="form-control" id="dash-owner-filter" style="width:auto; min-width:160px; padding:7px 12px; font-weight:600; font-size:12.5px; border-radius:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border); color:var(--text);">
+            <option value="all">Todos os donos</option>
+          </select>
           <div class="segmented" id="dash-period-toggle">
             <button data-period="hoje">Hoje</button>
             <button data-period="7d" class="active">7 dias</button>

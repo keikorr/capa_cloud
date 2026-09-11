@@ -106,6 +106,7 @@ class CapaxeroDashboard {
 
     this.activeTab = 'estacoes';
     this.ownershipFilter = 'all';
+    this.selectedOwner = 'all';
     this.periodoKey = '7d';
     const now = new Date();
     this.selectedMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
@@ -501,6 +502,15 @@ class CapaxeroDashboard {
         this.renderDashboard();
       });
     }
+
+    // Filtro por Dono no Dashboard
+    const selDashOwner = document.getElementById('dash-owner-filter');
+    if (selDashOwner) {
+      selDashOwner.addEventListener('change', (e) => {
+        this.selectedOwner = e.target.value;
+        this.renderDashboard();
+      });
+    }
   }
 
   updateDashboardPeriodLabel() {
@@ -550,8 +560,14 @@ class CapaxeroDashboard {
   }
 
   getFilteredStations() {
-    if (this.ownershipFilter === 'all') return this.stations;
-    return this.stations.filter(s => this.matchesOwnershipFilter(s.raw?.owner_id || s.dono));
+    let list = this.stations;
+    if (this.ownershipFilter !== 'all') {
+      list = list.filter(s => this.matchesOwnershipFilter(s.raw?.owner_id || s.dono));
+    }
+    if (this.selectedOwner && this.selectedOwner !== 'all') {
+      list = list.filter(s => s.raw?.owner_id === this.selectedOwner || s.dono === this.selectedOwner || s.raw?.owner === this.selectedOwner);
+    }
+    return list;
   }
 
   switchPage(pageId) {
@@ -1578,6 +1594,23 @@ class CapaxeroDashboard {
     const selModalOwner = document.getElementById('modal-select-new-owner');
     const selMoveTotem = document.getElementById('move-select-totem');
     const selMoveLoc = document.getElementById('move-new-location');
+    const selDashOwner = document.getElementById('dash-owner-filter');
+
+    if (selDashOwner) {
+      const opts = ['<option value="all">Todos os donos</option>'];
+      if (users.length > 0) {
+        users.forEach(u => {
+          const name = u.responsible_name || u.company_name || u.username;
+          opts.push(`<option value="${u.id}">${name}</option>`);
+        });
+      } else {
+        const distinctOwners = [...new Set(this.stations.map(s => s.dono).filter(Boolean))];
+        distinctOwners.forEach(ownerName => {
+          opts.push(`<option value="${ownerName}">${ownerName}</option>`);
+        });
+      }
+      setOptions(selDashOwner, opts.join(''));
+    }
 
     // Reescrever innerHTML de um <select> descarta a opção que o operador acabou de escolher.
     // Como populateSelectors() roda a cada DASHBOARD_UPDATE (o totem conectando já dispara um),
@@ -2578,12 +2611,10 @@ class CapaxeroDashboard {
     // Filtra as transações reais dentro do período selecionado (Hoje / 7 dias / 30 dias / Mês)
     const { start, end } = this.getDashboardDateRange();
     const filteredStations = this.getFilteredStations();
+    const filteredDevnos = new Set(filteredStations.map(s => s.devno));
     const txsPeriod = (this.transactions || []).filter(t => {
       if (t.status && t.status !== 'APPROVED') return false;
-      if (this.ownershipFilter !== 'all') {
-        const station = this.stations.find(s => s.devno === t.devno);
-        if (!station || !this.matchesOwnershipFilter(station.raw?.owner_id || station.dono)) return false;
-      }
+      if (!filteredDevnos.has(t.devno)) return false;
       const d = new Date(t.timestamp);
       return d >= start && d < end;
     });
@@ -2600,14 +2631,14 @@ class CapaxeroDashboard {
     const elPeriodTotal = document.getElementById('dash-chart-period-total');
 
     if (elTotalRev) {
-      if (this.state.historySummary) {
+      if (this.state.historySummary && this.selectedOwner === 'all' && this.ownershipFilter === 'all' && this.periodoKey === 'all') {
         elTotalRev.textContent = fmtBRL((this.state.historySummary.totalCents || 0) / 100);
       } else {
         elTotalRev.textContent = fmtBRL(totalRev);
       }
     }
     if (elTotalCycles) {
-      if (this.state.historySummary) {
+      if (this.state.historySummary && this.selectedOwner === 'all' && this.ownershipFilter === 'all' && this.periodoKey === 'all') {
         elTotalCycles.textContent = this.state.historySummary.txCount || 0;
       } else {
         elTotalCycles.textContent = totalCyc;
