@@ -876,6 +876,16 @@ class CapaxeroDashboard {
     const btnOpenConfig = document.getElementById('btn-open-config');
     const btnOpenCieloConfig = document.getElementById('btn-open-cielo-config');
     const btnConfirmOwner = document.getElementById('modal-btn-confirm-owner');
+    const btnDeleteTotem = document.getElementById('btn-delete-totem');
+
+    if (btnDeleteTotem) {
+      btnDeleteTotem.addEventListener('click', () => {
+        if (this.selectedStationId) {
+          const s = this.stations.find(st => st.id === this.selectedStationId || st.devno === this.selectedStationId);
+          this.deleteTotem(this.selectedStationId, s ? s.nome : '');
+        }
+      });
+    }
 
     const sendCmd = async (cmd, params = {}) => {
       if (!this.selectedStationId) return;
@@ -2140,21 +2150,25 @@ class CapaxeroDashboard {
       if (list.length === 0) {
         tbody.innerHTML = `<tr><td colspan="${isAdmin ? 7 : 6}" style="text-align:center; padding:24px; color:#8a97a7;">Nenhum local cadastrado.</td></tr>`;
       } else {
-        tbody.innerHTML = list.map(l => `
+        tbody.innerHTML = list.map(l => {
+          const locName = l.name || l.depotna || 'Ponto de Instalação';
+          const locNameEsc = locName.replace(/'/g, "\\'");
+          return `
           <tr>
             <td class="mono accent">${l.depotno || 'LC'}</td>
-            <td style="font-weight:600; color:#fff;">${l.name}</td>
+            <td style="font-weight:600; color:#fff;">${locName}</td>
             <td class="muted">${l.address || '—'}</td>
             <td class="mono">${l.totemCount ? `${l.totemCount} totem(s)` : '—'}</td>
             <td class="mono green">${fmtBRL(l.revenueToday || 0)}</td>
             <td><span class="status-chip active">Ativo</span></td>
             ${isAdmin ? `
             <td style="text-align:right; white-space:nowrap;">
-              <button class="btn btn-blue" style="padding:6px 12px; font-size:11.5px;" onclick="window.app.openMoveModal('${l.devno || ''}', '${l.name}', '${l.depotno}')">Alocar Máquina</button>
-              <button class="btn btn-danger" style="padding:6px 12px; font-size:11.5px; margin-left:6px;" onclick="window.app.deleteDepotLocation('${l.depotno}', '${(l.name || '').replace(/'/g, "\\'")}')">Excluir</button>
+              <button class="btn btn-blue" style="padding:6px 12px; font-size:11.5px;" onclick="window.app.openMoveModal('${l.devno || ''}', '${locNameEsc}', '${l.depotno}')">Alocar Máquina</button>
+              <button class="btn btn-danger" style="padding:6px 12px; font-size:11.5px; margin-left:6px;" onclick="window.app.deleteDepotLocation('${l.depotno}', '${locNameEsc}')">Excluir</button>
             </td>` : ''}
           </tr>
-        `).join('');
+        `;
+        }).join('');
       }
     }
 
@@ -2372,6 +2386,32 @@ class CapaxeroDashboard {
       }
     }
     this.openModal('move-modal');
+  }
+
+  async deleteTotem(devno, name) {
+    const s = this.stations.find(st => st.id === devno || st.devno === devno);
+    const machineName = name || (s ? s.nome : `Totem #${devno}`);
+
+    if (!confirm(`Deseja realmente excluir a máquina "${machineName}" (${devno})?\n\nEsta ação removerá a máquina do painel e desvinculará suas referentes configurações.`)) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/v1/admin/totems/${encodeURIComponent(devno)}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${this.token}` }
+      }).then(r => r.json());
+
+      if (res.success) {
+        this.showToast(`Estação ${machineName} excluída com sucesso.`);
+        this.closeModal('detail-modal');
+        await this.fetchBackendData();
+      } else {
+        this.showToast(res.message || 'Erro ao excluir a máquina.', 'err');
+      }
+    } catch (err) {
+      this.showToast('Erro de conexão ao excluir a máquina.', 'err');
+    }
   }
 
   async deleteDepotLocation(depotno, name) {

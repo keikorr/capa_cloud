@@ -35,9 +35,11 @@
   --radius-sm: 8px;
 
   /* Curvas de easing fortes — as easings padrão do CSS são fracas demais e
-     não dão a sensação de resposta imediata que uma UI precisa. */
+     não dão a sensação de resposta imediata que uma UI precisa. (Emil Kowalski Design Engineering) */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 * { box-sizing: border-box; }
@@ -57,6 +59,10 @@ body {
 }
 
 button, input, select { font-family: inherit; }
+
+.mono, .val, .kpi-value, .rev, .kpi-num, table.data-table td {
+  font-feature-settings: "tnum" 1, "cv05" 1;
+}
 
 a { color: inherit; }
 
@@ -313,7 +319,9 @@ a { color: inherit; }
   background: transparent;
   color: var(--text-muted);
   cursor: pointer;
+  transition: transform 160ms var(--ease-out), background-color 160ms var(--ease-out), color 160ms var(--ease-out);
 }
+.segmented button:active { transform: scale(0.97); }
 .segmented button.active { background: var(--brand-yellow); color: var(--bg); }
 
 .btn {
@@ -327,7 +335,7 @@ a { color: inherit; }
   align-items: center;
   gap: 6px;
   white-space: nowrap;
-  transition: transform 140ms var(--ease-out), filter 140ms var(--ease-out), opacity 140ms var(--ease-out);
+  transition: transform 160ms var(--ease-out), filter 160ms var(--ease-out), opacity 160ms var(--ease-out), box-shadow 160ms var(--ease-out);
 }
 .btn-primary { background: var(--brand-yellow); color: var(--bg); font-weight: 700; }
 .btn-outline { background: rgba(255,255,255,0.06); border: 1px solid var(--border-strong); color: var(--text-soft); }
@@ -338,7 +346,7 @@ a { color: inherit; }
 .btn:disabled { opacity: 0.45; cursor: not-allowed; }
 .btn:active:not(:disabled) { transform: scale(0.97); }
 @media (hover: hover) and (pointer: fine) {
-  .btn:not(:disabled):hover { filter: brightness(1.08); }
+  .btn:not(:disabled):hover { filter: brightness(1.08); transform: translateY(-1px); }
 }
 
 .form-control {
@@ -349,8 +357,9 @@ a { color: inherit; }
   border: 1px solid var(--border-strong);
   color: var(--text);
   font-size: 13px;
+  transition: border-color 160ms var(--ease-out), box-shadow 160ms var(--ease-out);
 }
-.form-control:focus { outline: none; border-color: var(--brand-yellow); }
+.form-control:focus { outline: none; border-color: var(--brand-yellow); box-shadow: 0 0 0 3px rgba(253, 203, 36, 0.2); }
 label.field-label { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 6px; }
 
 /* ============================================================
@@ -372,6 +381,11 @@ label.field-label { display: block; font-size: 11px; color: var(--text-muted); m
   border: 1px solid var(--border);
   border-radius: 14px;
   backdrop-filter: blur(12px);
+  transition: transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out), border-color 200ms var(--ease-out);
+}
+.kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 .kpi-card::before {
   content: '';
@@ -518,6 +532,14 @@ label.field-label { display: block; font-size: 11px; color: var(--text-muted); m
   display: block;
   width: 100%;
   cursor: pointer;
+  transition: transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out), border-color 200ms var(--ease-out);
+}
+.totem-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 32px -8px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+.totem-card:active {
+  transform: translateY(0) scale(0.98);
 }
 .totem-card.status-cleaning { border-color: rgba(85,135,179,0.5); }
 .totem-card.status-idle { border-color: rgba(0,197,102,0.28); }

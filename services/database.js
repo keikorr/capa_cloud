@@ -120,6 +120,19 @@ class RelationalDatabase {
         defaultCieloMerchantKey: "FMnlYedXdu5Xoa5n3hczfHh8yAMbYF7logQQ4qPL"
       };
     }
+
+    // Garantia de integridade: desfaz IDs depotno duplicados caso existam
+    const seenDepotnos = new Set();
+    let nextDepotIdx = 1;
+    for (const d of this.tables.depots) {
+      if (!d.depotno || seenDepotnos.has(d.depotno)) {
+        while (seenDepotnos.has(`DEP-${nextDepotIdx}`)) {
+          nextDepotIdx++;
+        }
+        d.depotno = `DEP-${nextDepotIdx}`;
+      }
+      seenDepotnos.add(d.depotno);
+    }
   }
 
   seedDefaultCoupons() {
@@ -676,7 +689,7 @@ class RelationalDatabase {
     const totem = this.getTotem(devno) || this.upsertTotem({ devno });
     totem.depotno = newDepot.depotno;
     totem.branno = newDepot.branno;
-    totem.location = newDepot.address || newDepot.depotna;
+    totem.location = newDepot.name || newDepot.depotna || newDepot.address;
 
     this.save();
     return { totem, depot: newDepot };

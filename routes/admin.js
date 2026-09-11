@@ -383,11 +383,17 @@ router.post('/admin/totems', (req, res) => {
  * Exclui um totem registrado
  */
 router.delete('/admin/totems/:devno', (req, res) => {
+  const user = extractUser(req);
   const { devno } = req.params;
+
+  if (user && !store.canUserSeeTotem(user, devno)) {
+    return res.status(403).json({ success: false, message: 'Você não tem permissão para excluir esta máquina.' });
+  }
+
   const deleted = store.deleteTotem(devno);
 
   if (!deleted) {
-    return res.status(404).json({ success: false, message: 'Totem não encontrado.' });
+    return res.status(404).json({ success: false, message: 'Máquina não encontrada.' });
   }
 
   wsManager.broadcastDashboardUpdate();
