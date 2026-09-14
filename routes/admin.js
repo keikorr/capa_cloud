@@ -158,6 +158,28 @@ router.get('/admin/stats', (req, res) => {
  */
 router.get('/admin/history-summary', async (req, res) => {
   const user = extractUser(req);
+
+  // Em desenvolvimento local o armazenamento oficial é o JSON em memória/arquivo.
+  // Não tente abrir o PostgreSQL nesse modo: além de gerar 500, isso polui o console e
+  // fazia o dashboard parecer instável mesmo quando os dados locais estavam disponíveis.
+  if (!getDatabaseUrl()) {
+    const transactions = (store.getTransactions(20000, user) || [])
+      .filter(transaction => transaction.status === 'APPROVED');
+    const totalCents = transactions.reduce(
+      (sum, transaction) => sum + Math.round(Number(transaction.amount || 0) * 100),
+      0
+    );
+    return res.json({
+      success: true,
+      source: 'live',
+      data: {
+        txCount: transactions.length,
+        totalCents,
+        dailyCycles: buildDailyCycles(transactions)
+      }
+    });
+  }
+
   try {
     const data = await historyRepo.getGlobalHistorySummary(user);
     return res.json({ success: true, data });

@@ -2067,11 +2067,17 @@ class CapaxeroDashboard {
       local: t.location || 'Ponto a Cadastrar',
       endereco: t.location || 'Ponto de Instalação',
       ponto: t.location || 'Ponto de Instalação',
-      dono: t.owner || 'Jonathan Silveira',
+      dono: t.owner || 'Dono não definido',
       status: statusKey,
       plano: 'Intermediária',
       etapa: t.currentCycle?.step || (statusKey === 'CLEANING' ? 'Higienização em andamento' : (statusKey === 'IDLE' ? 'Ocioso — pronto para uso' : statusKey)),
-      pct: statusKey === 'CLEANING' ? 45 : (statusKey === 'IDLE' ? 100 : 0),
+      // O progresso só pode vir da telemetria do totem. Não invente 45%/100% quando
+      // a máquina não enviou uma leitura real.
+      pct: (() => {
+        const rawProgress = t.currentCycle?.progressPercent ?? t.currentCycle?.percent;
+        const value = Number(rawProgress);
+        return Number.isFinite(value) ? Math.max(0, Math.min(100, value)) : null;
+      })(),
       restante: '—',
       trava: t.doorLocked ? 'Travada' : 'Destravada',
       uv: t.liquidLevelPercent !== undefined ? Number(t.liquidLevelPercent) : null,
@@ -2120,7 +2126,7 @@ class CapaxeroDashboard {
         return `<option value="${u.id}">${label}</option>`;
       }).join('');
     } else {
-      ownerOptions = '<option value="USR-CRPADMIN">Jonathan (Super Admin)</option>';
+      ownerOptions = '<option value="" disabled>Nenhum dono disponível</option>';
     }
 
     const totemOptions = (this.stations.length > 0 ? this.stations : [])
@@ -2274,7 +2280,8 @@ class CapaxeroDashboard {
             const m = this.meta[s.status] || this.meta.IDLE;
             const isRun = s.status === 'CLEANING';
             const isIdle = s.status === 'IDLE';
-            const pct = isRun ? (s.pct || 0) : (isIdle ? 100 : 0);
+            const pct = isRun && Number.isFinite(s.pct) ? s.pct : 0;
+            const hasProgress = isRun && Number.isFinite(s.pct);
 
             return `
               <div class="totem-card status-${s.status.toLowerCase()}" onclick="window.app.openStationDetails('${s.id}')">
@@ -2292,7 +2299,7 @@ class CapaxeroDashboard {
                       <div class="title">${s.etapa}</div>
                       <div class="sub">${isRun ? `Plano ${s.plano} · em andamento` : (isIdle ? `Plano padrão · pronto` : 'Aguardando')}</div>
                     </div>
-                    <span class="cycle-box-pct" style="color:${m.color};">${isRun ? `${pct}%` : (isIdle ? 'Pronto' : '—')}</span>
+                    <span class="cycle-box-pct" style="color:${m.color};">${isRun ? (hasProgress ? `${pct}%` : '—') : (isIdle ? 'Pronto' : '—')}</span>
                   </div>
                   <div class="cycle-bar-bg">
                     <div class="cycle-bar-fill ${isRun ? 'animated' : 'solid'}" style="width:${pct}%; --fill-color:${m.color};"></div>
@@ -2363,8 +2370,9 @@ class CapaxeroDashboard {
     document.getElementById('modal-ponto-val').textContent = s.ponto;
     document.getElementById('modal-cycle-stage').textContent = s.etapa;
     document.getElementById('modal-cycle-sub').textContent = isRun ? `Plano ${s.plano} · em andamento` : 'Ocioso — pronto para higienizar';
-    document.getElementById('modal-cycle-pct').textContent = isRun ? `${s.pct}%` : (s.status === 'IDLE' ? 'Pronto' : '—');
-    document.getElementById('modal-cycle-bar').style.width = isRun ? `${s.pct}%` : (s.status === 'IDLE' ? '100%' : '0%');
+    const hasProgress = isRun && Number.isFinite(s.pct);
+    document.getElementById('modal-cycle-pct').textContent = isRun ? (hasProgress ? `${s.pct}%` : '—') : (s.status === 'IDLE' ? 'Pronto' : '—');
+    document.getElementById('modal-cycle-bar').style.width = hasProgress ? `${s.pct}%` : '0%';
     document.getElementById('modal-stat-door').textContent = s.trava;
     document.getElementById('modal-stat-door').style.color = s.trava === 'Travada' ? '#00C566' : '#FF9100';
     document.getElementById('modal-stat-rev').textContent = s.fatToday || s.fat || fmtBRL(0);
