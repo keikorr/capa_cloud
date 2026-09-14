@@ -12,6 +12,7 @@ const wsManager = require('../services/websocket');
 const { getUserFromToken, refreshSessionsForUser, invalidateSessionsForUser } = require('./auth');
 const { getDatabaseUrl } = require('../config/db');
 const historyRepo = require('../db/repositories/transactions.repo');
+const { APP_DOWNLOAD_DIR, getPublishedRelease, publishRelease, getCurrentManifest } = require('../services/appRelease');
 
 // Configuração de upload de vídeo para a rota de admin
 const videoStorage = multer.diskStorage({
@@ -38,6 +39,38 @@ const videoUpload = multer({
       cb(null, true);
     } else {
       cb(new Error('Formato de vídeo inválido. Permitidos: .mp4, .webm, .mov, etc.'));
+    }
+  }
+});
+
+// Configuração de upload do APK do totem (botão "Publicar nova versão" do painel).
+// Nome de arquivo inclui o versionCode para nunca colidir com a versão anterior enquanto o
+// upload ainda está em andamento — publishRelease() só troca o manifesto depois de gravado.
+const apkStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    if (!fs.existsSync(APP_DOWNLOAD_DIR)) {
+      fs.mkdirSync(APP_DOWNLOAD_DIR, { recursive: true });
+    }
+    cb(null, APP_DOWNLOAD_DIR);
+  },
+  filename: (req, file, cb) => {
+    // Não dá para usar req.body.versionCode aqui: multer processa o multipart na ordem em que
+    // os campos chegam, e o streaming do arquivo pode começar antes do body ser parseado (foi
+    // exatamente o que aconteceu testando com curl -F "apk=@..." antes de -F "versionCode=...").
+    // A versão em si vive só no manifesto (app-version.json) — o nome do arquivo só precisa
+    // ser único, então timestamp + o nome original resolve sem depender de ordem de campos.
+    cb(null, `capaxero-totem-${Date.now()}${path.extname(file.originalname) || '.apk'}`);
+  }
+});
+
+const apkUpload = multer({
+  storage: apkStorage,
+  limits: { fileSize: 250 * 1024 * 1024 }, // Até 250 MB
+  fileFilter: (req, file, cb) => {
+    if (/\.apk$/i.test(file.originalname)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Formato inválido. Envie um arquivo .apk.'));
     }
   }
 });
@@ -81,6 +114,30 @@ function validateEcommerceCredentials(cielo) {
 function extractUser(req) {
   const token = req.headers.authorization || req.query.token;
   return getUserFromToken(token);
+}
+
+/**
+ * Guarda para as rotas de atualização remota do APK.
+ *
+ * Não usa o idioma `user && user.role !== 'CRPADMIN'` do resto do arquivo de propósito: nesse
+ * idioma, uma requisição SEM token nenhum passa pela checagem (user é null, "user &&" já é
+ * falso) e é tratada como CRPADMIN — inofensivo para as rotas existentes porque
+ * requireAdminToken (middleware/auth.js) já protegia /api/v1/admin/* antes de chegar aqui, mas
+ * hoje esse middleware é um no-op. Publicar um APK ou empurrar uma instalação para uma máquina
+ * física é perigoso demais para herdar esse buraco: aqui exigimos usuário autenticado de fato.
+ * Devolve null quando autorizado; caso contrário já escreve a resposta 401/403 e devolve o erro.
+ */
+function requireCrpAdmin(req, res) {
+  const user = extractUser(req);
+  if (!user) {
+    res.status(401).json({ success: false, message: 'Autenticação necessária.' });
+    return null;
+  }
+  if (user.role !== 'CRPADMIN') {
+    res.status(403).json({ success: false, message: 'Acesso negado. Apenas o perfil CRPADMIN pode gerenciar atualizações do aplicativo.' });
+    return null;
+  }
+  return user;
 }
 
 /**
@@ -618,6 +675,127 @@ router.post('/admin/remote-command', (req, res) => {
       doorLocked: totem.doorLocked,
       deliveredOnline: wsResult.deliveredOnline
     }
+  });
+});
+
+/**
+ * POST /api/v1/admin/app/apk
+ * Publica uma nova versão do APK do totem (upload pelo painel). Substitui o processo manual
+ * documentado em public/downloads/README.md — copiar o arquivo por SSH e editar o JSON à mão.
+ */
+router.post('/admin/app/apk', (req, res) => {
+  if (!requireCrpAdmin(req, res)) return;
+
+  apkUpload.single('apk')(req, res, async (err) => {
+    if (err) {
+      return res.status(400).json({ success: false, message: err.message });
+    }
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'Nenhum arquivo .apk enviado.' });
+    }
+
+    const versionCode = Number(req.body.versionCode);
+    const versionName = String(req.body.versionName || '').trim();
+
+    const cleanup = () => { try { fs.unlinkSync(req.file.path); } catch (_) {} };
+
+    if (!Number.isInteger(versionCode) || versionCode <= 0) {
+      cleanup();
+      return res.status(400).json({ success: false, message: 'Campo "versionCode" é obrigatório e deve ser um inteiro positivo.' });
+    }
+    if (!versionName) {
+      cleanup();
+      return res.status(400).json({ success: false, message: 'Campo "versionName" é obrigatório.' });
+    }
+
+    // versionCode só cresce — publicar um número igual ou menor faz o totem ignorar a versão
+    // nova (é assim que ele decide se atualiza), então rejeitar aqui evita o upload inútil.
+    const current = getCurrentManifest();
+    if (current && versionCode <= Number(current.versionCode || 0)) {
+      cleanup();
+      return res.status(409).json({
+        success: false,
+        message: `versionCode ${versionCode} não é maior que o já publicado (${current.versionCode}). O totem ignoraria esta versão.`
+      });
+    }
+
+    const oldApkFile = current?.apkFile;
+
+    publishRelease({
+      versionCode,
+      versionName,
+      notes: req.body.notes || '',
+      apkFile: req.file.filename
+    });
+
+    // Remove o binário anterior para não acumular ~50MB por versão publicada — só depois que
+    // o manifesto novo já aponta para o arquivo recém-gravado.
+    if (oldApkFile && oldApkFile !== req.file.filename) {
+      const oldPath = path.join(APP_DOWNLOAD_DIR, oldApkFile);
+      if (fs.existsSync(oldPath)) {
+        try { fs.unlinkSync(oldPath); } catch (_) {}
+      }
+    }
+
+    try {
+      const release = await getPublishedRelease(req);
+      return res.json({ success: true, message: `Versão ${versionName} (${versionCode}) publicada com sucesso.`, data: release });
+    } catch (releaseErr) {
+      return res.status(500).json({ success: false, message: releaseErr.message });
+    }
+  });
+});
+
+/**
+ * POST /api/v1/admin/totems/:devno/update-app
+ * Dispara a atualização remota do APK numa máquina específica: envia à Cloudflare/WS o comando
+ * APP_UPDATE com a versão publicada (services/appRelease.js). O totem decide sozinho se instala
+ * (versionCode maior) e quando (só com a máquina ociosa) — ver APK-Capaxero core/update/.
+ */
+router.post('/admin/totems/:devno/update-app', async (req, res) => {
+  if (!requireCrpAdmin(req, res)) return;
+
+  const { devno } = req.params;
+  const totem = store.getTotem(devno);
+  if (!totem) {
+    return res.status(404).json({ success: false, message: 'Totem não encontrado.' });
+  }
+
+  let release;
+  try {
+    release = await getPublishedRelease(req);
+  } catch (err) {
+    return res.status(err.statusCode || 500).json({ success: false, message: err.message });
+  }
+
+  const wsResult = wsManager.sendCommandToTotem(devno, 'APP_UPDATE', release);
+
+  // sendCommandToTotem nunca falha por si só — devolve deliveredOnline:false quando o totem
+  // não tem socket aberto (services/websocket.js). Diferente do /remote-command genérico, aqui
+  // devolvemos erro de verdade: mandar o operador acreditar que uma atualização foi entregue a
+  // uma máquina offline é pior do que avisar e deixar ele tentar de novo mais tarde.
+  if (!wsResult.deliveredOnline) {
+    return res.status(409).json({
+      success: false,
+      message: `Totem ${devno} está offline. A atualização não pôde ser entregue — tente novamente quando a máquina estiver conectada.`
+    });
+  }
+
+  store.upsertTotem({
+    devno,
+    pendingAppUpdate: {
+      versionCode: release.versionCode,
+      versionName: release.versionName,
+      requestedAt: new Date().toISOString(),
+      requestedBy: (req.headers.authorization || req.query.token) ? extractUser(req)?.username : null
+    }
+  });
+  wsManager.broadcastDashboardUpdate();
+
+  return res.json({
+    success: true,
+    message: `Atualização para ${release.versionName} (${release.versionCode}) enviada ao totem ${devno}.`,
+    data: { devno, release }
   });
 });
 

@@ -862,7 +862,14 @@ class RelationalDatabase {
   }
 
   updateHeartbeat(devno, telemetry) {
-    let totem = this.getTotem(devno);
+    // Referência crua de this.tables.totems, não this.getTotem() — getTotem() passa por
+    // maskTotemCredentials(), que devolve um CLONE ({...totem, ...}). Mutar o clone e chamar
+    // save() (que serializa this.tables direto) gravava sempre o totem antigo: toda telemetria
+    // de heartbeat — status, trava da porta, nível de líquido, ciclo em andamento — era
+    // perdida silenciosamente a cada chamada, e só sobrevivia por acidente quando
+    // upsertTotem/broadcastToDashboard(TOTEM_HEARTBEAT) eram chamados com os mesmos dados por
+    // outro caminho. Corrigido para casar com o padrão já usado em transferTotemOwner (L395).
+    let totem = this.tables.totems.find(t => t.devno === devno);
     if (!totem) {
       totem = this.upsertTotem({ devno, ...telemetry });
     }
@@ -874,12 +881,17 @@ class RelationalDatabase {
     if (telemetry.doorLocked !== undefined) totem.doorLocked = telemetry.doorLocked;
     if (telemetry.liquidLevelPercent !== undefined) totem.liquidLevelPercent = telemetry.liquidLevelPercent;
     if (telemetry.currentCycle !== undefined) totem.currentCycle = telemetry.currentCycle;
+    // appVersion/versionCode: o heartbeat os enviava desde sempre e este método os descartava
+    // (só ficavam gravados no primeiro contato, via login/register — routes/api.js). Sem isso
+    // o painel continua mostrando a versão antiga depois de uma atualização remota do APK.
+    if (telemetry.appVersion !== undefined) totem.appVersion = telemetry.appVersion;
+    if (telemetry.versionCode !== undefined) totem.versionCode = telemetry.versionCode;
     delete totem.temperature;
     delete totem.fragranceLevelPercent;
     totem.lastHeartbeat = new Date().toISOString();
 
     this.save();
-    return totem;
+    return this.maskTotemCredentials(totem, true);
   }
 
   // Marca como OFFLINE qualquer totem sem heartbeat há mais de `timeoutMs`

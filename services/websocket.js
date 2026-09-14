@@ -154,6 +154,25 @@ class WebSocketManager {
       case 'COMMAND_ACK':
         console.log(`[WS] ACK de comando recebido do totem ${devno}:`, data);
         this.broadcastToDashboard('COMMAND_ACK', { devno, data });
+
+        // O comando de atualização remota do APK tem vida mais longa que um ACK comum
+        // (DOWNLOADING -> AWAITING_OPERATOR_TAP -> INSTALLED, minutos entre um e outro) e o
+        // painel precisa ver esse progresso mesmo se reabrir o modal da máquina no meio do
+        // processo — por isso persiste em pendingAppUpdate, além de repassar ao vivo abaixo.
+        if (devno && data && data.command === 'APP_UPDATE') {
+          store.upsertTotem({
+            devno,
+            pendingAppUpdate: {
+              versionCode: data.versionCode ?? null,
+              versionName: data.versionName ?? null,
+              status: data.status || 'UNKNOWN',
+              message: data.message || null,
+              progressPercent: data.progressPercent ?? null,
+              updatedAt: new Date().toISOString()
+            }
+          });
+          this.broadcastToDashboard('APP_UPDATE_STATUS', { devno, ...data });
+        }
         break;
 
       default:

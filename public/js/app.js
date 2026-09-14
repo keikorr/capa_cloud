@@ -414,6 +414,26 @@ class CapaxeroDashboard {
       } else {
         this.fetchBackendData();
       }
+    } else if (msg.type === 'APP_UPDATE_STATUS') {
+      // Progresso ao vivo do comando APP_UPDATE (COMMAND_ACK repassado pelo servidor —
+      // services/websocket.js). Só atualiza a caixa de versão se o modal daquela máquina
+      // estiver aberto; o registro completo (pendingAppUpdate) já foi persistido no totem
+      // pelo servidor, então um fetchBackendData() futuro também traria o mesmo estado.
+      const data = msg.data || {};
+      const devno = data.devno;
+      if (devno) {
+        const idx = this.stations.findIndex(s => s.code === devno || s.devno === devno);
+        if (idx !== -1 && this.stations[idx].raw) {
+          this.stations[idx].raw.pendingAppUpdate = {
+            versionCode: data.versionCode ?? null,
+            versionName: data.versionName ?? null,
+            status: data.status || 'UNKNOWN',
+            message: data.message || null,
+            progressPercent: data.progressPercent ?? null
+          };
+        }
+        this.refreshStationDetailsLive(devno);
+      }
     } else if (msg.type === 'NEW_ALERT') {
       this.fetchBackendData();
       if (msg.data?.alert) {
@@ -1472,6 +1492,50 @@ class CapaxeroDashboard {
 
     // Configuração dos controles de Upload de Vídeo de Higienização
     this.setupVideoUploadControls();
+
+    // Configuração dos controles de publicação/disparo de atualização remota do APK
+    this.setupAppUpdateControls();
+  }
+
+  /**
+   * Repinta a caixa "Versão do app instalada" do modal de detalhes a partir do totem cru
+   * (s.raw — normalizeTotem preserva o objeto original do backend). Chamado por
+   * renderStationTelemetry, então roda tanto na abertura do modal quanto em todo heartbeat
+   * ao vivo enquanto ele está aberto — pendingAppUpdate é como o progresso de uma
+   * atualização em andamento chega até aqui sem precisar de outro fetch.
+   */
+  renderAppUpdateStatus(raw) {
+    const versionEl = document.getElementById('modal-app-version');
+    const statusEl = document.getElementById('modal-app-update-status');
+    if (!versionEl || !statusEl) return;
+
+    versionEl.textContent = raw.appVersion
+      ? `${raw.appVersion}${raw.versionCode ? ` (build ${raw.versionCode})` : ''}`
+      : 'Desconhecida — máquina ainda não reportou';
+
+    const pending = raw.pendingAppUpdate;
+    if (!pending || !pending.status) {
+      statusEl.style.display = 'none';
+      return;
+    }
+
+    const labels = {
+      RECEIVED: 'Comando recebido pelo totem...',
+      REJECTED_NOT_NEWER: 'Recusado: versão publicada não é mais nova que a instalada.',
+      DOWNLOADING: `Baixando${pending.progressPercent != null ? ` (${pending.progressPercent}%)` : '...'}`,
+      VERIFY_FAILED: 'Falha na verificação do arquivo baixado — o totem vai tentar de novo.',
+      DEFERRED_CYCLE_ACTIVE: 'Baixado — aguardando a máquina ficar ociosa para instalar.',
+      NEEDS_INSTALL_PERMISSION: 'Aguardando o técnico liberar "instalar apps desconhecidos" no totem.',
+      AWAITING_OPERATOR_TAP: 'Pronto — aguardando toque em "Instalar" na tela do totem.',
+      INSTALL_FAILED: 'Falha ao instalar no totem.',
+      INSTALLED: 'Instalado com sucesso!'
+    };
+
+    statusEl.style.display = 'block';
+    statusEl.textContent = `Atualização p/ ${pending.versionName || pending.versionCode}: ${labels[pending.status] || pending.status}${pending.message ? ` — ${pending.message}` : ''}`;
+    statusEl.style.color = pending.status === 'INSTALLED' ? '#00C566'
+      : (pending.status.startsWith('REJECTED') || pending.status.includes('FAILED')) ? '#FF6B7F'
+      : '#7fb2dd';
   }
 
   updateVideoUI(videoUrl) {
@@ -1664,6 +1728,195 @@ class CapaxeroDashboard {
           }
         } catch (err) {
           this.showToast('Erro ao comunicar com o servidor.', 'err');
+        }
+      });
+    }
+  }
+
+  /**
+   * Publicação global de uma nova versão do APK (modal #app-update-modal, aberto pelo menu de
+   * perfil) e disparo por máquina (botão #btn-update-app, dentro do modal de detalhes). Clone
+   * de setupVideoUploadControls() — mesmo padrão de dropzone/XHR/progresso — mas o upload não
+   * é por totem: qualquer APK publicado aqui fica disponível para toda a frota.
+   */
+  setupAppUpdateControls() {
+    const btnOpen = document.getElementById('pm-btn-publish-apk');
+    const modal = document.getElementById('app-update-modal');
+    const dropzone = document.getElementById('apk-dropzone');
+    const fileInput = document.getElementById('apk-file-input');
+    const btnPublish = document.getElementById('btn-publish-apk-now');
+    const btnCancel = document.getElementById('app-update-cancel');
+    const currentBox = document.getElementById('app-update-current');
+    const progressWrap = document.getElementById('apk-progress-wrap');
+    const progressBar = document.getElementById('apk-progress-bar');
+    const progressPct = document.getElementById('apk-progress-pct');
+
+    let selectedApkFile = null;
+
+    const renderCurrentRelease = async () => {
+      if (!currentBox) return;
+      currentBox.textContent = 'Carregando versão publicada...';
+      try {
+        const res = await fetch('/api/v1/app/version').then(r => r.json());
+        if (res.success) {
+          const d = res.data;
+          const sizeMb = (d.sizeBytes / (1024 * 1024)).toFixed(1);
+          currentBox.innerHTML = `<strong style="color:#e7edf4;">Publicada atualmente:</strong> ${d.versionName} (build ${d.versionCode}) · ${sizeMb} MB` +
+            (d.notes ? `<br>${d.notes}` : '');
+        } else {
+          currentBox.textContent = 'Nenhuma versão publicada ainda — este será o primeiro APK enviado.';
+        }
+      } catch (_) {
+        currentBox.textContent = 'Não foi possível consultar a versão publicada.';
+      }
+    };
+
+    if (btnOpen) {
+      btnOpen.addEventListener('click', () => {
+        const pm = document.getElementById('profile-menu');
+        if (pm) pm.classList.remove('open');
+        selectedApkFile = null;
+        if (btnPublish) btnPublish.style.display = 'none';
+        if (progressWrap) progressWrap.style.display = 'none';
+        document.getElementById('apk-version-code').value = '';
+        document.getElementById('apk-version-name').value = '';
+        document.getElementById('apk-notes').value = '';
+        renderCurrentRelease();
+        this.openModal('app-update-modal');
+      });
+    }
+
+    if (btnCancel && modal) {
+      btnCancel.addEventListener('click', () => modal.classList.remove('open'));
+    }
+
+    const handleFileSelected = (file) => {
+      if (!/\.apk$/i.test(file.name)) {
+        this.showToast('Selecione um arquivo .apk válido.', 'warn');
+        return;
+      }
+      if (file.size > 250 * 1024 * 1024) {
+        this.showToast('O APK excede o limite de 250 MB.', 'warn');
+        return;
+      }
+      selectedApkFile = file;
+      if (btnPublish) {
+        btnPublish.style.display = 'inline-block';
+        btnPublish.textContent = `⬆️ Publicar "${file.name.slice(0, 24)}" (${(file.size / (1024 * 1024)).toFixed(1)} MB)`;
+      }
+      this.showToast(`Arquivo "${file.name}" selecionado.`, 'ok');
+    };
+
+    if (dropzone && fileInput) {
+      dropzone.addEventListener('click', () => fileInput.click());
+      dropzone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropzone.style.borderColor = '#00F0FF';
+        dropzone.style.background = 'rgba(0, 240, 255, 0.08)';
+      });
+      dropzone.addEventListener('dragleave', () => {
+        dropzone.style.borderColor = 'rgba(85,135,179,0.4)';
+        dropzone.style.background = 'rgba(255,255,255,0.02)';
+      });
+      dropzone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropzone.style.borderColor = 'rgba(85,135,179,0.4)';
+        dropzone.style.background = 'rgba(255,255,255,0.02)';
+        if (e.dataTransfer.files && e.dataTransfer.files[0]) handleFileSelected(e.dataTransfer.files[0]);
+      });
+      fileInput.addEventListener('change', () => {
+        if (fileInput.files && fileInput.files[0]) handleFileSelected(fileInput.files[0]);
+      });
+    }
+
+    if (btnPublish) {
+      btnPublish.addEventListener('click', () => {
+        const versionCode = document.getElementById('apk-version-code').value.trim();
+        const versionName = document.getElementById('apk-version-name').value.trim();
+        const notes = document.getElementById('apk-notes').value.trim();
+
+        if (!selectedApkFile) {
+          this.showToast('Selecione um arquivo .apk para enviar.', 'warn');
+          return;
+        }
+        if (!versionCode || !versionName) {
+          this.showToast('Preencha o código e o nome da versão.', 'warn');
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append('versionCode', versionCode);
+        formData.append('versionName', versionName);
+        formData.append('notes', notes);
+        formData.append('apk', selectedApkFile);
+
+        if (progressWrap) progressWrap.style.display = 'block';
+        if (progressBar) progressBar.style.width = '0%';
+        if (progressPct) progressPct.textContent = '0%';
+        btnPublish.disabled = true;
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/api/v1/admin/app/apk');
+        if (this.token) xhr.setRequestHeader('Authorization', `Bearer ${this.token}`);
+
+        xhr.upload.onprogress = (e) => {
+          if (e.lengthComputable) {
+            const pct = Math.round((e.loaded / e.total) * 100);
+            if (progressBar) progressBar.style.width = `${pct}%`;
+            if (progressPct) progressPct.textContent = `${pct}%`;
+          }
+        };
+
+        xhr.onload = () => {
+          btnPublish.disabled = false;
+          let res = null;
+          try { res = JSON.parse(xhr.responseText); } catch (_) {}
+          if (xhr.status >= 200 && xhr.status < 300 && res && res.success) {
+            this.showToast(res.message || 'Versão publicada com sucesso!', 'ok');
+            selectedApkFile = null;
+            btnPublish.style.display = 'none';
+            renderCurrentRelease();
+          } else {
+            this.showToast((res && res.message) || 'Falha ao publicar a versão.', 'err');
+          }
+        };
+
+        xhr.onerror = () => {
+          btnPublish.disabled = false;
+          this.showToast('Erro de conexão durante o envio do APK.', 'err');
+        };
+
+        xhr.send(formData);
+      });
+    }
+
+    // Botão "Atualizar app" dentro do modal de detalhes de uma máquina específica
+    const btnUpdateApp = document.getElementById('btn-update-app');
+    if (btnUpdateApp) {
+      btnUpdateApp.addEventListener('click', async () => {
+        if (!this.selectedStationId) return;
+        if (!confirm(`Enviar a versão publicada para o totem ${this.selectedStationId} agora? A máquina vai baixar em segundo plano e pedir para o operador tocar em "Instalar" quando estiver pronta.`)) {
+          return;
+        }
+
+        btnUpdateApp.disabled = true;
+        try {
+          const res = await fetch(`/api/v1/admin/totems/${encodeURIComponent(this.selectedStationId)}/update-app`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${this.token}` }
+          }).then(r => r.json());
+
+          if (res.success) {
+            this.showToast(res.message || 'Atualização enviada ao totem.', 'ok');
+          } else {
+            // 409 (offline) e 404 (sem versão publicada) chegam aqui com a mensagem já pronta —
+            // sem isso o operador acredita que o comando foi entregue quando não foi.
+            this.showToast(res.message || 'Não foi possível enviar a atualização.', 'err');
+          }
+        } catch (_) {
+          this.showToast('Erro ao comunicar com o servidor.', 'err');
+        } finally {
+          btnUpdateApp.disabled = false;
         }
       });
     }
@@ -2085,6 +2338,7 @@ class CapaxeroDashboard {
     document.getElementById('modal-stat-rev').textContent = s.fatToday || s.fat || fmtBRL(0);
     document.getElementById('modal-stat-cycles').textContent = s.ciclosToday !== undefined ? s.ciclosToday : (s.ciclos || 0);
     document.getElementById('modal-current-owner-lbl').textContent = `Dono atual: ${s.dono}`;
+    this.renderAppUpdateStatus(s.raw || {});
 
     // Status Pill
     const pill = document.getElementById('modal-status-pill');

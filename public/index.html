@@ -107,6 +107,9 @@
         <button class="pm-link" id="pm-btn-edit-profile" style="width:100%; margin-bottom:8px; display:flex; align-items:center; justify-content:center; gap:8px; background:rgba(253,203,36,0.12); border:1px solid rgba(253,203,36,0.35); color:var(--brand-yellow); font-weight:700; border-radius:9px; padding:9px; font-size:12.5px; cursor:pointer;">
           <svg class="i" viewBox="0 0 24 24"><path d="M4 20l4-1 11-11-3-3L5 16l-1 4z"/><path d="M14 6l3 3"/></svg> Editar Meu Perfil (E-mail & Tel)
         </button>
+        <button class="pm-link admin-only" id="pm-btn-publish-apk" style="width:100%; margin-bottom:8px; display:flex; align-items:center; justify-content:center; gap:8px; background:rgba(85,135,179,0.12); border:1px solid rgba(85,135,179,0.35); color:#7fb2dd; font-weight:700; border-radius:9px; padding:9px; font-size:12.5px; cursor:pointer;">
+          <svg class="i" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/></svg> Publicar Nova Versão do App
+        </button>
         <div style="display:flex; gap:8px;">
           <a href="simulador.html" target="_blank" style="flex:1; text-align:center; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14); color:#e7edf4; border-radius:9px; padding:9px; font-size:12.5px; font-weight:600; text-decoration:none;"><svg class="i" viewBox="0 0 24 24"><path d="M9 2h6M10 2v6l-5 9a2 2 0 002 3h10a2 2 0 002-3l-5-9V2"/><path d="M8 15h8"/></svg> Simulador</a>
           <button class="pm-logout" id="pm-logout" style="flex:1; background:rgba(255,61,87,.12); border:1px solid rgba(255,61,87,.4); color:#FF6B7F; border-radius:9px; padding:9px; font-size:12.5px; font-weight:600; cursor:pointer;">Sair</button>
@@ -668,6 +671,18 @@
               <div class="gauge-sub" id="modal-uv-sensor-sub">Sensor de nível do reservatório</div>
             </div>
           </div>
+        </div>
+
+        <!-- Versão do App / Atualização remota -->
+        <div class="admin-only" id="modal-app-update-card" style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; padding:12px 14px; border-radius:10px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); margin-bottom:16px;">
+          <div>
+            <div class="lbl" style="margin-bottom:3px;">Versão do app instalada</div>
+            <div class="val" id="modal-app-version" style="font-size:13px;">—</div>
+            <div id="modal-app-update-status" style="font-size:11.5px; color:#7fb2dd; margin-top:4px; display:none;"></div>
+          </div>
+          <button class="btn btn-outline" id="btn-update-app" style="border-color:rgba(85,135,179,0.55); color:#7fb2dd; white-space:nowrap;">
+            <svg class="i" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0115-6.7M21 12a9 9 0 01-15 6.7"/><path d="M3 3v6h6M21 21v-6h-6"/></svg> Atualizar app
+          </button>
         </div>
 
         <!-- Remote Action Buttons -->
@@ -1399,6 +1414,64 @@
           <button type="submit" class="btn btn-primary" style="background:var(--brand-yellow); color:#000; font-weight:800;">Salvar Alterações</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL — Publicar Nova Versão do App do Totem (Exclusivo CRPADMIN)
+       ============================================================ -->
+  <div class="modal-overlay" id="app-update-modal">
+    <div class="modal-box compact" style="width:min(560px,96vw);">
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+        <h2 style="font-family: var(--font-display); font-weight: 900; font-size: 20px; margin:0; color:var(--brand-yellow);"><svg class="i" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg> PUBLICAR NOVA VERSÃO DO APP</h2>
+        <button class="modal-close" id="app-update-close" style="margin-left:auto;">✕</button>
+      </div>
+      <p style="margin:0 0 16px; font-size:12.5px; color:#8a97a7;">
+        O APK enviado aqui fica disponível para qualquer totem que clicar em "Atualizar app".
+        O totem só instala se o "Código da versão" for maior que o dele — nunca reenvia sozinho uma versão igual ou anterior.
+      </p>
+
+      <div id="app-update-current" style="padding:12px 14px; border-radius:10px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); margin-bottom:16px; font-size:12.5px; color:#8a97a7;">
+        Carregando versão publicada...
+      </div>
+
+      <div id="apk-dropzone" style="border: 2px dashed rgba(85,135,179,0.4); border-radius: 10px; padding: 16px; text-align: center; background: rgba(255,255,255,0.02); cursor: pointer; transition: all 0.2s ease; margin-bottom:14px;">
+        <input type="file" id="apk-file-input" accept=".apk,application/vnd.android.package-archive" style="display: none;">
+        <div style="font-size: 12px; font-weight: 700; color: #e7edf4; margin-bottom: 2px;">
+          <svg class="i" viewBox="0 0 24 24"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/><path d="M12 11v6M9 14l3-3 3 3"/></svg> Clique para selecionar ou arraste o arquivo .apk
+        </div>
+        <div style="font-size: 10.5px; color: #8a97a7;">Tamanho máximo: 250 MB</div>
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:14px;">
+        <div class="form-group" style="margin:0;">
+          <label class="field-label">Código da versão (versionCode) *</label>
+          <input type="number" class="form-control" id="apk-version-code" placeholder="Ex: 3" min="1" step="1" required>
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label class="field-label">Nome da versão (versionName) *</label>
+          <input type="text" class="form-control" id="apk-version-name" placeholder="Ex: 1.2.0" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="field-label">Notas desta versão (opcional)</label>
+        <input type="text" class="form-control" id="apk-notes" placeholder="O que mudou nesta versão">
+      </div>
+
+      <div id="apk-progress-wrap" style="display: none; margin-top:6px;">
+        <div style="display: flex; justify-content: space-between; font-size: 10.5px; color: #7fb2dd; margin-bottom: 4px;">
+          <span>Enviando APK para o servidor...</span>
+          <span id="apk-progress-pct">0%</span>
+        </div>
+        <div style="height: 6px; border-radius: 3px; background: rgba(255,255,255,0.08); overflow: hidden;">
+          <div id="apk-progress-bar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #FDCB24, #00F0FF); border-radius: 3px; transition: width 0.2s;"></div>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:18px;">
+        <button type="button" class="btn btn-outline" id="app-update-cancel">Fechar</button>
+        <button type="button" class="btn btn-primary" id="btn-publish-apk-now" style="display:none; background:#5587B3; color:#fff; font-weight:700;">⬆️ Publicar Versão</button>
+      </div>
     </div>
   </div>
 

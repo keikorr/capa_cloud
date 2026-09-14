@@ -15,6 +15,7 @@ const store = require('../services/store');
 const wsManager = require('../services/websocket');
 const { sanitizeCpf, isValidCpf, formatCpf, COUPON_CPF_ENABLED } = require('../services/cpf');
 const { normalizeMode, inferModeFromAmount } = require('../services/modes');
+const { getPublishedRelease } = require('../services/appRelease');
 
 // Configuração do Storage para Vídeos de Higienização
 const videoStorage = multer.diskStorage({
@@ -306,61 +307,17 @@ router.put(['/totems/:totemId/config', '/totem/config/:devno'], (req, res) => {
  * GET /api/v1/app/version
  * Versão publicada do APK do totem, para a atualização pelo botão do Painel do Operador.
  *
- * A URL de download é montada a partir do host da própria requisição: assim o totem recebe
- * o endereço por onde ele já está falando (túnel Cloudflare, IP da LAN, domínio próprio) sem
- * precisar de nenhuma configuração extra.
+ * A leitura do manifesto, o hash do APK e a URL de download (montada a partir do host da
+ * própria requisição, ciente de túnel/proxy) vivem em services/appRelease.js — o mesmo helper
+ * que a rota de disparo de atualização remota (routes/admin.js) usa, para as duas nunca
+ * divergirem sobre qual é a versão publicada.
  */
-const APP_DOWNLOAD_DIR = path.join(__dirname, '../public/downloads');
-const appVersionCache = { mtimeMs: 0, sha256: null };
-
-router.get(['/app/version', '/app/latest'], (req, res) => {
+router.get(['/app/version', '/app/latest'], async (req, res) => {
   try {
-    const manifestPath = path.join(APP_DOWNLOAD_DIR, 'app-version.json');
-    if (!fs.existsSync(manifestPath)) {
-      return res.status(404).json({
-        code: -1, success: false,
-        message: 'Nenhuma versão do aplicativo publicada no servidor.'
-      });
-    }
-
-    const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-    const apkName = manifest.apkFile || 'capaxero-totem.apk';
-    const apkPath = path.join(APP_DOWNLOAD_DIR, apkName);
-
-    if (!fs.existsSync(apkPath)) {
-      return res.status(404).json({
-        code: -1, success: false,
-        message: `Manifesto aponta para "${apkName}", mas o arquivo não está em public/downloads.`
-      });
-    }
-
-    const stat = fs.statSync(apkPath);
-
-    // O hash só é recalculado quando o APK muda — são ~48 MB, não dá para reler a cada consulta.
-    if (appVersionCache.mtimeMs !== stat.mtimeMs || !appVersionCache.sha256) {
-      appVersionCache.sha256 = crypto.createHash('sha256').update(fs.readFileSync(apkPath)).digest('hex');
-      appVersionCache.mtimeMs = stat.mtimeMs;
-    }
-
-    // Atrás do túnel/proxy o esquema real vem no cabeçalho; req.protocol diria "http".
-    const proto = (req.headers['x-forwarded-proto'] || '').split(',')[0].trim() || req.protocol || 'http';
-    const host = req.headers['x-forwarded-host'] || req.headers.host;
-
-    return res.json({
-      code: 0,
-      success: true,
-      data: {
-        versionCode: Number(manifest.versionCode) || 0,
-        versionName: manifest.versionName || '0.0.0',
-        notes: manifest.notes || '',
-        downloadUrl: `${proto}://${host}/downloads/${encodeURIComponent(apkName)}`,
-        sizeBytes: stat.size,
-        sha256: appVersionCache.sha256,
-        publishedAt: stat.mtime.toISOString()
-      }
-    });
+    const release = await getPublishedRelease(req);
+    return res.json({ code: 0, success: true, data: release });
   } catch (err) {
-    return res.status(500).json({ code: -1, success: false, message: err.message });
+    return res.status(err.statusCode || 500).json({ code: -1, success: false, message: err.message });
   }
 });
 
@@ -380,7 +337,8 @@ router.post(['/telemetry/heartbeat', '/totem/heartbeat'], (req, res) => {
     liquidLevelPercent,
     isLiquidLevelOk,
     currentCycle,
-    appVersion
+    appVersion,
+    versionCode
   } = req.body;
   // Nota: "temperature"/"temperatureCelsius" e "fragranceLevelPercent" chegam do totem, mas a
   // máquina não tem sensor de temperatura nem de nível de fragrância (só porta e líquido — ver
@@ -406,7 +364,8 @@ router.post(['/telemetry/heartbeat', '/totem/heartbeat'], (req, res) => {
     doorLocked: doorState,
     liquidLevelPercent: liquidState !== undefined ? liquidState : 100,
     currentCycle: currentCycle || (currentPhase ? { step: currentPhase } : null),
-    appVersion: appVersion || '1.0.0'
+    appVersion: appVersion || '1.0.0',
+    versionCode: versionCode !== undefined ? Number(versionCode) : undefined
   });
 
   // Notifica o dashboard via WebSocket para aparecer imediatamente como máquina online
