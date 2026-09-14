@@ -882,6 +882,19 @@
                   <div style="font-size: 10.5px; color: #8a97a7;">Tamanho máximo: 150 MB (Recomendado: 1080p ou 720p 16:9)</div>
                 </div>
 
+                <!-- Alternativa: colar um link direto (evita o limite de upload do servidor —
+                     útil quando o proxy da VPS bloqueia arquivos grandes com 413). -->
+                <div style="display: flex; align-items: center; gap: 6px; font-size: 10px; color: #64748b;">
+                  <div style="flex:1; height:1px; background:rgba(255,255,255,0.08);"></div>
+                  ou cole um link direto
+                  <div style="flex:1; height:1px; background:rgba(255,255,255,0.08);"></div>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                  <input type="text" id="conf-video-url-input" class="form-control" style="flex:1; font-size: 11.5px;"
+                    placeholder="https://.../video.mp4 (link direto, não a página de visualização)">
+                  <button type="button" class="btn btn-outline" id="btn-use-video-url" style="white-space:nowrap; font-size: 11.5px; padding: 8px 12px;">Usar link</button>
+                </div>
+
                 <!-- Progress Bar -->
                 <div id="conf-video-progress-wrap" style="display: none;">
                   <div style="display: flex; justify-content: space-between; font-size: 10.5px; color: #7fb2dd; margin-bottom: 4px;">

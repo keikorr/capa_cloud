@@ -1731,6 +1731,48 @@ class CapaxeroDashboard {
         }
       });
     }
+
+    // Alternativa ao upload: colar um link direto. Útil quando o proxy da VPS na frente do
+    // servidor rejeita arquivos grandes com 413 antes mesmo de chegar no multer — aqui não
+    // sobe bytes nenhum pelo navegador, o totem baixa direto de onde a URL apontar.
+    const btnUseVideoUrl = document.getElementById('btn-use-video-url');
+    const videoUrlInput = document.getElementById('conf-video-url-input');
+    if (btnUseVideoUrl && videoUrlInput) {
+      btnUseVideoUrl.addEventListener('click', async () => {
+        const url = videoUrlInput.value.trim();
+        if (!url) {
+          this.showToast('Cole um link de vídeo válido.', 'warn');
+          return;
+        }
+        if (!/^https?:\/\//i.test(url)) {
+          this.showToast('O link precisa começar com http:// ou https://.', 'warn');
+          return;
+        }
+        if (!this.selectedStationId) return;
+
+        btnUseVideoUrl.disabled = true;
+        try {
+          const res = await fetch(`/api/v1/totems/${encodeURIComponent(this.selectedStationId)}/video`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.token}` },
+            body: JSON.stringify({ videoUrl: url })
+          }).then(r => r.json());
+
+          if (res.success && res.data?.videoUrl) {
+            this.updateVideoUI(res.data.videoUrl);
+            this.showToast('Link de vídeo vinculado à máquina com sucesso!', 'ok');
+            videoUrlInput.value = '';
+            await this.fetchBackendData();
+          } else {
+            this.showToast(res.message || 'Erro ao vincular o link.', 'err');
+          }
+        } catch (err) {
+          this.showToast('Erro ao comunicar com o servidor.', 'err');
+        } finally {
+          btnUseVideoUrl.disabled = false;
+        }
+      });
+    }
   }
 
   /**
