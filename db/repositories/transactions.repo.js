@@ -60,7 +60,9 @@ const SQL_SUMMARY = `
       coalesce(round(avg(amount_cents)), 0)::bigint                       AS avg_ticket_cents,
       min(occurred_at)                                                    AS first_sale_at,
       max(occurred_at)                                                    AS last_sale_at,
-      count(DISTINCT (occurred_at AT TIME ZONE 'America/Fortaleza')::date) AS active_days
+      count(DISTINCT (occurred_at AT TIME ZONE 'America/Fortaleza')::date) AS active_days,
+      coalesce(array_agg(DISTINCT (occurred_at AT TIME ZONE 'America/Fortaleza')::date::text)
+        FILTER (WHERE occurred_at IS NOT NULL), ARRAY[]::text[])           AS active_dates
     FROM base
   ),
   by_mode AS (
@@ -183,7 +185,8 @@ async function getMachineHistory(devno, { limit = 50, offset = 0, couponLimit = 
         txCount,
         totalCents: Number(totals.total_cents || 0),
         avgTicketCents: Number(totals.avg_ticket_cents || 0),
-        activeDays: Number(totals.active_days || 0)
+        activeDays: Number(totals.active_days || 0),
+        activeDates: Array.isArray(totals.active_dates) ? totals.active_dates : []
       },
       byMode: (summaryRow.by_mode || []).map(m => ({
         mode: m.mode,
@@ -251,4 +254,54 @@ async function getGlobalHistorySummary(userFilter = null) {
   });
 }
 
-module.exports = { getMachineHistory, getGlobalHistorySummary };
+/**
+ * Livro de vendas usado pelo dashboard. Diferente dos agregados antigos, devolve as
+ * transações que sustentam cada número da tela, permitindo que o front derive gráfico,
+ * rankings e tendências da mesma fonte do histórico por máquina.
+ */
+async function getDashboardHistory(userFilter = null) {
+  return withTx(async (client) => {
+    await client.query(`SET LOCAL statement_timeout = ${STATEMENT_TIMEOUT_MS}`);
+
+    const params = [];
+    let ownerClause = '';
+    if (userFilter && userFilter.role !== 'CRPADMIN' && userFilter.id) {
+      params.push(userFilter.id);
+      ownerClause = `AND m.owner_id = $${params.length}`;
+    }
+
+    const result = await client.query(`
+      SELECT
+        t.public_id,
+        t.order_id,
+        t.devno,
+        t.mode,
+        t.mode_label,
+        CASE WHEN t.payment_method = 'Cupom / Gratuidade' THEN 0 ELSE t.amount_cents END AS amount_cents,
+        t.payment_method,
+        t.occurred_at,
+        max(t.created_at) OVER () AS imported_at
+      FROM transactions t
+      INNER JOIN totems m ON m.devno = t.devno
+      WHERE t.status = 'APPROVED' ${ownerClause}
+      ORDER BY t.occurred_at DESC, t.id DESC
+      LIMIT 20000
+    `, params);
+
+    return {
+      importedAt: result.rows[0]?.imported_at || null,
+      transactions: result.rows.map(row => ({
+        publicId: row.public_id,
+        orderId: row.order_id,
+        devno: row.devno,
+        mode: row.mode,
+        modeLabel: row.mode_label,
+        amountCents: Number(row.amount_cents || 0),
+        paymentMethod: row.payment_method,
+        occurredAt: row.occurred_at
+      }))
+    };
+  });
+}
+
+module.exports = { getMachineHistory, getGlobalHistorySummary, getDashboardHistory };

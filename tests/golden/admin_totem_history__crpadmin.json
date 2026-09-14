@@ -30,6 +30,13 @@
         "lastSaleAt": "2026-09-02T18:00:21.971Z"
       },
       "summary": {
+        "activeDates": [
+          "2026-09-02",
+          "2026-09-01",
+          "2026-08-31",
+          "2026-08-27",
+          "2026-08-26"
+        ],
         "activeDays": 5,
         "avgTicketCents": 1178,
         "totalCents": 27092,

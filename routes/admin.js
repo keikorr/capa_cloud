@@ -812,6 +812,86 @@ router.get('/admin/transactions', (req, res) => {
   });
 });
 
+function transactionKey(t) {
+  return String(t.publicId || t.id || t.orderId || `${t.devno}|${t.timestamp || t.occurredAt}|${t.amount ?? t.amountCents}|${t.mode || ''}`);
+}
+
+function liveTransactionPayload(t) {
+  return {
+    id: t.id || null,
+    publicId: t.publicId || t.id || null,
+    orderId: t.orderId || null,
+    devno: t.devno,
+    totemName: t.totemName || null,
+    mode: t.mode || t.modeLabel || null,
+    modeLabel: t.modeLabel || t.mode || null,
+    amount: Number(t.paymentMethod === 'Cupom / Gratuidade' ? 0 : (t.amount || 0)),
+    paymentMethod: t.paymentMethod || null,
+    timestamp: t.timestamp || t.occurredAt,
+    status: 'APPROVED'
+  };
+}
+
+function archivedTransactionPayload(t) {
+  return {
+    publicId: t.publicId,
+    orderId: t.orderId,
+    devno: t.devno,
+    mode: t.mode,
+    modeLabel: t.modeLabel,
+    amount: Number(t.amountCents || 0) / 100,
+    paymentMethod: t.paymentMethod,
+    timestamp: t.occurredAt,
+    status: 'APPROVED'
+  };
+}
+
+/**
+ * GET /api/v1/admin/dashboard-history
+ * Fonte única do painel: arquivo relacional + vendas criadas depois da importação.
+ * O corte pela data de importação impede que fixtures antigas do JSON contaminem os
+ * gráficos; a chave estável impede duplicidade durante uma migração/reimportação.
+ */
+router.get('/admin/dashboard-history', async (req, res) => {
+  const user = extractUser(req);
+  if (!user) {
+    return res.status(401).json({ success: false, message: 'Sessão expirada. Entre novamente.' });
+  }
+
+  try {
+    if (!getDatabaseUrl()) {
+      return res.json({ success: true, source: 'live', data: store.getTransactions(20000, user) });
+    }
+
+    const archived = await historyRepo.getDashboardHistory(user);
+    const importedAtMs = archived.importedAt ? new Date(archived.importedAt).getTime() : 0;
+    const archivedRows = archived.transactions.map(archivedTransactionPayload);
+    const seen = new Set(archivedRows.map(transactionKey));
+    const recentRows = store.getTransactions(20000, user)
+      .filter(t => (!t.status || t.status === 'APPROVED') && t.timestamp && new Date(t.timestamp).getTime() > importedAtMs)
+      .map(liveTransactionPayload)
+      .filter(t => {
+        const key = transactionKey(t);
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+
+    const data = [...recentRows, ...archivedRows]
+      .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+    return res.json({
+      success: true,
+      source: 'history+live',
+      importedAt: archived.importedAt,
+      data
+    });
+  } catch (error) {
+    console.error('[API] Erro ao montar histórico consolidado do dashboard:', error);
+    return res.json({ success: true, source: 'live-fallback', data: store.getTransactions(20000, user) });
+  }
+});
+
 /**
  * Vendas desta máquina que aconteceram DEPOIS do corte do arquivo Postgres (ou o
  * histórico inteiro da máquina, se o arquivo nem existir neste ambiente). O histórico é
@@ -900,7 +980,8 @@ router.get('/admin/totems/:devno/history', async (req, res) => {
           txCount: liveTxs.length,
           totalCents,
           avgTicketCents: avgTicket,
-          activeDays: activeDaysSet.size
+          activeDays: activeDaysSet.size,
+          activeDates: [...activeDaysSet]
         },
         byMode: [],
         byPayment: [],
@@ -927,7 +1008,7 @@ router.get('/admin/totems/:devno/history', async (req, res) => {
         available: true,
         reason: null,
         ...history,
-        liveDelta: buildLiveDelta(devno, history.snapshot.lastSaleAt)
+        liveDelta: buildLiveDelta(devno, history.snapshot.importedAt)
       }
     });
   } catch (err) {
@@ -954,7 +1035,8 @@ router.get('/admin/totems/:devno/history', async (req, res) => {
           txCount: liveTxs.length,
           totalCents,
           avgTicketCents: avgTicket,
-          activeDays: activeDaysSet.size
+          activeDays: activeDaysSet.size,
+          activeDates: [...activeDaysSet]
         },
         byMode: [],
         byPayment: [],

@@ -198,6 +198,7 @@ async function main() {
       ['admin_alerts__crpadmin', '/api/v1/admin/alerts', admToken],
       ['admin_alerts_ativos__crpadmin', '/api/v1/admin/alerts?active=true', admToken],
       ['admin_transactions__crpadmin', '/api/v1/admin/transactions?limit=5000', admToken],
+      ['admin_dashboard_history__crpadmin', '/api/v1/admin/dashboard-history', admToken],
       ['admin_stats__crpadmin', '/api/v1/admin/stats', admToken],
       ['admin_income__crpadmin', '/api/v1/admin/income-report', admToken],
       ['auth_me__crpadmin', '/api/v1/auth/me', admToken]
@@ -215,6 +216,7 @@ async function main() {
         ['admin_depots__owner', '/api/v1/admin/depots', ownerToken],
         ['admin_alerts__owner', '/api/v1/admin/alerts', ownerToken],
         ['admin_transactions__owner', '/api/v1/admin/transactions?limit=5000', ownerToken],
+        ['admin_dashboard_history__owner', '/api/v1/admin/dashboard-history', ownerToken],
         ['admin_stats__owner', '/api/v1/admin/stats', ownerToken],
         ['admin_income__owner', '/api/v1/admin/income-report', ownerToken],
         ['auth_me__owner', '/api/v1/auth/me', ownerToken]
@@ -271,6 +273,50 @@ async function main() {
           console.error(`     itens em data: esperado ${ea}, obtido ${eb}`);
         }
         falhas++;
+      }
+    }
+
+    if (!UPDATE) {
+      // Regressão do seletor de dono: confirma o fluxo completo no banco descartável,
+      // depois que o front consegue finalmente enviar uma opção válida.
+      if (owner && totemAlheio) {
+        const transferRes = await fetch(`${BASE}/api/v1/admin/totems/${encodeURIComponent(totemAlheio.devno)}/owner`, {
+          method: 'PUT',
+          headers: { Authorization: `Bearer ${admToken}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ targetUserId: owner.id })
+        });
+        const transferBody = await transferRes.json();
+        if (!transferRes.ok || !transferBody.success || transferBody.data?.owner_id !== owner.id) {
+          console.error('  FALHOU   owner_transfer__crpadmin');
+          falhas++;
+        } else {
+          console.log('  ok       owner_transfer__crpadmin');
+        }
+      }
+
+      // O livro entregue ao dashboard precisa ser deduplicado e numericamente íntegro;
+      // todos os widgets derivam desta mesma lista.
+      const historyRes = await fetch(`${BASE}/api/v1/admin/dashboard-history`, {
+        headers: { Authorization: `Bearer ${admToken}` }
+      });
+      const historyBody = await historyRes.json();
+      const rows = Array.isArray(historyBody.data) ? historyBody.data : [];
+      const keys = rows.map(t => String(t.publicId || t.id || t.orderId || `${t.devno}|${t.timestamp}|${t.amount}|${t.mode || ''}`));
+      const hasDuplicates = new Set(keys).size !== keys.length;
+      const hasInvalidAmount = rows.some(t => !Number.isFinite(Number(t.amount)));
+      if (!historyRes.ok || !historyBody.success || hasDuplicates || hasInvalidAmount) {
+        console.error('  FALHOU   dashboard_history__integrity');
+        falhas++;
+      } else {
+        console.log('  ok       dashboard_history__integrity');
+      }
+
+      const anonymousHistoryRes = await fetch(`${BASE}/api/v1/admin/dashboard-history`);
+      if (anonymousHistoryRes.status !== 401) {
+        console.error('  FALHOU   dashboard_history__requires_auth');
+        falhas++;
+      } else {
+        console.log('  ok       dashboard_history__requires_auth');
       }
     }
   } catch (err) {

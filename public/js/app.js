@@ -440,29 +440,18 @@ class CapaxeroDashboard {
         this.showToast(`Alerta em ${msg.data.alert.totemName || 'Totem'}: ${msg.data.alert.message}`, 'warn');
       }
     } else if (msg.type === 'NEW_TRANSACTION') {
-      this.fetchBackendData();
+      const refreshPromise = this.fetchBackendData();
       if (msg.data?.transaction) {
         const tx = msg.data.transaction;
         this.showToast(`Venda aprovada: ${fmtBRL(tx.amount)} em ${tx.totemName}`, 'ok');
 
-        // Atualização em Tempo Real (0ms) no histórico do modal se estiver aberto para esta máquina
+        // Recarrega o histórico consolidado da máquina para atualizar linha, totais e paginação.
         if (this.selectedStationId && (tx.devno === this.selectedStationId || tx.totemId === this.selectedStationId)) {
-          const tbody = document.getElementById('station-history-tbody');
-          if (tbody) {
-            const newRow = `
-              <tr style="background:rgba(0,197,102,.14); transition:background 2s ease;">
-                <td class="mono muted">${new Date(tx.timestamp || Date.now()).toLocaleString('pt-BR')}</td>
-                <td>${tx.mode || 'INTERMEDIARIA'}</td>
-                <td class="muted">${tx.paymentMethod || 'PIX Instantâneo'}</td>
-                <td class="mono" style="text-align:right; color:#00C566;">${fmtBRL(tx.amount)}</td>
-              </tr>
-            `;
-            if (tbody.textContent.includes('Nenhuma venda') || tbody.textContent.includes('Carregando')) {
-              tbody.innerHTML = newRow;
-            } else {
-              tbody.insertAdjacentHTML('afterbegin', newRow);
-            }
-          }
+          refreshPromise.then(() => {
+            if (!this.selectedStationId || (tx.devno !== this.selectedStationId && tx.totemId !== this.selectedStationId)) return;
+            this.stationHistoryLoadedFor = null;
+            this.loadStationHistory(this.selectedStationId);
+          });
         }
       }
     }
@@ -2012,7 +2001,7 @@ class CapaxeroDashboard {
         fetch('/api/v1/admin/depots', { headers }).then(r => r.json()).catch(() => ({ success: false })),
         fetch('/api/v1/admin/users', { headers }).then(r => r.json()).catch(() => ({ success: false })),
         fetch('/api/v1/admin/alerts', { headers }).then(r => r.json()).catch(() => ({ success: false })),
-        fetch('/api/v1/admin/transactions?limit=5000', { headers }).then(r => r.json()).catch(() => ({ success: false })),
+        fetch('/api/v1/admin/dashboard-history', { headers }).then(r => r.json()).catch(() => ({ success: false })),
         fetch('/api/v1/coupons').then(r => r.json()).catch(() => ({ success: false })),
         fetch('/api/v1/admin/stats', { headers }).then(r => r.json()).catch(() => ({ success: false })),
         fetch('/api/v1/admin/history-summary', { headers }).then(r => r.json()).catch(() => ({ success: false })),
@@ -2106,6 +2095,20 @@ class CapaxeroDashboard {
 
   populateSelectors() {
     const users = this.state.users || [];
+
+    // Declarado antes do primeiro uso. A versão anterior chamava a função enquanto ela
+    // ainda estava na temporal dead zone, interrompendo o preenchimento dos seletores e
+    // deixando a troca de dono sem opções.
+    const setOptions = (el, html) => {
+      if (!el || el.innerHTML === html) return;
+
+      const selecionado = el.value;
+      el.innerHTML = html;
+      if (selecionado && Array.from(el.options).some(o => o.value === selecionado)) {
+        el.value = selecionado;
+      }
+    };
+
     let ownerOptions = '';
     if (users.length > 0) {
       ownerOptions = users.map(u => {
@@ -2146,21 +2149,6 @@ class CapaxeroDashboard {
       }
       setOptions(selDashOwner, opts.join(''));
     }
-
-    // Reescrever innerHTML de um <select> descarta a opção que o operador acabou de escolher.
-    // Como populateSelectors() roda a cada DASHBOARD_UPDATE (o totem conectando já dispara um),
-    // quem estava trocando o dono via a escolha voltar sozinha em segundos. Aqui o select só é
-    // reconstruído quando a lista realmente mudou, e a seleção em andamento é preservada.
-    const setOptions = (el, html) => {
-      if (!el) return;
-      if (el.innerHTML === html) return;
-
-      const selecionado = el.value;
-      el.innerHTML = html;
-      if (selecionado && Array.from(el.options).some(o => o.value === selecionado)) {
-        el.value = selecionado;
-      }
-    };
 
     const semTotens = '<option value="">Nenhuma máquina cadastrada</option>';
 
@@ -2423,38 +2411,38 @@ class CapaxeroDashboard {
     if (tab === 'history') this.loadStationHistory(this.selectedStationId);
   }
 
-  /** Monta o aviso de topo da aba Histórico: estado do arquivo + reconciliação com o JSON. */
+  /** Monta o aviso de topo do histórico consolidado: arquivo validado + vendas ao vivo. */
   renderStationHistoryNotice(data) {
     const fmtData = (iso) => iso ? new Date(iso).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }) : '—';
     const ld = data.liveDelta || { txCount: 0, totalCents: 0 };
     const ldLine = ld.txCount > 0
-      ? `<br>${ld.txCount} venda${ld.txCount > 1 ? 's' : ''} mais recente${ld.txCount > 1 ? 's' : ''} (${fmtBRL(ld.totalCents / 100)}) ainda não ${ld.txCount > 1 ? 'entraram' : 'entrou'} neste arquivo — aparece${ld.txCount > 1 ? 'm' : ''} na aba Visão geral.`
-      : `<br>Arquivo em dia — nenhuma venda posterior ao arquivo.`;
+      ? `<br>${ld.txCount} venda${ld.txCount > 1 ? 's' : ''} recente${ld.txCount > 1 ? 's' : ''} (${fmtBRL(ld.totalCents / 100)}) incorporada${ld.txCount > 1 ? 's' : ''} em tempo real abaixo.`
+      : `<br>Nenhuma venda posterior à última importação.`;
 
     if (data.reason === 'NOT_CONFIGURED') {
       return `<div class="history-notice neutral">
-        <span class="title">${ICONS.clipboard} Arquivo histórico não configurado neste ambiente</span>
-        Mostrando o total conhecido a partir do painel: ${ld.txCount} venda${ld.txCount === 1 ? '' : 's'} (${fmtBRL(ld.totalCents / 100)}).
+        <span class="title">${ICONS.clipboard} Histórico em tempo real</span>
+        Exibindo as vendas confirmadas disponíveis neste ambiente.
       </div>`;
     }
 
     if (!data.machineInSnapshot) {
       return `<div class="history-notice neutral">
-        <span class="title">${ICONS.clipboard} Máquina cadastrada depois do arquivo</span>
-        Esta máquina ainda não existia quando o histórico foi importado (arquivo de ${fmtData(data.snapshot?.importedAt)}).${ldLine}
+        <span class="title">${ICONS.clipboard} Histórico consolidado</span>
+        Máquina cadastrada depois da importação de ${fmtData(data.snapshot?.importedAt)}.${ldLine}
       </div>`;
     }
 
     if (data.summary.txCount === 0) {
       return `<div class="history-notice neutral">
-        <span class="title">${ICONS.clipboard} Nenhuma venda no arquivo</span>
-        Arquivo congelado em ${fmtData(data.snapshot.importedAt)}.${ldLine}
+        <span class="title">${ICONS.clipboard} Histórico consolidado</span>
+        Nenhuma venda anterior à importação de ${fmtData(data.snapshot.importedAt)}.${ldLine}
       </div>`;
     }
 
     return `<div class="history-notice ${ld.txCount > 0 ? 'neutral' : 'green'}">
-      <span class="title">${ICONS.clipboard} Arquivo congelado em ${fmtData(data.snapshot.importedAt)}</span>
-      Cobre vendas de ${fmtData(data.snapshot.firstSaleAt)} até ${fmtData(data.snapshot.lastSaleAt)}.${ldLine}
+      <span class="title">${ICONS.clipboard} Histórico consolidado e atualizado</span>
+      Base validada de ${fmtData(data.snapshot.firstSaleAt)} até ${fmtData(data.snapshot.lastSaleAt)}.${ldLine}
     </div>`;
   }
 
@@ -2466,10 +2454,10 @@ class CapaxeroDashboard {
     </div>`;
   }
 
-  /** Linhas da tabela de vendas do arquivo. */
+  /** Linhas da tabela de vendas consolidadas. */
   renderStationHistoryRows(transactions) {
     if (!transactions.length) {
-      return `<tr><td colspan="4" style="text-align:center; padding:28px; color:var(--text-muted); font-size:13px;">Nenhuma venda neste arquivo.</td></tr>`;
+      return `<tr><td colspan="4" style="text-align:center; padding:28px; color:var(--text-muted); font-size:13px;">Nenhuma venda registrada para esta máquina.</td></tr>`;
     }
     return transactions.map(t => `
       <tr>
@@ -2501,6 +2489,8 @@ class CapaxeroDashboard {
     const localTxs = (this.transactions || [])
       .filter(t => (t.devno === devno || t.totemId === devno) && !(t.status && t.status !== 'APPROVED'))
       .map(t => ({
+        publicId: t.publicId || t.id || null,
+        orderId: t.orderId || null,
         occurredAt: t.timestamp,
         modeLabel: t.mode,
         mode: t.mode,
@@ -2557,38 +2547,69 @@ class CapaxeroDashboard {
       }
 
       const data = res.data;
+      const importedAtMs = data.snapshot?.importedAt ? new Date(data.snapshot.importedAt).getTime() : 0;
+      const recentTxs = localTxs.filter(t => t.occurredAt && new Date(t.occurredAt).getTime() > importedAtMs);
+      const archivedTxs = data.transactions || [];
+      const txKey = t => String(t.publicId || t.orderId || `${t.occurredAt}|${t.amountCents}|${t.mode || ''}`);
+      const seen = new Set();
+      const combinedTxs = [...recentTxs, ...archivedTxs]
+        .filter(t => {
+          const key = txKey(t);
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        })
+        .sort((a, b) => new Date(b.occurredAt) - new Date(a.occurredAt));
+
+      const recentCents = recentTxs.reduce((acc, t) => acc + Number(t.amountCents || 0), 0);
+      const archivedSummary = data.summary || { txCount: 0, totalCents: 0, activeDays: 0 };
+      const consolidatedSummary = {
+        txCount: Number(archivedSummary.txCount || 0) + recentTxs.length,
+        totalCents: Number(archivedSummary.totalCents || 0) + recentCents,
+        activeDays: new Set([
+          ...(archivedSummary.activeDates || []),
+          ...recentTxs.map(t => String(t.occurredAt).slice(0, 10))
+        ]).size
+      };
+      consolidatedSummary.avgTicketCents = consolidatedSummary.txCount
+        ? Math.round(consolidatedSummary.totalCents / consolidatedSummary.txCount)
+        : 0;
+
+      data.archivedTransactions = archivedTxs;
+      data.transactions = combinedTxs;
+      data.consolidatedSummary = consolidatedSummary;
       this.stationHistoryData = data;
       this.stationHistoryDevno = devno;
 
       if (notice) notice.innerHTML = this.renderStationHistoryNotice(data);
 
-      if (data.available && data.machineInSnapshot && data.summary) {
+      if (data.available && data.summary) {
         if (summary) {
           summary.innerHTML = `
             <div class="cpf-summary-box">
-              <div class="lbl">Vendas no arquivo</div>
-              <div class="val accent">${data.summary.txCount}</div>
+              <div class="lbl">Vendas confirmadas</div>
+              <div class="val accent">${consolidatedSummary.txCount}</div>
             </div>
             <div class="cpf-summary-box">
-              <div class="lbl">Faturamento arquivado</div>
-              <div class="val">${fmtBRL(data.summary.totalCents / 100)}</div>
+              <div class="lbl">Faturamento total</div>
+              <div class="val">${fmtBRL(consolidatedSummary.totalCents / 100)}</div>
             </div>
             <div class="cpf-summary-box">
               <div class="lbl">Ticket médio</div>
-              <div class="val">${fmtBRL(data.summary.avgTicketCents / 100)}</div>
+              <div class="val">${fmtBRL(consolidatedSummary.avgTicketCents / 100)}</div>
             </div>
             <div class="cpf-summary-box">
               <div class="lbl">Dias com venda</div>
-              <div class="val">${data.summary.activeDays}</div>
+              <div class="val">${consolidatedSummary.activeDays}</div>
             </div>
           `;
         }
       }
 
-      if (tbody) tbody.innerHTML = this.renderStationHistoryRows(data.transactions || []);
+      if (tbody) tbody.innerHTML = this.renderStationHistoryRows(combinedTxs);
 
       if (moreBtn) {
-        if (data.available && data.page && data.page.total > (data.transactions || []).length) {
+        if (data.available && data.page && data.page.total > archivedTxs.length) {
           moreBtn.style.display = 'inline-flex';
           moreBtn.onclick = () => this.loadStationHistoryMore();
         } else {
@@ -2622,7 +2643,7 @@ class CapaxeroDashboard {
 
     const tbody = document.getElementById('station-history-tbody');
     const moreBtn = document.getElementById('station-history-more');
-    const offset = (data.transactions || []).length;
+    const offset = (data.archivedTransactions || data.transactions || []).length;
 
     try {
       const res = await fetch(`/api/v1/admin/totems/${encodeURIComponent(devno)}/history?limit=50&offset=${offset}`, {
@@ -2631,11 +2652,12 @@ class CapaxeroDashboard {
       if (!res.success || !res.data.available) return;
 
       const novas = res.data.transactions || [];
+      data.archivedTransactions = [...(data.archivedTransactions || []), ...novas];
       data.transactions = [...(data.transactions || []), ...novas];
       if (tbody) tbody.insertAdjacentHTML('beforeend', this.renderStationHistoryRows(novas));
 
       if (moreBtn) {
-        moreBtn.style.display = data.page.total > data.transactions.length ? 'inline-flex' : 'none';
+        moreBtn.style.display = data.page.total > data.archivedTransactions.length ? 'inline-flex' : 'none';
       }
     } catch (err) {
       this.showToast('Falha ao carregar mais vendas.', 'err');
