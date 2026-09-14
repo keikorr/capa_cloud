@@ -490,6 +490,18 @@ class RelationalDatabase {
     return this.maskTotemCredentials(t, true);
   }
 
+  /**
+   * Referência CRUA (não a cópia mascarada de getTotem/maskTotemCredentials) do totem dentro
+   * de this.tables.totems, para quem precisa MUTAR e persistir — save() serializa this.tables
+   * diretamente, então mutar a cópia de getTotem() e chamar save() é sempre um no-op
+   * silencioso (achado testando updateTotemConfig: o vídeo customizado "salvava" na resposta
+   * da rota mas sumia ao reabrir o modal, porque nunca tinha ido para o array de verdade).
+   * Todo método que MUDA um totem e chama save() tem que passar por aqui, não por getTotem().
+   */
+  _findTotemRaw(devno) {
+    return this.tables.totems.find(t => t.devno === devno) || null;
+  }
+
   // Faturamento e ciclos realmente de HOJE, calculados a partir do histórico de transações
   getTodayMetrics(devno) {
     const now = new Date();
@@ -582,7 +594,7 @@ class RelationalDatabase {
   }
 
   updateTotemConfig(devno, newConfig, userRole = 'CRPADMIN') {
-    let totem = this.getTotem(devno);
+    let totem = this._findTotemRaw(devno);
     if (!totem) {
       totem = this.upsertTotem({ devno });
     }
@@ -670,21 +682,6 @@ class RelationalDatabase {
     return totem;
   }
 
-  transferTotemOwner(devno, targetUserId) {
-    const totem = this.getTotem(devno);
-    if (!totem) throw new Error(`Totem ${devno} não encontrado.`);
-
-    const user = this.getUserById(targetUserId);
-    if (!user) throw new Error(`Usuário ${targetUserId} não encontrado.`);
-
-    totem.owner_id = user.id;
-    totem.owner = user.responsible_name || user.username;
-    this.save();
-
-    console.log(`[DATABASE] Totem ${devno} transferido com sucesso para ${user.responsible_name} (${user.id})`);
-    return totem;
-  }
-
   relocateTotem(devno, newDepotno) {
     const oldDepot = this.tables.depots.find(d => d.devno === devno);
     if (oldDepot) oldDepot.devno = "";
@@ -693,7 +690,7 @@ class RelationalDatabase {
     if (!newDepot) return null;
     newDepot.devno = devno;
 
-    const totem = this.getTotem(devno) || this.upsertTotem({ devno });
+    const totem = this._findTotemRaw(devno) || this.upsertTotem({ devno });
     totem.depotno = newDepot.depotno;
     totem.branno = newDepot.branno;
     totem.location = newDepot.name || newDepot.depotna || newDepot.address;
@@ -790,17 +787,6 @@ class RelationalDatabase {
     }));
   }
 
-  setTotemOwner(devno, ownerName) {
-    const totem = this.getTotem(devno) || this.upsertTotem({ devno });
-    totem.owner = ownerName;
-    const matchedUser = this.tables.users.find(u => u.responsible_name === ownerName || u.username === ownerName);
-    if (matchedUser) {
-      totem.owner_id = matchedUser.id;
-    }
-    this.save();
-    return totem;
-  }
-
   // ==========================================
   // TRANSAÇÕES & TELEMETRIA
   // ==========================================
@@ -838,7 +824,7 @@ class RelationalDatabase {
       this.tables.transactions.pop();
     }
 
-    let totem = this.getTotem(tx.devno);
+    let totem = this._findTotemRaw(tx.devno);
     if (!totem && tx.devno) {
       totem = this.upsertTotem({ devno: tx.devno, name: tx.totemName });
     }
@@ -914,7 +900,7 @@ class RelationalDatabase {
   }
 
   markTotemOffline(devno) {
-    const totem = this.getTotem(devno);
+    const totem = this._findTotemRaw(devno);
     if (!totem || totem.status === 'OFFLINE') return null;
     totem.status = 'OFFLINE';
     this.save();
@@ -922,7 +908,7 @@ class RelationalDatabase {
   }
 
   recordCycleComplete(devno, cycleData) {
-    let totem = this.getTotem(devno);
+    let totem = this._findTotemRaw(devno);
     if (!totem) {
       totem = this.upsertTotem({ devno });
     }
@@ -965,7 +951,7 @@ class RelationalDatabase {
   // Abre uma Ordem de Manutenção: coloca a máquina em manutenção e registra o alerta
   // correspondente (mesmo save() persiste os dois, pois ambos vivem em this.tables).
   openMaintenanceOrder(devno, data = {}) {
-    const totem = this.getTotem(devno);
+    const totem = this._findTotemRaw(devno);
     if (!totem) return null;
 
     totem.status = 'MAINTENANCE';
@@ -1025,7 +1011,7 @@ class RelationalDatabase {
       // Resolver uma Ordem de Manutenção devolve a máquina para operação
       // (só se ela ainda estiver em manutenção — não sobrescreve ERROR/OFFLINE supervenientes).
       if (alert.type === 'MAINTENANCE' && alert.devno) {
-        const totem = this.getTotem(alert.devno);
+        const totem = this._findTotemRaw(alert.devno);
         if (totem && totem.status === 'MAINTENANCE') {
           totem.status = 'IDLE';
         }
