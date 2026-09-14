@@ -2190,3 +2190,114 @@ label.field-label { margin-bottom: 7px; font-weight: 600; color: #aab5c3; }
   .actions-row { grid-template-columns: 1fr; }
   .actions-row .push-right { grid-column: auto; }
 }
+
+/* Histórico de ciclos e leitura real do reservatório */
+.stock-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+}
+
+.stock-card-copy { min-width: 0; }
+
+.stock-updated-at {
+  margin-top: 6px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  line-height: 1.45;
+}
+
+.stock-refresh-btn {
+  min-height: 38px;
+  padding-inline: 13px;
+  white-space: nowrap;
+}
+
+.stock-refresh-btn.is-loading .i { animation: cpxSpin .8s linear infinite; }
+
+.station-cycle-chart {
+  margin-top: 14px;
+  padding: 18px 18px 12px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: radial-gradient(circle at 90% 0, rgba(0, 197, 102, .08), transparent 34%), var(--surface-1);
+}
+
+.station-cycle-chart-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+
+.station-cycle-chart-head h3 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.station-cycle-chart-head p {
+  margin: 4px 0 0;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.station-cycle-chart-head strong {
+  color: var(--brand-green);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.station-cycle-chart-canvas { min-height: 190px; }
+
+.station-cycle-chart-canvas svg {
+  display: block;
+  width: 100%;
+  height: 190px;
+  overflow: visible;
+}
+
+.cycle-chart-grid { stroke: rgba(255, 255, 255, .07); stroke-width: 1; }
+.cycle-chart-axis-label { fill: var(--text-muted); font-family: var(--font-mono); font-size: 9px; }
+.cycle-chart-area { fill: url(#cycleChartGradient); }
+.cycle-chart-line {
+  fill: none;
+  stroke: var(--brand-green);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.5;
+  vector-effect: non-scaling-stroke;
+}
+.cycle-chart-point {
+  fill: var(--surface-1);
+  stroke: var(--brand-green);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+.cycle-chart-empty {
+  display: grid;
+  min-height: 190px;
+  place-items: center;
+  color: var(--text-muted);
+  font-size: 12px;
+  text-align: center;
+}
+
+@keyframes cpxSpin { to { transform: rotate(360deg); } }
+
+@media (max-width: 640px) {
+  .stock-card { grid-template-columns: auto minmax(0, 1fr); }
+  .stock-refresh-btn { grid-column: 1 / -1; justify-content: center; width: 100%; }
+  .station-cycle-chart { padding-inline: 12px; }
+  .station-cycle-chart-canvas { overflow-x: auto; }
+  .station-cycle-chart-canvas svg { min-width: 620px; }
+}

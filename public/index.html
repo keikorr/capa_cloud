@@ -662,14 +662,19 @@
 
         <!-- Nível de líquido sanitizante (sensor real) — gauge de fragrância removido: a máquina não tem sensor de nível de perfume -->
         <div class="gauge-row" style="grid-template-columns:1fr;">
-          <div class="gauge-card">
+          <div class="gauge-card stock-card">
             <div class="gauge-ring" id="modal-uv-ring" style="background: conic-gradient(#00C566 360deg, rgba(255,255,255,.09) 0deg);">
               <div class="inner" id="modal-uv-text" style="color:#00C566; font-weight:800;">100%</div>
             </div>
-            <div>
-              <div class="gauge-title">Sanitizante UV</div>
+            <div class="stock-card-copy">
+              <div class="gauge-title">Estoque de sanitizante</div>
               <div class="gauge-sub" id="modal-uv-sensor-sub">Sensor de nível do reservatório</div>
+              <div class="stock-updated-at" id="modal-stock-updated-at">Aguardando telemetria da máquina</div>
             </div>
+            <button class="btn btn-outline stock-refresh-btn" id="btn-refresh-stock" type="button" title="Consultar a última telemetria recebida da máquina">
+              <svg class="i" viewBox="0 0 24 24"><path d="M20 11a8 8 0 10-2.3 5.7"/><path d="M20 4v7h-7"/></svg>
+              Atualizar
+            </button>
           </div>
         </div>
 
@@ -714,6 +719,17 @@
              abertura do modal, ver loadStationHistory em app.js) -->
         <div class="modal-pane" id="station-pane-history">
           <div id="station-history-notice"></div>
+
+          <section class="station-cycle-chart" aria-labelledby="station-cycle-chart-title">
+            <div class="station-cycle-chart-head">
+              <div>
+                <h3 id="station-cycle-chart-title">Histórico de ciclos</h3>
+                <p id="station-cycle-chart-period">Ciclos concluídos por dia</p>
+              </div>
+              <strong id="station-cycle-chart-total">—</strong>
+            </div>
+            <div id="station-cycle-chart-canvas" class="station-cycle-chart-canvas"></div>
+          </section>
 
           <div class="cpf-summary-grid" id="station-history-summary" style="margin-top:14px;"></div>
 

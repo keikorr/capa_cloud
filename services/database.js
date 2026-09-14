@@ -528,10 +528,8 @@ class RelationalDatabase {
     const existing = index !== -1 ? this.tables.totems[index] : null;
 
     const doorLocked = data.doorLocked !== undefined ? data.doorLocked : (data.isDoorClosed !== undefined ? data.isDoorClosed : true);
-    let liquidLevel = data.liquidLevelPercent;
-    if (liquidLevel === undefined && data.isLiquidLevelOk !== undefined) {
-      liquidLevel = data.isLiquidLevelOk ? 100 : 10;
-    }
+    const liquidLevel = data.liquidLevelPercent;
+    const liquidLevelOk = data.isLiquidLevelOk;
 
     const base = existing || {
       devno: devno,
@@ -545,7 +543,8 @@ class RelationalDatabase {
       status: "IDLE",
       totalCyclesToday: 0,
       revenueToday: 0,
-      liquidLevelPercent: 100,
+      liquidLevelPercent: null,
+      isLiquidLevelOk: null,
       doorLocked: true,
       config: {
         basicPrice: 14.0,
@@ -577,6 +576,9 @@ class RelationalDatabase {
       owner: data.owner || base.owner || "Jonathan",
       doorLocked: doorLocked,
       liquidLevelPercent: liquidLevel !== undefined ? liquidLevel : base.liquidLevelPercent,
+      isLiquidLevelOk: liquidLevelOk !== undefined
+        ? Boolean(liquidLevelOk)
+        : (liquidLevel !== undefined ? Number(liquidLevel) > 10 : base.isLiquidLevelOk),
       status: data.status || (data.machineState ? (data.machineState.includes('CLEAN') ? 'CLEANING' : (data.machineState === 'MAINTENANCE' ? 'MAINTENANCE' : 'IDLE')) : base.status),
       config: base.config, // Preserva integralmente as configurações salvas em banco
       lastHeartbeat: new Date().toISOString()
@@ -866,6 +868,7 @@ class RelationalDatabase {
     totem.status = telemetry.status || totem.status;
     if (telemetry.doorLocked !== undefined) totem.doorLocked = telemetry.doorLocked;
     if (telemetry.liquidLevelPercent !== undefined) totem.liquidLevelPercent = telemetry.liquidLevelPercent;
+    if (telemetry.isLiquidLevelOk !== undefined) totem.isLiquidLevelOk = telemetry.isLiquidLevelOk;
     if (telemetry.currentCycle !== undefined) totem.currentCycle = telemetry.currentCycle;
     // appVersion/versionCode: o heartbeat os enviava desde sempre e este método os descartava
     // (só ficavam gravados no primeiro contato, via login/register — routes/api.js). Sem isso
@@ -915,17 +918,8 @@ class RelationalDatabase {
 
     totem.status = "IDLE";
     totem.currentCycle = null;
-    totem.liquidLevelPercent = Math.max(0, (totem.liquidLevelPercent || 100) - 2);
-
-    if (totem.liquidLevelPercent <= 20) {
-      this.addAlert({
-        devno,
-        totemName: totem.name,
-        type: "LOW_LIQUID",
-        severity: totem.liquidLevelPercent <= 10 ? "CRITICAL" : "WARNING",
-        message: `Nível de sanitizante baixo (${totem.liquidLevelPercent}%). Reabastecimento necessário.`
-      });
-    }
+    // O ciclo concluído não estima consumo. O estoque só muda quando o sensor envia uma
+    // nova leitura ou quando um técnico registra um reabastecimento explícito.
 
     this.save();
     return totem;
@@ -1114,7 +1108,10 @@ class RelationalDatabase {
     const totalTotems = totemsList.length;
     const onlineTotems = totemsList.filter(t => t.status !== "OFFLINE").length;
     const cleaningTotems = totemsList.filter(t => t.status === "CLEANING").length;
-    const alertTotems = totemsList.filter(t => t.status === "ERROR" || (t.liquidLevelPercent <= 20)).length;
+    const alertTotems = totemsList.filter(t => {
+      const hasPercent = t.liquidLevelPercent !== null && t.liquidLevelPercent !== undefined && Number.isFinite(Number(t.liquidLevelPercent));
+      return t.status === "ERROR" || t.isLiquidLevelOk === false || (hasPercent && Number(t.liquidLevelPercent) <= 20);
+    }).length;
 
     const now = new Date();
     const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());

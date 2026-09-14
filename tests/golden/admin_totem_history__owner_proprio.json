@@ -11,6 +11,28 @@
         "discountCents": 0,
         "rows": []
       },
+      "dailyCycles": [
+        {
+          "count": 3,
+          "date": "2026-08-26"
+        },
+        {
+          "count": 3,
+          "date": "2026-08-27"
+        },
+        {
+          "count": 12,
+          "date": "2026-08-31"
+        },
+        {
+          "count": 4,
+          "date": "2026-09-01"
+        },
+        {
+          "count": 1,
+          "date": "2026-09-02"
+        }
+      ],
       "devno": "CPX-002",
       "liveDelta": {
         "since": null,

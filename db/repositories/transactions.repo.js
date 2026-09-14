@@ -77,11 +77,20 @@ const SQL_SUMMARY = `
            count(*)::bigint                      AS tx_count,
            coalesce(sum(amount_cents), 0)::bigint AS total_cents
     FROM base GROUP BY payment_method
+  ),
+  by_day AS (
+    SELECT
+      (occurred_at AT TIME ZONE 'America/Fortaleza')::date::text AS business_date,
+      count(*)::bigint AS cycle_count
+    FROM base
+    WHERE occurred_at IS NOT NULL
+    GROUP BY (occurred_at AT TIME ZONE 'America/Fortaleza')::date
   )
   SELECT
     (SELECT row_to_json(t) FROM totals t)                                                    AS totals,
     coalesce((SELECT json_agg(m ORDER BY m.total_cents DESC) FROM by_mode m),    '[]'::json)  AS by_mode,
     coalesce((SELECT json_agg(p ORDER BY p.total_cents DESC) FROM by_payment p), '[]'::json)  AS by_payment,
+    coalesce((SELECT json_agg(d ORDER BY d.business_date) FROM by_day d),        '[]'::json)  AS daily_cycles,
     EXISTS (SELECT 1 FROM totems WHERE devno = $1)                                            AS machine_in_snapshot,
     -- Global, não por máquina: a importação inteira roda numa única transação, num único
     -- instante — "quando o arquivo foi congelado" é um fato da base inteira, não desta
@@ -198,6 +207,10 @@ async function getMachineHistory(devno, { limit = 50, offset = 0, couponLimit = 
         paymentMethod: p.payment_method,
         txCount: Number(p.tx_count || 0),
         totalCents: Number(p.total_cents || 0)
+      })),
+      dailyCycles: (summaryRow.daily_cycles || []).map(d => ({
+        date: d.business_date,
+        count: Number(d.cycle_count || 0)
       })),
       page: {
         limit,

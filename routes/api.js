@@ -351,22 +351,24 @@ router.post(['/telemetry/heartbeat', '/totem/heartbeat'], (req, res) => {
   }
 
   const doorState = doorLocked !== undefined ? doorLocked : (isDoorClosed !== undefined ? isDoorClosed : true);
-  let liquidState = liquidLevelPercent;
-  if (liquidState === undefined && isLiquidLevelOk !== undefined) {
-    liquidState = isLiquidLevelOk ? 100 : 10;
-  }
-
   const effectiveStatus = status || (machineState ? (machineState.includes('CLEAN') ? 'CLEANING' : (machineState === 'MAINTENANCE' ? 'MAINTENANCE' : 'IDLE')) : 'IDLE');
 
-  const updated = store.updateHeartbeat(id, {
+  const telemetry = {
     devno: id,
     status: effectiveStatus,
     doorLocked: doorState,
-    liquidLevelPercent: liquidState !== undefined ? liquidState : 100,
     currentCycle: currentCycle || (currentPhase ? { step: currentPhase } : null),
     appVersion: appVersion || '1.0.0',
     versionCode: versionCode !== undefined ? Number(versionCode) : undefined
-  });
+  };
+  if (liquidLevelPercent !== undefined && Number.isFinite(Number(liquidLevelPercent))) {
+    telemetry.liquidLevelPercent = Math.max(0, Math.min(100, Number(liquidLevelPercent)));
+  } else if (isLiquidLevelOk !== undefined) {
+    // Sensor binário informa apenas normal/baixo. Não convertemos isso em percentual fictício.
+    telemetry.isLiquidLevelOk = Boolean(isLiquidLevelOk);
+  }
+
+  const updated = store.updateHeartbeat(id, telemetry);
 
   // Notifica o dashboard via WebSocket para aparecer imediatamente como máquina online
   wsManager.broadcastToDashboard('TOTEM_HEARTBEAT', { devno: id, totem: updated });

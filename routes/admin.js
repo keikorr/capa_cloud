@@ -911,6 +911,17 @@ function buildLiveDelta(devno, sinceIso) {
   };
 }
 
+function buildDailyCycles(rows) {
+  const counts = new Map();
+  for (const row of rows) {
+    const date = row.timestamp ? String(row.timestamp).slice(0, 10) : '';
+    if (date) counts.set(date, (counts.get(date) || 0) + 1);
+  }
+  return [...counts.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([date, count]) => ({ date, count }));
+}
+
 /**
  * Classifica um erro do driver pg em algo que a UI consegue agir. '42P01' (undefined_table)
  * significa que a migration não rodou; qualquer outra coisa (porta morta, timeout,
@@ -985,6 +996,7 @@ router.get('/admin/totems/:devno/history', async (req, res) => {
         },
         byMode: [],
         byPayment: [],
+        dailyCycles: buildDailyCycles(liveTxs),
         page: { limit, offset, total: liveTxs.length },
         transactions: liveTxs.slice(offset, offset + limit).map(t => ({
           occurredAt: t.timestamp,
@@ -1040,6 +1052,7 @@ router.get('/admin/totems/:devno/history', async (req, res) => {
         },
         byMode: [],
         byPayment: [],
+        dailyCycles: buildDailyCycles(liveTxs),
         page: { limit, offset, total: liveTxs.length },
         transactions: liveTxs.slice(offset, offset + limit).map(t => ({
           occurredAt: t.timestamp,

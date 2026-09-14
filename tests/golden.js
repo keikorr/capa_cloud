@@ -318,6 +318,43 @@ async function main() {
       } else {
         console.log('  ok       dashboard_history__requires_auth');
       }
+
+      if (algumDevno) {
+        const machineHistoryRes = await fetch(`${BASE}/api/v1/admin/totems/${encodeURIComponent(algumDevno)}/history`, {
+          headers: { Authorization: `Bearer ${admToken}` }
+        });
+        const machineHistoryBody = await machineHistoryRes.json();
+        const dailyTotal = (machineHistoryBody.data?.dailyCycles || []).reduce((sum, day) => sum + Number(day.count || 0), 0);
+        if (!machineHistoryRes.ok || dailyTotal !== Number(machineHistoryBody.data?.summary?.txCount || 0)) {
+          console.error('  FALHOU   machine_cycle_history__daily_total');
+          falhas++;
+        } else {
+          console.log('  ok       machine_cycle_history__daily_total');
+        }
+      }
+
+      const stockDevno = 'CPX-TEST-NO-STOCK-SENSOR';
+      await fetch(`${BASE}/api/v1/telemetry/heartbeat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ devno: stockDevno, status: 'IDLE' })
+      });
+      await fetch(`${BASE}/api/v1/telemetry/heartbeat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ devno: stockDevno, status: 'IDLE', isLiquidLevelOk: false })
+      });
+      const stockTotemsRes = await fetch(`${BASE}/api/v1/admin/totems`, {
+        headers: { Authorization: `Bearer ${admToken}` }
+      });
+      const stockTotemsBody = await stockTotemsRes.json();
+      const stockTotem = (stockTotemsBody.data || []).find(t => t.devno === stockDevno);
+      if (!stockTotemsRes.ok || !stockTotem || stockTotem.liquidLevelPercent !== null || stockTotem.isLiquidLevelOk !== false) {
+        console.error('  FALHOU   stock_telemetry__no_invented_percentage');
+        falhas++;
+      } else {
+        console.log('  ok       stock_telemetry__no_invented_percentage');
+      }
     }
   } catch (err) {
     console.error('Falha na execução:', err.message);

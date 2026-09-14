@@ -942,6 +942,7 @@ class CapaxeroDashboard {
     const btnOpenCieloConfig = document.getElementById('btn-open-cielo-config');
     const btnConfirmOwner = document.getElementById('modal-btn-confirm-owner');
     const btnDeleteTotem = document.getElementById('btn-delete-totem');
+    const btnRefreshStock = document.getElementById('btn-refresh-stock');
 
     if (btnDeleteTotem) {
       btnDeleteTotem.addEventListener('click', () => {
@@ -968,6 +969,7 @@ class CapaxeroDashboard {
     if (btnActPurge) btnActPurge.addEventListener('click', () => { sendCmd('PURGE_LINES'); this.showToast('Purga de linhas iniciada — 45s.'); });
     if (btnActTest) btnActTest.addEventListener('click', () => { sendCmd('SELF_TEST'); this.showToast('Autoteste em execução no totem.'); });
     if (btnActOpenOM) btnActOpenOM.addEventListener('click', () => this.openOMModal(this.selectedStationId));
+    if (btnRefreshStock) btnRefreshStock.addEventListener('click', () => this.refreshStationStock());
 
     const btnOpenNewOM = document.getElementById('btn-open-new-om');
     if (btnOpenNewOM) btnOpenNewOM.addEventListener('click', () => this.openOMModal());
@@ -2072,7 +2074,7 @@ class CapaxeroDashboard {
       pct: statusKey === 'CLEANING' ? 45 : (statusKey === 'IDLE' ? 100 : 0),
       restante: '—',
       trava: t.doorLocked ? 'Travada' : 'Destravada',
-      uv: t.liquidLevelPercent !== undefined ? t.liquidLevelPercent : 100,
+      uv: t.liquidLevelPercent !== undefined ? Number(t.liquidLevelPercent) : null,
       fat: fmtBRL(t.revenueToday || 0),
       fatVal: t.revenueToday || 0,
       ciclos: t.totalCyclesToday || 0,
@@ -2382,22 +2384,64 @@ class CapaxeroDashboard {
     const uvText = document.getElementById('modal-uv-text');
     const uvSub = document.getElementById('modal-uv-sensor-sub');
 
-    const isLiquidOk = s.raw?.isLiquidLevelOk !== undefined ? Boolean(s.raw.isLiquidLevelOk) : (s.uv > 10);
-    const liquidPct = s.raw?.liquidLevelPercent !== undefined ? s.raw.liquidLevelPercent : (isLiquidOk ? 100 : 0);
-    const liquidColor = isLiquidOk ? '#00C566' : '#FF3D57';
+    const rawPct = Number(s.raw?.liquidLevelPercent);
+    const hasLiquidPct = s.raw?.liquidLevelPercent !== undefined && Number.isFinite(rawPct);
+    const hasLiquidState = s.raw?.isLiquidLevelOk !== undefined;
+    const liquidPct = hasLiquidPct ? Math.max(0, Math.min(100, rawPct)) : null;
+    const isLiquidOk = hasLiquidState ? Boolean(s.raw.isLiquidLevelOk) : (hasLiquidPct ? liquidPct > 10 : null);
+    const liquidColor = isLiquidOk === null ? '#718096' : (isLiquidOk ? '#00C566' : '#FF3D57');
 
     if (uvText) {
-      uvText.textContent = isLiquidOk ? `${liquidPct}%` : 'BAIXO';
+      uvText.textContent = hasLiquidPct ? `${Math.round(liquidPct)}%` : (isLiquidOk === null ? '—' : (isLiquidOk ? 'OK' : 'BAIXO'));
       uvText.style.color = liquidColor;
     }
     if (uvSub) {
-      uvSub.textContent = isLiquidOk ? '✓ Sensor: Nível Normal / OK' : 'Sensor: Nível Baixo (Reabastecer)';
-      uvSub.style.color = isLiquidOk ? '#7fb2dd' : '#FF6B7F';
+      uvSub.textContent = isLiquidOk === null
+        ? 'Sem leitura do sensor'
+        : (isLiquidOk ? '✓ Sensor: nível normal' : 'Sensor: nível baixo — reabastecer');
+      uvSub.style.color = isLiquidOk === null ? '#8a97a7' : (isLiquidOk ? '#7fb2dd' : '#FF6B7F');
     }
     if (uvRing) {
-      uvRing.style.background = `conic-gradient(${liquidColor} ${liquidPct * 3.6}deg, rgba(255,255,255,.09) 0deg)`;
+      const fillDegrees = hasLiquidPct ? liquidPct * 3.6 : (isLiquidOk === null ? 0 : 360);
+      uvRing.style.background = `conic-gradient(${liquidColor} ${fillDegrees}deg, rgba(255,255,255,.09) 0deg)`;
     }
 
+    const stockUpdated = document.getElementById('modal-stock-updated-at');
+    if (stockUpdated) {
+      const lastHeartbeat = s.raw?.lastHeartbeat ? new Date(s.raw.lastHeartbeat) : null;
+      stockUpdated.textContent = lastHeartbeat && !Number.isNaN(lastHeartbeat.getTime())
+        ? `Última leitura: ${lastHeartbeat.toLocaleString('pt-BR')} · ${s.status !== 'OFFLINE' ? 'tempo real ativo' : 'máquina offline'}`
+        : 'Aguardando telemetria da máquina';
+    }
+
+  }
+
+  async refreshStationStock() {
+    const btn = document.getElementById('btn-refresh-stock');
+    const updated = document.getElementById('modal-stock-updated-at');
+    if (!this.selectedStationId || btn?.disabled) return;
+
+    if (btn) {
+      btn.disabled = true;
+      btn.classList.add('is-loading');
+    }
+    if (updated) updated.textContent = 'Consultando a última telemetria...';
+
+    await this.fetchBackendData();
+    const station = this.stations.find(s => s.id === this.selectedStationId || s.devno === this.selectedStationId);
+    if (station) {
+      this.renderStationTelemetry(station);
+      this.showToast(station.status === 'OFFLINE'
+        ? 'Máquina offline. Exibindo a última leitura de estoque recebida.'
+        : 'Estoque atualizado com a leitura em tempo real da máquina.', station.status === 'OFFLINE' ? 'warn' : 'ok');
+    } else {
+      this.showToast('Não foi possível localizar a máquina para atualizar o estoque.', 'err');
+    }
+
+    if (btn) {
+      btn.disabled = false;
+      btn.classList.remove('is-loading');
+    }
   }
 
   /** Alterna entre as abas Visão geral / Histórico do modal de detalhes da máquina. */
@@ -2469,6 +2513,69 @@ class CapaxeroDashboard {
     `).join('');
   }
 
+  renderStationCycleChart(dailyCycles = [], recentTransactions = []) {
+    const canvas = document.getElementById('station-cycle-chart-canvas');
+    const totalEl = document.getElementById('station-cycle-chart-total');
+    const periodEl = document.getElementById('station-cycle-chart-period');
+    if (!canvas) return;
+
+    const counts = new Map();
+    dailyCycles.forEach(item => {
+      if (item?.date) counts.set(String(item.date).slice(0, 10), Number(item.count || 0));
+    });
+    recentTransactions.forEach(tx => {
+      const date = tx?.occurredAt ? String(tx.occurredAt).slice(0, 10) : '';
+      if (date) counts.set(date, (counts.get(date) || 0) + 1);
+    });
+
+    const populatedDates = [...counts.keys()].sort();
+    if (!populatedDates.length) {
+      canvas.innerHTML = '<div class="cycle-chart-empty">Nenhum ciclo concluído registrado para esta máquina.</div>';
+      if (totalEl) totalEl.textContent = '0 ciclos';
+      if (periodEl) periodEl.textContent = 'Ciclos concluídos por dia';
+      return;
+    }
+
+    const [year, month, day] = populatedDates[populatedDates.length - 1].split('-').map(Number);
+    const endDate = new Date(Date.UTC(year, month - 1, day));
+    const points = [];
+    for (let offset = 13; offset >= 0; offset--) {
+      const date = new Date(endDate.getTime() - offset * 86400000);
+      const key = date.toISOString().slice(0, 10);
+      points.push({ key, label: `${key.slice(8, 10)}/${key.slice(5, 7)}`, value: counts.get(key) || 0 });
+    }
+
+    const width = 720;
+    const height = 190;
+    const pad = { left: 36, right: 14, top: 12, bottom: 32 };
+    const chartWidth = width - pad.left - pad.right;
+    const chartHeight = height - pad.top - pad.bottom;
+    const maxValue = Math.max(1, ...points.map(p => p.value));
+    const ceiling = Math.max(3, Math.ceil(maxValue / 3) * 3);
+    const xy = points.map((point, index) => ({
+      ...point,
+      x: pad.left + (index * chartWidth / (points.length - 1)),
+      y: pad.top + chartHeight - (point.value / ceiling * chartHeight)
+    }));
+    const linePath = xy.map((p, index) => `${index ? 'L' : 'M'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
+    const areaPath = `${linePath} L ${xy[xy.length - 1].x.toFixed(1)} ${(pad.top + chartHeight).toFixed(1)} L ${xy[0].x.toFixed(1)} ${(pad.top + chartHeight).toFixed(1)} Z`;
+    const ticks = [0, 1, 2, 3].map(step => {
+      const value = Math.round(ceiling * step / 3);
+      const y = pad.top + chartHeight - (step * chartHeight / 3);
+      return `<line class="cycle-chart-grid" x1="${pad.left}" y1="${y}" x2="${width - pad.right}" y2="${y}"/><text class="cycle-chart-axis-label" x="0" y="${y + 3}">${value}</text>`;
+    }).join('');
+    const labels = xy.map(p => `<text class="cycle-chart-axis-label" x="${p.x}" y="${height - 8}" text-anchor="middle">${p.label}</text>`).join('');
+    const dots = xy.map(p => `<circle class="cycle-chart-point" cx="${p.x}" cy="${p.y}" r="3.2"><title>${p.label}: ${p.value} ciclo${p.value === 1 ? '' : 's'}</title></circle>`).join('');
+    const total = points.reduce((sum, point) => sum + point.value, 0);
+
+    canvas.innerHTML = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Histórico diário de ciclos">
+      <defs><linearGradient id="cycleChartGradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#00C566" stop-opacity=".34"/><stop offset="1" stop-color="#00C566" stop-opacity=".02"/></linearGradient></defs>
+      ${ticks}<path class="cycle-chart-area" d="${areaPath}"/><path class="cycle-chart-line" d="${linePath}"/>${dots}${labels}
+    </svg>`;
+    if (totalEl) totalEl.textContent = `${total} ciclo${total === 1 ? '' : 's'} no período`;
+    if (periodEl) periodEl.textContent = `${points[0].label} a ${points[points.length - 1].label} · ciclos concluídos por dia`;
+  }
+
   /**
    * Carrega o histórico de vendas (arquivo Postgres) desta máquina. Carregado uma vez por
    * abertura do modal — stationHistoryLoadedFor é resetado em openStationDetails() e em
@@ -2526,10 +2633,12 @@ class CapaxeroDashboard {
       }
       if (tbody) tbody.innerHTML = this.renderStationHistoryRows(localTxs);
       if (notice) notice.innerHTML = `<div class="history-notice green"><span class="title">Histórico em tempo real</span>Exibindo vendas gravadas para esta máquina.</div>`;
+      this.renderStationCycleChart([], localTxs);
     } else {
       if (notice) notice.innerHTML = `<div class="history-notice neutral">Carregando histórico...</div>`;
       if (summary) summary.innerHTML = '';
       if (tbody) tbody.innerHTML = '';
+      this.renderStationCycleChart();
     }
 
     if (moreBtn) moreBtn.style.display = 'none';
@@ -2580,6 +2689,7 @@ class CapaxeroDashboard {
       data.consolidatedSummary = consolidatedSummary;
       this.stationHistoryData = data;
       this.stationHistoryDevno = devno;
+      this.renderStationCycleChart(data.dailyCycles || [], recentTxs);
 
       if (notice) notice.innerHTML = this.renderStationHistoryNotice(data);
 
