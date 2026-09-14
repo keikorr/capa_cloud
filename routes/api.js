@@ -14,6 +14,7 @@ const QRCode = require('qrcode');
 const store = require('../services/store');
 const wsManager = require('../services/websocket');
 const { sanitizeCpf, isValidCpf, formatCpf, COUPON_CPF_ENABLED } = require('../services/cpf');
+const { normalizeMode, inferModeFromAmount } = require('../services/modes');
 
 // Configuração do Storage para Vídeos de Higienização
 const videoStorage = multer.diskStorage({
@@ -471,17 +472,34 @@ router.post(['/transactions/sync', '/telemetry/transactions'], (req, res) => {
   }
 
   const totem = store.getTotem(id) || store.upsertTotem({ devno: id });
+  const modesPricesInCents = totem?.config?.modes
+    ? {
+        basica: totem.config.modes.basica?.priceInCents,
+        intermediaria: totem.config.modes.intermediaria?.priceInCents,
+        avancada: totem.config.modes.avancada?.priceInCents
+      }
+    : null;
+
+  // Resolve a modalidade real de uma venda cujo modeTitle/mode não veio ou não foi
+  // reconhecido: casar o valor cobrado contra a tabela de preços do totem acerta a
+  // modalidade de fato na maioria dos casos. Só cai no default fixo (Intermediária) se nem
+  // isso resolver — normalizeModeOrDefault, chamado depois em store.addTransaction, nunca
+  // fica sabendo do valor cobrado, então essa inferência por preço precisa acontecer aqui.
+  const resolveMode = (rawMode, amountInCents) =>
+    normalizeMode(rawMode) || inferModeFromAmount(amountInCents, modesPricesInCents) || rawMode || 'INTERMEDIARIA';
+
   const syncedOrderIds = [];
 
   // Se veio lista de transações
   if (Array.isArray(transactions)) {
     for (const tx of transactions) {
+      const txAmountInCents = tx.amountInCents ? tx.amountInCents : Math.round((tx.amount || 17.0) * 100);
       const txRecord = store.addTransaction({
         orderId: tx.orderId,
         devno: id,
         totemName: totem ? totem.name : `Totem #${id}`,
-        mode: tx.modeTitle || tx.mode || 'INTERMEDIARIA',
-        amount: (tx.amountInCents ? (tx.amountInCents / 100) : (tx.amount || 17.0)),
+        mode: resolveMode(tx.modeTitle || tx.mode, txAmountInCents),
+        amount: txAmountInCents / 100,
         paymentMethod: tx.paymentMethod || 'CARTAO',
         nsu: tx.nsu || '',
         authCode: tx.authCode || '',
@@ -499,12 +517,13 @@ router.post(['/transactions/sync', '/telemetry/transactions'], (req, res) => {
     }
   } else if (orderId) {
     // Transação única
+    const txAmountInCents = amountInCents ? amountInCents : Math.round((amount || 17.0) * 100);
     const txRecord = store.addTransaction({
       orderId: orderId,
       devno: id,
       totemName: totem ? totem.name : `Totem #${id}`,
-      mode: modeTitle || 'INTERMEDIARIA',
-      amount: (amountInCents ? (amountInCents / 100) : (amount || 17.0)),
+      mode: resolveMode(modeTitle, txAmountInCents),
+      amount: txAmountInCents / 100,
       paymentMethod: paymentMethod || 'CARTAO',
       nsu: nsu || '',
       authCode: authCode || '',

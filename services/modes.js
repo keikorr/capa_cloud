@@ -71,4 +71,37 @@ function isValidMode(mode) {
   return MODES.includes(mode);
 }
 
-module.exports = { MODES, LABELS, normalizeMode, normalizeModeOrDefault, modeLabel, isValidMode };
+/**
+ * Infere a modalidade a partir do valor cobrado quando a grafia recebida não é reconhecida
+ * (ou não veio). Usado como fallback antes de normalizeModeOrDefault: o valor da venda já
+ * reflete o que o cliente pagou, então casar contra a tabela de preços do totem acerta a
+ * modalidade real na maioria dos casos — bem melhor do que assumir Intermediária sempre.
+ * modesPricesInCents: { basica, intermediaria, avancada } (aceita undefined por chave).
+ */
+function inferModeFromAmount(amountInCents, modesPricesInCents) {
+  if (!amountInCents || !modesPricesInCents) return null;
+  let closest = null;
+  let closestDiff = Infinity;
+  for (const mode of MODES) {
+    const price = modesPricesInCents[mode.toLowerCase()];
+    if (price == null) continue;
+    const diff = Math.abs(price - amountInCents);
+    if (diff < closestDiff) {
+      closestDiff = diff;
+      closest = mode;
+    }
+  }
+  // Só aceita o mais próximo se bater em cima (tolerância de R$0,50) — um valor muito
+  // distante de todas as três (ex.: cupom com desconto) não deve virar um palpite forçado.
+  return closestDiff <= 50 ? closest : null;
+}
+
+module.exports = {
+  MODES,
+  LABELS,
+  normalizeMode,
+  normalizeModeOrDefault,
+  modeLabel,
+  isValidMode,
+  inferModeFromAmount
+};
