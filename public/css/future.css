@@ -27,8 +27,8 @@
   --status-blue: #86a9ae;
   --status-orange: #f0a64a;
   --status-red: #ff6b70;
-  --font-display: 'Bodoni Moda', Georgia, serif;
-  --font-body: 'Manrope', sans-serif;
+  --font-display: 'Archivo', system-ui, -apple-system, sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
   --sidebar-w: 124px;
   --ease-out: cubic-bezier(.16, 1, .3, 1);
@@ -283,22 +283,22 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
   margin: 0;
   color: #f2eee3;
   font-family: var(--font-display);
-  font-size: clamp(34px, 4vw, 58px);
-  font-style: normal;
-  font-weight: 600;
-  letter-spacing: -.035em;
+  font-size: clamp(32px, 3.8vw, 54px);
+  font-style: italic;
+  font-weight: 900;
+  letter-spacing: -.02em;
   line-height: .98;
   text-wrap: balance;
 }
-.page-head h1 .i { color: var(--brand-gold); vertical-align: .05em; }
+.page-head h1 .i { color: var(--brand-gold); vertical-align: .05em; font-style: normal; }
 .page-head p { max-width: 68ch; margin-top: 12px; color: #969487; font-size: 12.5px; line-height: 1.65; }
 
 h2, h3, .table-card-head h2, .panel-card h2, .chart-card h2, .station-group-head h2 {
   color: #eae5d8;
   font-family: var(--font-body);
   font-style: normal;
-  font-weight: 800;
-  letter-spacing: .045em;
+  font-weight: 700;
+  letter-spacing: .02em;
 }
 
 /* Metrics and operational surfaces */
@@ -437,6 +437,55 @@ input[type='checkbox'], input[type='radio'] { accent-color: var(--brand-gold); }
 
 /* Modal system */
 .modal-overlay { padding: 24px; background: rgba(2,3,2,.82); backdrop-filter: blur(10px); }
+.modal-box {
+  position: relative;
+  max-height: calc(100vh - 48px);
+  overflow: auto;
+  border: 1px solid var(--border-strong);
+  border-radius: 16px;
+  background: #0d0f0c;
+  box-shadow: var(--shadow-high);
+}
+.modal-box .modal-sticky-head {
+  padding: 22px 26px;
+  background: #10120e;
+  border-bottom: 1px solid var(--border-soft);
+}
+.modal-box .modal-body { padding: 22px 26px 28px; }
+.modal-box .detail-loc { color: var(--text-muted); font-size: 11px; margin-top: 7px; }
+.modal-box .info-box {
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  background: #11130f;
+  box-shadow: none;
+}
+.modal-box .info-box .lbl { color: #858479; font-size: 9px; letter-spacing: .1em; }
+.modal-box .info-box .val { color: #eee9dc; font-size: 13px; }
+.modal-box .cycle-box.is-active {
+  border-color: rgba(134,169,174,.5);
+  background: #121a1b;
+  box-shadow: inset 0 0 0 1px rgba(134,169,174,.05);
+}
+.modal-box .cycle-box:not(.is-active) { border-color: var(--border-soft); }
+.modal-box #modal-cycle-stage { color: #f1ecdf !important; }
+.modal-box #modal-cycle-sub { color: #8e9b99 !important; }
+.modal-box #modal-cycle-pct { color: var(--brand-gold) !important; }
+.modal-box #modal-cycle-bar { background: linear-gradient(90deg, #d7ad4a, #f0d287) !important; animation: none !important; }
+.modal-box .stock-card {
+  border-color: var(--border-soft);
+  border-radius: 12px;
+  background: #11130f;
+}
+.modal-box .gauge-title { color: #eee9dc; }
+.modal-box .gauge-sub { color: #83c9a4; }
+.modal-box .stock-updated-at { color: #777970; }
+.modal-box .admin-panel {
+  border-color: rgba(215,173,74,.22);
+  border-radius: 12px;
+  background: #11130f;
+}
+.modal-box .actions-row { gap: 9px; }
+.modal-box .actions-row .btn { min-height: 38px; }
 .modal {
   max-height: calc(100vh - 48px);
   border: 1px solid var(--border-strong);
@@ -455,7 +504,7 @@ input[type='checkbox'], input[type='radio'] { accent-color: var(--brand-gold); }
   background: #e2b955;
 }
 .modal-header { padding: 22px 26px; border-bottom-color: var(--border-soft); background: #10120e; }
-.detail-title h2, .modal-header h2 { color: #f1ecdf; font-family: var(--font-display); font-style: normal; font-weight: 600; letter-spacing: -.025em; }
+.detail-title h2, .modal-header h2 { color: #f1ecdf; font-family: var(--font-display); font-style: italic; font-weight: 900; letter-spacing: -.02em; }
 .modal-body { padding: 24px 26px 28px; }
 .modal-close { color: #8c8b82; border-color: var(--border-soft); border-radius: 9px; background: #151711; }
 .modal-close:hover { color: #f0c667; border-color: var(--border-strong); }
@@ -496,14 +545,14 @@ input[type='checkbox'], input[type='radio'] { accent-color: var(--brand-gold); }
 }
 .auth-brand { justify-content: flex-start; }
 .auth-brand img { width: 56px !important; height: 56px !important; object-fit: cover; border: 1px solid var(--border-strong); border-radius: 12px !important; }
-.auth-title { color: #efeadc; font-family: var(--font-body); font-size: 20px; font-style: normal; letter-spacing: .04em; }
+.auth-title { color: #efeadc; font-family: var(--font-display); font-size: 20px; font-style: italic; font-weight: 900; letter-spacing: .04em; }
 .auth-sub { color: var(--brand-gold); font-family: var(--font-mono); font-size: 10px; letter-spacing: .2em; }
 .auth-tagline { max-width: 38ch; color: #85857c; font-size: 11px; line-height: 1.6; }
 .auth-manifesto { margin-top: auto; display: grid; gap: 20px; }
-.auth-manifesto strong { color: #f2ede0; font-family: var(--font-display); font-size: clamp(39px, 4.2vw, 62px); font-weight: 600; letter-spacing: -.04em; line-height: .96; }
+.auth-manifesto strong { color: #f2ede0; font-family: var(--font-display); font-size: clamp(39px, 4.2vw, 62px); font-weight: 900; font-style: italic; letter-spacing: -.03em; line-height: .96; }
 .auth-manifesto span { max-width: 43ch; color: #99978b; font-size: 12px; line-height: 1.75; }
 .auth-form { align-self: center; padding: 48px 42px; }
-.auth-form::before { content: 'Acesso à central'; display: block; margin-bottom: 28px; color: #eee9dc; font-family: var(--font-display); font-size: 28px; letter-spacing: -.03em; }
+.auth-form::before { content: 'Acesso à central'; display: block; margin-bottom: 28px; color: #eee9dc; font-family: var(--font-display); font-size: 28px; font-weight: 900; font-style: italic; letter-spacing: -.02em; }
 .auth-submit-btn { min-height: 48px; margin-top: 9px; }
 
 /* Maps and utilities */
