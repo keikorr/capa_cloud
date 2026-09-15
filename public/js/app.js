@@ -107,6 +107,7 @@ class CapaxeroDashboard {
     this.activeTab = 'estacoes';
     this.ownershipFilter = 'all';
     this.selectedOwner = 'all';
+    this.selectedMachine = 'all';
     this.periodoKey = '7d';
     const now = new Date();
     this.selectedMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
@@ -252,6 +253,7 @@ class CapaxeroDashboard {
   async checkSessionAndBoot() {
     const authScreen = document.getElementById('auth-screen');
     if (!this.token) {
+      document.body.classList.remove('is-admin');
       if (authScreen) authScreen.classList.remove('hidden');
       return;
     }
@@ -269,6 +271,8 @@ class CapaxeroDashboard {
         this.connectWebSocket();
       } else {
         localStorage.removeItem('cpx_token');
+        this.currentUser = null;
+        document.body.classList.remove('is-admin');
         if (authScreen) authScreen.classList.remove('hidden');
       }
     } catch (_) {
@@ -286,8 +290,14 @@ class CapaxeroDashboard {
   }
 
   updateUserUI() {
-    if (!this.currentUser) return;
+    if (!this.currentUser) {
+      document.body.classList.remove('is-admin');
+      return;
+    }
     const isAdmin = this.currentUser.role === 'CRPADMIN';
+
+    // Toggle de classe global no body para controle seguro via CSS
+    document.body.classList.toggle('is-admin', isAdmin);
 
     const nameEl = document.getElementById('user-display-name');
     const roleEl = document.getElementById('user-display-role');
@@ -295,6 +305,7 @@ class CapaxeroDashboard {
     const pmEmail = document.getElementById('pm-user-email');
     const pmRole = document.getElementById('pm-user-role');
     const tabCadastros = document.getElementById('tab-cadastros');
+    const ownershipBar = document.getElementById('ownership-bar');
 
     const displayName = this.currentUser.responsible_name || this.currentUser.username;
     if (nameEl) nameEl.textContent = displayName;
@@ -303,20 +314,47 @@ class CapaxeroDashboard {
     if (pmEmail) pmEmail.textContent = this.currentUser.email || '--';
     if (pmRole) pmRole.innerHTML = isAdmin ? `${ICONS.lock} ADMIN — total` : `${ICONS.user} Dono da Máquina`;
 
-    if (tabCadastros) {
-      tabCadastros.style.display = isAdmin ? 'block' : 'none';
+    // Filtro por vínculo (ownership bar) - exclusivo para conta de ADMIN
+    if (ownershipBar) {
+      if (isAdmin) {
+        ownershipBar.style.removeProperty('display');
+      } else {
+        ownershipBar.style.setProperty('display', 'none', 'important');
+        this.ownershipFilter = 'all';
+        const btns = document.querySelectorAll('#ownership-filter-toggle button');
+        btns.forEach(b => b.classList.toggle('active', b.dataset.ownership === 'all'));
+      }
     }
 
+    // Cadastros - exclusivo para conta de ADMIN
+    if (tabCadastros) {
+      if (isAdmin) {
+        tabCadastros.style.removeProperty('display');
+      } else {
+        tabCadastros.style.setProperty('display', 'none', 'important');
+      }
+      if (!isAdmin && this.activeTab === 'cadastros') this.switchPage('estacoes');
+    }
+
+    // Manutenção - exclusivo para conta de ADMIN
     const tabManutencao = document.getElementById('tab-manutencao');
     if (tabManutencao) {
-      tabManutencao.style.display = isAdmin ? 'flex' : 'none';
+      if (isAdmin) {
+        tabManutencao.style.removeProperty('display');
+      } else {
+        tabManutencao.style.setProperty('display', 'none', 'important');
+      }
       // Se um dono estava na aba de manutenção quando perdeu acesso (troca de conta), volta pra Estações
       if (!isAdmin && this.activeTab === 'manutencao') this.switchPage('estacoes');
     }
 
     // Oculta todas as ações e painéis restritos de realocação / gestão de donos para não-admins
     document.querySelectorAll('.admin-only').forEach(el => {
-      el.style.display = isAdmin ? '' : 'none';
+      if (isAdmin) {
+        el.style.removeProperty('display');
+      } else {
+        el.style.setProperty('display', 'none', 'important');
+      }
     });
 
     const adminLocaisControls = document.getElementById('admin-locais-controls');
@@ -488,6 +526,7 @@ class CapaxeroDashboard {
         localStorage.removeItem('cpx_token');
         this.token = null;
         this.currentUser = null;
+        document.body.classList.remove('is-admin');
         const authScreen = document.getElementById('auth-screen');
         if (authScreen) authScreen.classList.remove('hidden');
         if (profileMenu) profileMenu.classList.remove('open');
@@ -552,11 +591,20 @@ class CapaxeroDashboard {
       });
     }
 
-    // Filtro por Dono no Dashboard
+    // Filtros por Dono e Máquina no Dashboard
     const selDashOwner = document.getElementById('dash-owner-filter');
     if (selDashOwner) {
       selDashOwner.addEventListener('change', (e) => {
         this.selectedOwner = e.target.value;
+        this.populateSelectors();
+        this.renderDashboard();
+      });
+    }
+
+    const selDashMachine = document.getElementById('dash-machine-filter');
+    if (selDashMachine) {
+      selDashMachine.addEventListener('change', (e) => {
+        this.selectedMachine = e.target.value;
         this.renderDashboard();
       });
     }
@@ -616,10 +664,19 @@ class CapaxeroDashboard {
     if (this.selectedOwner && this.selectedOwner !== 'all') {
       list = list.filter(s => s.raw?.owner_id === this.selectedOwner || s.dono === this.selectedOwner || s.raw?.owner === this.selectedOwner);
     }
+    if (this.selectedMachine && this.selectedMachine !== 'all') {
+      list = list.filter(s => s.devno === this.selectedMachine);
+    }
     return list;
   }
 
   switchPage(pageId) {
+    if (!this.currentUser) return;
+    const isAdmin = this.currentUser.role === 'CRPADMIN';
+    if (!isAdmin && (pageId === 'cadastros' || pageId === 'manutencao')) {
+      return; // Bloqueia navegação para abas restritas se não for admin
+    }
+
     this.activeTab = pageId;
     document.querySelectorAll('.nav-tab-btn').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.page === pageId);
@@ -2097,7 +2154,9 @@ class CapaxeroDashboard {
     this.renderManutencao();
     this.renderDashboard();
     this.renderCoupons();
-    this.renderCadastros();
+    if (this.currentUser?.role === 'CRPADMIN') {
+      this.renderCadastros();
+    }
     this.populateSelectors();
   }
 
@@ -2156,6 +2215,24 @@ class CapaxeroDashboard {
         });
       }
       setOptions(selDashOwner, opts.join(''));
+    }
+
+    const selDashMachine = document.getElementById('dash-machine-filter');
+    if (selDashMachine) {
+      const opts = ['<option value="all">Todas as máquinas</option>'];
+      let stList = this.stations || [];
+      if (this.selectedOwner && this.selectedOwner !== 'all') {
+        stList = stList.filter(s => s.raw?.owner_id === this.selectedOwner || s.dono === this.selectedOwner || s.raw?.owner === this.selectedOwner);
+      }
+      stList.forEach(s => {
+        const label = s.nome ? `${s.nome} (${s.devno})` : s.devno;
+        opts.push(`<option value="${s.devno}">${label}</option>`);
+      });
+      setOptions(selDashMachine, opts.join(''));
+      if (this.selectedMachine && this.selectedMachine !== 'all' && !stList.some(s => s.devno === this.selectedMachine)) {
+        this.selectedMachine = 'all';
+        selDashMachine.value = 'all';
+      }
     }
 
     const semTotens = '<option value="">Nenhuma máquina cadastrada</option>';
@@ -3391,13 +3468,16 @@ class CapaxeroDashboard {
     if (elOmsCountHead) elOmsCountHead.textContent = `${openOms} em aberto`;
     if (elPeriodTotal) elPeriodTotal.textContent = `${fmtBRL(totalRev)} no período`;
 
-    // 1. Gráfico SVG & Eixo Y dinâmico — faturamento real agregado por dia
+    // 1. Gráficos SVG & Eixos Y dinâmicos — Faturamento & Ciclos agregados por dia
     const dayMs = 24 * 60 * 60 * 1000;
     const dayKey = (d) => `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
     const totalsByDay = {};
+    const cyclesByDay = {};
     txsPeriod.forEach(t => {
       const d = new Date(t.timestamp);
-      totalsByDay[dayKey(d)] = (totalsByDay[dayKey(d)] || 0) + (Number(t.amount) || 0);
+      const k = dayKey(d);
+      totalsByDay[k] = (totalsByDay[k] || 0) + (Number(t.amount) || 0);
+      cyclesByDay[k] = (cyclesByDay[k] || 0) + 1;
     });
 
     const renderEnd = new Date(Math.min(end.getTime() - 1, Date.now()));
@@ -3412,12 +3492,13 @@ class CapaxeroDashboard {
     if (dayList.length === 1) dayList.unshift(new Date(dayList[0].getTime() - dayMs));
 
     const dias = dayList.map(d => `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`);
+    const W = 720, H = 210, pad = 8;
+    const px = i => pad + i * (W - pad * 2) / (dayList.length - 1);
+
+    // --- 1A. GRÁFICO DE FATURAMENTO (R$) ---
     const serieRaw = dayList.map(d => totalsByDay[dayKey(d)] || 0);
     const maxS = Math.max(...serieRaw, 10);
     const minS = 0;
-    const W = 720, H = 210, pad = 8;
-
-    const px = i => pad + i * (W - pad * 2) / (serieRaw.length - 1);
     const py = v => H - 14 - (v - minS) / (maxS - minS || 1) * (H - 40);
     const pts = serieRaw.map((v, i) => ({ x: px(i), y: py(v), v, label: dias[i] }));
 
@@ -3459,6 +3540,58 @@ class CapaxeroDashboard {
     }
     if (elXAxis) {
       elXAxis.innerHTML = pts.map(p => `<span>${p.label}</span>`).join('');
+    }
+
+    // --- 1B. GRÁFICO DE HISTÓRICO DE CICLOS (Volume) ---
+    const serieCyclesRaw = dayList.map(d => cyclesByDay[dayKey(d)] || 0);
+    const maxCycles = Math.max(...serieCyclesRaw, 5);
+    const minCycles = 0;
+    const pyCycles = v => H - 14 - (v - minCycles) / (maxCycles - minCycles || 1) * (H - 40);
+    const ptsCycles = serieCyclesRaw.map((v, i) => ({ x: px(i), y: pyCycles(v), v, label: dias[i] }));
+
+    let lineCyclesPath = '';
+    ptsCycles.forEach((p, i) => {
+      if (!i) { lineCyclesPath += `M${p.x},${p.y}`; return; }
+      const q = ptsCycles[i - 1], cx = (q.x + p.x) / 2;
+      lineCyclesPath += ` C${cx},${q.y} ${cx},${p.y} ${p.x},${p.y}`;
+    });
+    const areaCyclesPath = lineCyclesPath + ` L${ptsCycles[ptsCycles.length - 1].x},${H} L${ptsCycles[0].x},${H} Z`;
+
+    const elCyclesSvgLine = document.getElementById('dash-cycles-svg-line');
+    const elCyclesSvgArea = document.getElementById('dash-cycles-svg-area');
+    const elCyclesSvgGrid = document.getElementById('dash-cycles-svg-grid-lines');
+    const elCyclesSvgPts = document.getElementById('dash-cycles-svg-points');
+    const elCyclesXAxis = document.getElementById('dash-cycles-chart-x-axis');
+    const elCyclesYAxis = document.getElementById('dash-cycles-chart-y-axis');
+    const elCyclesPeriodTotal = document.getElementById('dash-cycles-chart-period-total');
+
+    if (elCyclesPeriodTotal) {
+      elCyclesPeriodTotal.textContent = `${totalCyc} ${totalCyc === 1 ? 'ciclo' : 'ciclos'} no período`;
+    }
+
+    if (elCyclesYAxis) {
+      const steps = [1, 0.75, 0.5, 0.25, 0];
+      const hasCycles = serieCyclesRaw.some(v => v > 0);
+      elCyclesYAxis.innerHTML = steps.map(pct => {
+        if (!hasCycles) return `<span>0</span>`;
+        const val = minCycles + pct * (maxCycles - minCycles);
+        return `<span>${Math.round(val)}</span>`;
+      }).join('');
+    }
+
+    if (elCyclesSvgLine) elCyclesSvgLine.setAttribute('d', lineCyclesPath);
+    if (elCyclesSvgArea) elCyclesSvgArea.setAttribute('d', areaCyclesPath);
+    if (elCyclesSvgGrid) {
+      elCyclesSvgGrid.innerHTML = [0, 0.25, 0.5, 0.75, 1].map(t => {
+        const y = 14 + t * (H - 40);
+        return `<line x1="0" x2="720" y1="${y}" y2="${y}" stroke="rgba(255,255,255,.06)" stroke-width="1"></line>`;
+      }).join('');
+    }
+    if (elCyclesSvgPts) {
+      elCyclesSvgPts.innerHTML = ptsCycles.map(p => `<circle cx="${p.x}" cy="${p.y}" r="3.5" fill="#0c0e11" stroke="#7fb2dd" stroke-width="2"><title>${p.label}: ${p.v} ciclo(s)</title></circle>`).join('');
+    }
+    if (elCyclesXAxis) {
+      elCyclesXAxis.innerHTML = ptsCycles.map(p => `<span>${p.label}</span>`).join('');
     }
 
     // 2. Ranking por Máquina — faturamento real do período
@@ -3722,8 +3855,22 @@ class CapaxeroDashboard {
     if (!tbody) return;
 
     const list = (this.state.coupons || []).filter(c => {
+      const isAdmin = this.currentUser?.role === 'CRPADMIN';
+      
+      if (!isAdmin) {
+        if (!c.allowedTotems || c.allowedTotems.length === 0) return true;
+        return c.allowedTotems.some(devno => {
+          const station = this.stations.find(s => s.devno === devno);
+          if (!station) return false;
+          const ownerIdOrName = station.raw?.owner_id || station.dono;
+          return ownerIdOrName === this.currentUser?.id || 
+                 ownerIdOrName === this.currentUser?.username || 
+                 ownerIdOrName === this.currentUser?.responsible_name;
+        });
+      }
+
       if (this.ownershipFilter === 'all') return true;
-      if (!c.allowedTotems || c.allowedTotems.length === 0) return true; // cupom global, não é restrito a um dono
+      if (!c.allowedTotems || c.allowedTotems.length === 0) return true;
       return c.allowedTotems.some(devno => {
         const station = this.stations.find(s => s.devno === devno);
         return station && this.matchesOwnershipFilter(station.raw?.owner_id || station.dono);
@@ -3818,6 +3965,7 @@ class CapaxeroDashboard {
 
   // --- 5. CADASTROS ---
   renderCadastros() {
+    if (!this.currentUser || this.currentUser.role !== 'CRPADMIN') return;
     const tbody = document.getElementById('cadastros-tbody');
     if (!tbody) return;
 

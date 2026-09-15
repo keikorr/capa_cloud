@@ -66,10 +66,10 @@
     <nav class="nav-tabs" role="tablist">
       <button class="nav-tab-btn active" data-page="estacoes"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h6M7 16h8"/></svg><span>Estações</span></button>
       <button class="nav-tab-btn" data-page="locais"><svg class="i" viewBox="0 0 24 24"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1116 0z"/><circle cx="12" cy="10" r="2.5"/></svg><span>Locais</span></button>
-      <button class="nav-tab-btn" data-page="manutencao" id="tab-manutencao" style="display:none;"><svg class="i" viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 00-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 005.4-5.4l-2.8 2.8-2-2 2.8-2.8z"/></svg><span>Manutenção</span></button>
+      <button class="nav-tab-btn admin-only" data-page="manutencao" id="tab-manutencao" style="display:none !important;"><svg class="i" viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 00-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 005.4-5.4l-2.8 2.8-2-2 2.8-2.8z"/></svg><span>Manutenção</span></button>
       <button class="nav-tab-btn" data-page="dashboard"><svg class="i" viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M22 19V2"/></svg><span>Dashboard</span></button>
       <button class="nav-tab-btn" data-page="coupons" id="tab-coupons"><svg class="i" viewBox="0 0 24 24"><path d="M3 8a2 2 0 012-2h14a2 2 0 012 2v2a2 2 0 000 4v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2a2 2 0 000-4V8z"/><path d="M10 6v12" stroke-dasharray="2 2"/></svg><span>Cupons &amp; Vouchers</span></button>
-      <button class="nav-tab-btn" data-page="cadastros" id="tab-cadastros" style="display:none;"><svg class="i" viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0114 0M17 8h5M19.5 5.5v5"/></svg><span>Cadastros</span></button>
+      <button class="nav-tab-btn admin-only" data-page="cadastros" id="tab-cadastros" style="display:none !important;"><svg class="i" viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0114 0M17 8h5M19.5 5.5v5"/></svg><span>Cadastros</span></button>
     </nav>
 
     <div class="navbar-search">
@@ -124,7 +124,7 @@
     </div>
   </header>
 
-  <div class="ownership-bar">
+  <div class="ownership-bar admin-only" id="ownership-bar" style="display:none !important;">
     <span class="ownership-bar-label">Filtrar por vínculo:</span>
     <div class="segmented" id="ownership-filter-toggle" title="Filtrar por vínculo em todas as abas">
       <button data-ownership="all" class="active">Todos</button>
@@ -350,6 +350,9 @@
           <select class="form-control" id="dash-owner-filter" style="width:auto; min-width:160px; padding:7px 12px; font-weight:600; font-size:12.5px; border-radius:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border); color:var(--text);">
             <option value="all">Todos os donos</option>
           </select>
+          <select class="form-control" id="dash-machine-filter" style="width:auto; min-width:160px; padding:7px 12px; font-weight:600; font-size:12.5px; border-radius:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border); color:var(--text);">
+            <option value="all">Todas as máquinas</option>
+          </select>
           <div class="segmented" id="dash-period-toggle">
             <button data-period="hoje">Hoje</button>
             <button data-period="7d" class="active">7 dias</button>
@@ -380,20 +383,20 @@
         </div>
       </div>
 
-      <!-- Gráfico Histórico de Faturamento & Ranking por Máquina -->
-      <div style="display:grid; grid-template-columns: 1.35fr 1fr; gap:18px; margin-bottom:18px;">
+      <!-- Gráficos Históricos: Faturamento & Ciclos lado a lado -->
+      <div class="dash-two-col">
         <div class="chart-card">
           <div class="chart-head">
             <h2>Histórico de faturamento</h2>
-            <span class="total" id="dash-chart-period-total">R$ 32.725,00 no período</span>
+            <span class="total" id="dash-chart-period-total">R$ 0,00 no período</span>
           </div>
           <div class="chart-flex">
             <div class="chart-y-axis" id="dash-chart-y-axis">
-              <span>5.120</span>
-              <span>4.610</span>
-              <span>4.120</span>
-              <span>3.410</span>
-              <span>2.980</span>
+              <span>0</span>
+              <span>0</span>
+              <span>0</span>
+              <span>0</span>
+              <span>0</span>
             </div>
             <div style="flex:1; min-width:0;">
               <svg viewBox="0 0 720 210" preserveAspectRatio="none" style="width:100%; height:210px; display:block; overflow:visible;" id="dash-svg-chart">
@@ -414,18 +417,52 @@
         </div>
 
         <div class="chart-card">
-          <h2>Faturamento por máquina</h2>
-          <div id="dash-ranking-maquinas" style="display:flex; flex-direction:column; gap:13px; margin-top:18px;"></div>
+          <div class="chart-head">
+            <h2>Histórico de ciclos</h2>
+            <span class="total" id="dash-cycles-chart-period-total" style="color:#7fb2dd;">0 ciclos no período</span>
+          </div>
+          <div class="chart-flex">
+            <div class="chart-y-axis" id="dash-cycles-chart-y-axis">
+              <span>0</span>
+              <span>0</span>
+              <span>0</span>
+              <span>0</span>
+              <span>0</span>
+            </div>
+            <div style="flex:1; min-width:0;">
+              <svg viewBox="0 0 720 210" preserveAspectRatio="none" style="width:100%; height:210px; display:block; overflow:visible;" id="dash-cycles-svg-chart">
+                <defs>
+                  <linearGradient id="cpxCyclesGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#5587B3" stop-opacity="0.42"></stop>
+                    <stop offset="100%" stop-color="#5587B3" stop-opacity="0"></stop>
+                  </linearGradient>
+                </defs>
+                <g id="dash-cycles-svg-grid-lines"></g>
+                <path id="dash-cycles-svg-area" d="" fill="url(#cpxCyclesGrad)"></path>
+                <path id="dash-cycles-svg-line" d="" fill="none" stroke="#7fb2dd" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                <g id="dash-cycles-svg-points"></g>
+              </svg>
+              <div class="chart-x-axis" id="dash-cycles-chart-x-axis"></div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Faturamento por Dono & Ciclos por Plano -->
-      <div style="display:grid; grid-template-columns: 1fr 1.35fr; gap:18px; margin-bottom:18px;">
+      <!-- Faturamento por Máquina & Faturamento por Dono -->
+      <div class="dash-two-col">
+        <div class="chart-card">
+          <h2>Faturamento por máquina</h2>
+          <div id="dash-ranking-maquinas" style="display:flex; flex-direction:column; gap:13px; margin-top:18px;"></div>
+        </div>
+
         <div class="chart-card">
           <h2>Faturamento por dono</h2>
           <div id="dash-ranking-donos" style="display:flex; flex-direction:column; gap:13px; margin-top:18px;"></div>
         </div>
+      </div>
 
+      <!-- Ciclos por Plano -->
+      <div style="margin-bottom:18px;">
         <div class="chart-card">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:10px;">
             <h2>Ciclos por plano</h2>
@@ -522,7 +559,7 @@
   <!-- ============================================================
        PÁGINA 4 — GESTÃO DE DONOS & CADASTROS (EXCLUSIVO CRPADMIN)
        ============================================================ -->
-  <main class="page" id="page-cadastros">
+  <main class="page admin-only" id="page-cadastros">
     <div class="cpx-fade-up">
       <div class="page-head">
         <div>
