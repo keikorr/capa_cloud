@@ -24,37 +24,190 @@ const config = require('../config/cielo_conecta');
 // ─────────────────────────────────────────────────────────────────────────────
 // Estado interno (tokens e tabelas de inicialização em memória)
 // ─────────────────────────────────────────────────────────────────────────────
-const tokenCache = new Map(); // scope -> { accessToken, expiresAt }
-let initializationCache = null; // { data, fetchedAt, version }
+// Chaveado por `clientId|scope`, e não só por scope: com a parametrização por máquina,
+// um Map indexado apenas pelo escopo devolveria o token do totem A para o totem B, que
+// tem outro credenciamento — a Cielo recusaria a venda (ou, pior, autorizaria na conta
+// errada). A chave é o clientId e não o devno de propósito: duas máquinas do mesmo
+// lojista compartilham credencial e devem compartilhar o token.
+const tokenCache = new Map(); // `${clientId}|${scope}` -> { accessToken, expiresAt }
+
+// Chaveado por `subordinatedMerchantId|terminalId`: as tabelas EMV são do TERMINAL, então
+// um cache global entregaria as tabelas (e o InitializationVersion) de um terminal a outro.
+const initializationCache = new Map(); // chave -> { data, fetchedAt }
+
 let orderSequence = 0;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Resolução das credenciais efetivas de uma máquina
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Hosts da Cielo Conecta por ambiente.
+ *
+ * São funções, e não constantes de módulo, pelo mesmo motivo de ecommerceSalesUrl() em
+ * routes/cielo.js: o ambiente é resolvido POR MÁQUINA a partir do painel, então ler o host
+ * uma única vez no boot faria a troca de ambiente não ter efeito nenhum sem reiniciar o
+ * servidor. As variáveis de ambiente continuam tendo precedência quando presentes.
+ */
+/**
+ * `allowEnvOverride` existe por uma armadilha concreta: o .env.example traz
+ * CIELO_AUTH_URL / CIELO_BASE_URL / CIELO_INIT_URL já apontados para os hosts de SANDBOX.
+ * Quem copiasse o exemplo e depois marcasse "Produção" no painel de uma máquina veria a
+ * venda sair contra o sandbox mesmo assim — a variável de ambiente venceria silenciosamente
+ * a escolha por máquina, anulando a parametrização inteira.
+ *
+ * Regra: quando a MÁQUINA escolheu explicitamente o ambiente, o host vem desse ambiente.
+ * A variável de ambiente segue valendo como escape hatch (proxy, mock, host alternativo)
+ * para quem não parametrizou a máquina.
+ */
+function conectaAuthUrl(isProduction, allowEnvOverride = true) {
+  if (allowEnvOverride && config.authUrl) return config.authUrl;
+  return isProduction
+    ? 'https://auth.cieloecommerce.cielo.com.br/oauth2/token'
+    : 'https://authsandbox.cieloecommerce.cielo.com.br/oauth2/token';
+}
+
+function conectaBaseUrl(isProduction, allowEnvOverride = true) {
+  if (allowEnvOverride && config.baseUrl) return config.baseUrl;
+  return isProduction
+    ? 'https://api.cieloecommerce.cielo.com.br'
+    : 'https://apisandbox.cieloecommerce.cielo.com.br';
+}
+
+function conectaInitUrl(isProduction, allowEnvOverride = true) {
+  if (allowEnvOverride && config.initUrl) return config.initUrl;
+  return isProduction
+    ? 'https://parametersdownload.cieloecommerce.cielo.com.br/api/v0.1/initialization'
+    : 'https://parametersdownloadsandbox.cieloecommerce.cielo.com.br/api/v0.1/initialization';
+}
+
+/**
+ * Credenciais e ambiente Cielo Conecta efetivos de uma máquina.
+ *
+ * Espelha resolveEcommerceCredentials() de routes/cielo.js, que resolveu exatamente este
+ * mesmo problema do lado do PIX: o painel gravava as credenciais em `config.cielo.*` e o
+ * pagamento lia outra coisa, então a credencial cadastrada ficava guardada sem nunca ser
+ * usada. Aqui o pagamento lia `config/cielo_conecta.js`, que é 100% .env — ou seja, TODAS
+ * as máquinas transacionavam com o mesmo credenciamento, ignorando o painel.
+ *
+ * Ordem de prioridade: o que o painel grava na máquina, depois o .env. Não há camada
+ * legada como no E-commerce — o Conecta nunca teve campos na raiz da config.
+ *
+ * Aceita `null` (nenhuma máquina no contexto) e devolve a configuração global do .env,
+ * o que mantém funcionando quem chama o serviço fora do fluxo de uma máquina.
+ */
+function resolveConectaCredentials(totem) {
+  const cfg = (totem && totem.config) || {};
+  const nested = cfg.cielo || {};
+
+  const pick = (...values) => {
+    for (const v of values) {
+      if (typeof v === 'string' && v.trim()) return v.trim();
+    }
+    return '';
+  };
+
+  // A máquina escolheu o ambiente no painel? Então os hosts saem desse ambiente, e não
+  // de uma variável de ambiente que contradiria a escolha (ver conectaBaseUrl acima).
+  const machineEnvironment = pick(nested.conectaEnvironment);
+  const environment = machineEnvironment || config.environment || 'Homologacao';
+  const isProduction = environment === 'Producao';
+  const allowEnvOverride = !machineEnvironment;
+
+  const cardTimeoutSeconds = Number(nested.conectaCardTimeoutSeconds) > 0
+    ? Number(nested.conectaCardTimeoutSeconds)
+    : config.cardTimeoutSeconds;
+
+  const credentials = {
+    devno: (totem && totem.devno) || null,
+
+    environment,
+    isProduction,
+    environmentHeaders: config.environmentHeadersByEnvironment[environment]
+      || config.environmentHeadersByEnvironment.Homologacao,
+
+    authUrl: conectaAuthUrl(isProduction, allowEnvOverride),
+    baseUrl: conectaBaseUrl(isProduction, allowEnvOverride),
+    initUrl: conectaInitUrl(isProduction, allowEnvOverride),
+
+    clientId: pick(nested.conectaClientId, config.clientId),
+    clientSecret: pick(nested.conectaClientSecret, config.clientSecret),
+    merchantId: pick(nested.conectaSubordinatedMerchantId, config.merchantId),
+    terminalId: pick(nested.conectaTerminalId, config.terminalId),
+
+    pinpad: {
+      license: pick(nested.pinpadLicense, config.pinpad.license),
+      companyName: pick(nested.pinpadCompany, config.pinpad.companyName),
+      comm: pick(nested.pinpadComm, config.pinpad.comm) || 'USB'
+    },
+
+    cardTimeoutSeconds
+  };
+
+  credentials.isConfigured = Boolean(
+    credentials.clientId &&
+    credentials.clientSecret &&
+    credentials.merchantId &&
+    credentials.terminalId
+  );
+
+  return credentials;
+}
+
+/**
+ * Credenciais globais do .env — atalho para quem não tem uma máquina em mãos.
+ */
+function defaultCredentials() {
+  return resolveConectaCredentials(null);
+}
+
+/**
+ * Normaliza o argumento das funções públicas: aceita as credenciais já resolvidas, um
+ * totem cru, ou nada (cai no .env).
+ */
+function asCredentials(input) {
+  if (!input) return defaultCredentials();
+  if (input.isConfigured !== undefined && input.authUrl) return input;
+  return resolveConectaCredentials(input);
+}
 
 /**
  * Indica se o serviço deve operar em modo simulador (sem chamar a Cielo de verdade).
- * Em "auto", o simulador liga sozinho enquanto faltarem URL base ou credenciais.
+ * Em "auto", o simulador liga sozinho enquanto faltarem URL base ou credenciais DA MÁQUINA.
  */
-function isSimulator() {
+function isSimulator(input) {
   if (config.simulator === 'on') return true;
   if (config.simulator === 'off') return false;
-  return !(config.baseUrl && config.clientId && config.clientSecret);
+  const creds = asCredentials(input);
+  return !(creds.baseUrl && creds.clientId && creds.clientSecret);
 }
 
 /**
  * Motivo pelo qual o simulador está ativo — útil para o painel e para os logs.
+ *
+ * As chaves que faltam são reportadas com o nome do campo no painel quando a máquina está
+ * parametrizada, e com o nome da variável de ambiente quando o fallback é o .env, para que
+ * a mensagem aponte o lugar onde o operador precisa realmente mexer.
  */
-function getConfigStatus() {
+function getConfigStatus(input) {
+  const creds = asCredentials(input);
   const missing = [];
-  if (!config.baseUrl) missing.push('CIELO_BASE_URL');
-  if (!config.authUrl) missing.push('CIELO_AUTH_URL');
-  if (!config.clientId) missing.push('CIELO_CLIENT_ID');
-  if (!config.clientSecret) missing.push('CIELO_CLIENT_SECRET');
-  if (!config.merchantId) missing.push('CIELO_SUBORDINATED_MERCHANT_ID');
-  if (!config.terminalId) missing.push('CIELO_TERMINAL_ID');
-  if (!config.pinpad.license) missing.push('CIELO_PINPAD_LICENSE');
-  if (!config.pinpad.companyName) missing.push('CIELO_PINPAD_COMPANY');
+
+  const label = (field, envVar) => (creds.devno ? field : envVar);
+
+  if (!creds.baseUrl) missing.push('CIELO_BASE_URL');
+  if (!creds.authUrl) missing.push('CIELO_AUTH_URL');
+  if (!creds.clientId) missing.push(label('Client ID', 'CIELO_CLIENT_ID'));
+  if (!creds.clientSecret) missing.push(label('Client Secret', 'CIELO_CLIENT_SECRET'));
+  if (!creds.merchantId) missing.push(label('Subordinated Merchant ID', 'CIELO_SUBORDINATED_MERCHANT_ID'));
+  if (!creds.terminalId) missing.push(label('Terminal ID', 'CIELO_TERMINAL_ID'));
+  if (!creds.pinpad.license) missing.push(label('Licença Pinpad', 'CIELO_PINPAD_LICENSE'));
+  if (!creds.pinpad.companyName) missing.push(label('Nome da Empresa (Pinpad)', 'CIELO_PINPAD_COMPANY'));
 
   return {
-    environment: config.environment,
-    simulator: isSimulator(),
+    devno: creds.devno,
+    environment: creds.environment,
+    simulator: isSimulator(creds),
     configured: missing.length === 0,
     missing
   };
@@ -95,21 +248,28 @@ function toCents(amount) {
  * Homologação devolve tokens de 24h; Produção, de apenas 20 minutos — por isso o token é
  * sempre renovado com base no `expires_in` real da resposta, descontada a margem de segurança.
  */
-async function getAccessToken(scope = config.scopeTransactional) {
-  const cached = tokenCache.get(scope);
+async function getAccessToken(input, scope = config.scopeTransactional) {
+  const creds = asCredentials(input);
+  const cacheKey = `${creds.clientId}|${scope}`;
+
+  const cached = tokenCache.get(cacheKey);
   if (cached && cached.expiresAt > Date.now()) {
     return cached.accessToken;
   }
 
-  if (!config.authUrl || !config.clientId || !config.clientSecret) {
-    throw new Error('Credenciais Cielo Conecta não configuradas (CIELO_AUTH_URL / CLIENT_ID / CLIENT_SECRET).');
+  if (!creds.authUrl || !creds.clientId || !creds.clientSecret) {
+    throw new Error(
+      creds.devno
+        ? `Credenciais Cielo Conecta não parametrizadas para a máquina ${creds.devno} (Client ID / Client Secret).`
+        : 'Credenciais Cielo Conecta não configuradas (CIELO_AUTH_URL / CLIENT_ID / CLIENT_SECRET).'
+    );
   }
 
-  const basic = Buffer.from(`${config.clientId}:${config.clientSecret}`).toString('base64');
+  const basic = Buffer.from(`${creds.clientId}:${creds.clientSecret}`).toString('base64');
   const body = new URLSearchParams({ grant_type: 'client_credentials' });
   if (scope) body.set('scope', scope);
 
-  const res = await fetch(config.authUrl, {
+  const res = await fetch(creds.authUrl, {
     method: 'POST',
     headers: {
       'Authorization': `Basic ${basic}`,
@@ -127,12 +287,15 @@ async function getAccessToken(scope = config.scopeTransactional) {
   const expiresInSeconds = Number(data.expires_in || 1200);
   const ttl = Math.max(expiresInSeconds - config.tokenRefreshMarginSeconds, 30);
 
-  tokenCache.set(scope, {
+  tokenCache.set(cacheKey, {
     accessToken: data.access_token,
     expiresAt: Date.now() + ttl * 1000
   });
 
-  console.log(`[CIELO CONECTA] Token OAuth2 obtido (escopo ${scope}, válido por ${expiresInSeconds}s).`);
+  console.log(
+    `[CIELO CONECTA] Token OAuth2 obtido (escopo ${scope}, ClientId ...${creds.clientId.slice(-6)}` +
+    `${creds.devno ? `, máquina ${creds.devno}` : ''}, válido por ${expiresInSeconds}s).`
+  );
   return data.access_token;
 }
 
@@ -140,9 +303,10 @@ async function getAccessToken(scope = config.scopeTransactional) {
  * Chamada autenticada genérica à API Cielo Conecta.
  * `kind` define qual valor vai no header "Environment": 'master' ou 'payment'.
  */
-async function cieloRequest(method, path, { body, scope, kind = 'payment' } = {}) {
-  const token = await getAccessToken(scope || (kind === 'master' ? config.scopeMaster : config.scopeTransactional));
-  const envHeader = config.environmentHeaders[kind];
+async function cieloRequest(input, method, path, { body, scope, kind = 'payment' } = {}) {
+  const creds = asCredentials(input);
+  const token = await getAccessToken(creds, scope || (kind === 'master' ? config.scopeMaster : config.scopeTransactional));
+  const envHeader = creds.environmentHeaders[kind];
 
   const headers = {
     'Authorization': `Bearer ${token}`,
@@ -151,7 +315,7 @@ async function cieloRequest(method, path, { body, scope, kind = 'payment' } = {}
   };
   if (envHeader) headers['Environment'] = envHeader;
 
-  const url = path.startsWith('http') ? path : `${config.baseUrl}${path}`;
+  const url = path.startsWith('http') ? path : `${creds.baseUrl}${path}`;
   const res = await fetch(url, {
     method,
     headers,
@@ -189,30 +353,39 @@ async function cieloRequest(method, path, { body, scope, kind = 'payment' } = {}
  * Sempre que o InitializationVersion mudar do lado da Cielo, o totem precisa recarregar as
  * tabelas no pinpad com PPC_CMD_TAB_LOAD (é exatamente o que PPC_CMD_TAB_VER detecta).
  */
-async function getInitialization({ force = false } = {}) {
+async function getInitialization(input, { force = false } = {}) {
+  const creds = asCredentials(input);
+  // As tabelas pertencem ao terminal, não ao processo — daí a chave composta.
+  const cacheKey = `${creds.merchantId}|${creds.terminalId}`;
   const cacheTtl = config.initializationCacheMinutes * 60 * 1000;
-  if (!force && initializationCache && (Date.now() - initializationCache.fetchedAt) < cacheTtl) {
-    return initializationCache.data;
+
+  const cached = initializationCache.get(cacheKey);
+  if (!force && cached && (Date.now() - cached.fetchedAt) < cacheTtl) {
+    return cached.data;
   }
 
-  if (isSimulator()) {
-    initializationCache = {
-      data: buildSimulatedInitialization(),
-      fetchedAt: Date.now()
-    };
-    return initializationCache.data;
+  if (isSimulator(creds)) {
+    const data = buildSimulatedInitialization();
+    initializationCache.set(cacheKey, { data, fetchedAt: Date.now() });
+    return data;
   }
 
-  if (!config.merchantId || !config.terminalId) {
-    throw new Error('SubordinatedMerchantId e TerminalId são obrigatórios para a baixa de parâmetros.');
+  if (!creds.merchantId || !creds.terminalId) {
+    throw new Error(
+      'SubordinatedMerchantId e TerminalId são obrigatórios para a baixa de parâmetros' +
+      (creds.devno ? ` (máquina ${creds.devno}).` : '.')
+    );
   }
 
-  const initBase = config.initUrl || `${config.baseUrl}/api/v0.1/initialization`;
-  const url = `${initBase.replace(/\/+$/, '')}/${config.merchantId}/${config.terminalId}`;
-  const data = await cieloRequest('GET', url, { kind: 'master' });
+  const initBase = creds.initUrl || `${creds.baseUrl}/api/v0.1/initialization`;
+  const url = `${initBase.replace(/\/+$/, '')}/${creds.merchantId}/${creds.terminalId}`;
+  const data = await cieloRequest(creds, 'GET', url, { kind: 'master' });
 
-  initializationCache = { data, fetchedAt: Date.now() };
-  console.log(`[CIELO CONECTA] Baixa de parâmetros concluída — InitializationVersion ${data.InitializationVersion}.`);
+  initializationCache.set(cacheKey, { data, fetchedAt: Date.now() });
+  console.log(
+    `[CIELO CONECTA] Baixa de parâmetros concluída para o terminal ${creds.terminalId}` +
+    `${creds.devno ? ` (máquina ${creds.devno})` : ''} — InitializationVersion ${data.InitializationVersion}.`
+  );
   return data;
 }
 
@@ -222,8 +395,9 @@ async function getInitialization({ force = false } = {}) {
  * O PPC_INP_INITVER recebe apenas os 10 ÚLTIMOS caracteres do InitializationVersion — a
  * comparação com PPC_OUT_TABVER é feita sobre esse mesmo recorte.
  */
-async function getPinpadTables({ force = false } = {}) {
-  const init = await getInitialization({ force });
+async function getPinpadTables(input, { force = false } = {}) {
+  const creds = asCredentials(input);
+  const init = await getInitialization(creds, { force });
   const fullVersion = String(init.InitializationVersion || '');
 
   return {
@@ -234,13 +408,13 @@ async function getPinpadTables({ force = false } = {}) {
     // Parâmetros de risco EMV usados em PPC_CMD_PROCCHIP e a lista de tags TagsFirst/TagsSecond
     emv: init.Emv || [],
     parameters: init.Parameters || {},
-    // Licença repassada ao PPC_CMD_OPEN no tablet
+    // Licença repassada ao PPC_CMD_OPEN no tablet — da MÁQUINA, não mais global
     pinpad: {
-      license: config.pinpad.license,
-      companyName: config.pinpad.companyName,
-      comm: config.pinpad.comm
+      license: creds.pinpad.license,
+      companyName: creds.pinpad.companyName,
+      comm: creds.pinpad.comm
     },
-    cardTimeoutSeconds: config.cardTimeoutSeconds
+    cardTimeoutSeconds: creds.cardTimeoutSeconds
   };
 }
 
@@ -268,10 +442,11 @@ function aidMatches(tableAid, cardAid) {
  * `appType` é o tipo pedido pelo usuário na tela ("01" crédito / "02" débito, mesmo valor
  * enviado ao pinpad em PPC_INP_APPTYPE) e serve de desempate quando o cartão é múltiplo.
  */
-async function resolveProduct({ cardAid, cardBin, appType = '01' }) {
+async function resolveProduct(input, { cardAid, cardBin, appType = '01' }) {
+  const creds = asCredentials(input);
   const wantedType = appType === '02' ? 1 : 0; // 0 = Crédito, 1 = Débito
   try {
-    const init = await getInitialization();
+    const init = await getInitialization(creds);
     const emvTable = (init && init.Emv) || [];
     const binsTable = (init && init.Bins) || [];
     const productsTable = (init && init.Products) || [];
@@ -356,16 +531,17 @@ async function resolveProduct({ cardAid, cardBin, appType = '01' }) {
  * @param {object} params.pinpadInfo       Saída de PPC_CMD_OPEN (número de série, características).
  * @param {string} [params.merchantOrderId] Se omitido, é gerado aqui.
  */
-async function authorizeCardSale({ amount, appType = '01', card = {}, pinpadInfo = {}, merchantOrderId, paymentDateTime }) {
+async function authorizeCardSale(input, { amount, appType = '01', card = {}, pinpadInfo = {}, merchantOrderId, paymentDateTime }) {
+  const creds = asCredentials(input);
   const merchantOrder = merchantOrderId || generateMerchantOrderId();
   const dateTime = paymentDateTime || formatPaymentDateTime();
   const amountCents = toCents(amount);
 
-  if (isSimulator()) {
+  if (isSimulator(creds)) {
     return simulateAuthorization({ merchantOrder, amountCents, appType, card, dateTime });
   }
 
-  const product = await resolveProduct({
+  const product = await resolveProduct(creds, {
     cardAid: card.cardAid,
     cardBin: card.cardBin,
     appType
@@ -407,7 +583,7 @@ async function authorizeCardSale({ amount, appType = '01', card = {}, pinpadInfo
   const body = {
     MerchantOrderId: merchantOrder,
     Payment: {
-      SubordinatedMerchantId: config.merchantId || config.clientId,
+      SubordinatedMerchantId: creds.merchantId || creds.clientId,
       Installments: 1,
       Interest: 'ByMerchant',
       Amount: amountCents,
@@ -417,7 +593,7 @@ async function authorizeCardSale({ amount, appType = '01', card = {}, pinpadInfo
       PaymentDateTime: dateTime,
       SoftDescriptor: 'Chip',
       PinPadInformation: {
-        TerminalId: config.terminalId || '00000001',
+        TerminalId: creds.terminalId || '00000001',
         SerialNumber: (pinpadInfo && pinpadInfo.serialNumber) || '205fae17775b1955',
         PhysicalCharacteristics: (pinpadInfo && pinpadInfo.physicalCharacteristics) || 'PinPadWithChipReaderWithSamModuleAndContactless',
         ReturnDataInfo: (pinpadInfo && pinpadInfo.returnDataInfo) || '00'
@@ -426,7 +602,7 @@ async function authorizeCardSale({ amount, appType = '01', card = {}, pinpadInfo
     }
   };
 
-  const response = await cieloRequest('POST', '/1/physicalSales', { body, kind: 'payment' });
+  const response = await cieloRequest(creds, 'POST', '/1/physicalSales', { body, kind: 'payment' });
   return normalizeSaleResponse(response, { merchantOrder, product, amountCents });
 }
 
@@ -484,14 +660,15 @@ function extractLinks(response, payment) {
 /**
  * Confirma a venda (quando o fluxo hipermídia da Cielo exigir o passo de confirmação).
  */
-async function confirmSale(sale) {
-  if (isSimulator()) {
+async function confirmSale(input, sale) {
+  const creds = asCredentials(input);
+  if (isSimulator(creds)) {
     return { confirmed: true, simulated: true };
   }
   const link = sale && sale.links && (sale.links.confirm || sale.links.confirmation);
   if (!link) return { confirmed: false, reason: 'Resposta da Cielo não trouxe link de confirmação.' };
 
-  const response = await cieloRequest(link.method || 'POST', link.href, { kind: 'payment' });
+  const response = await cieloRequest(creds, link.method || 'POST', link.href, { kind: 'payment' });
   return { confirmed: true, response };
 }
 
@@ -503,8 +680,9 @@ async function confirmSale(sale) {
  * cartão), ou qualquer falha depois da aprovação — a transação NÃO pode ficar pela metade e
  * o desfazimento precisa ser enviado.
  */
-async function reverseSale(sale, reason = 'FINISHCHIP_FAILED') {
-  if (isSimulator()) {
+async function reverseSale(input, sale, reason = 'FINISHCHIP_FAILED') {
+  const creds = asCredentials(input);
+  if (isSimulator(creds)) {
     console.log(`[CIELO CONECTA][SIM] Desfazimento simulado do pedido ${sale && sale.merchantOrderId} (${reason}).`);
     return { reversed: true, simulated: true, reason };
   }
@@ -515,7 +693,7 @@ async function reverseSale(sale, reason = 'FINISHCHIP_FAILED') {
     return { reversed: false, reason: 'Resposta da Cielo não trouxe link de desfazimento.' };
   }
 
-  const response = await cieloRequest(link.method || 'POST', link.href, { kind: 'payment' });
+  const response = await cieloRequest(creds, link.method || 'POST', link.href, { kind: 'payment' });
   console.log(`[CIELO CONECTA] Desfazimento enviado — pedido ${sale.merchantOrderId} (${reason}).`);
   return { reversed: true, reason, response };
 }
@@ -604,6 +782,12 @@ function simulateAuthorization({ merchantOrder, amountCents, appType, card, date
 }
 
 module.exports = {
+  // parametrização por máquina
+  resolveConectaCredentials,
+  defaultCredentials,
+  conectaAuthUrl,
+  conectaBaseUrl,
+  conectaInitUrl,
   // configuração / diagnóstico
   getConfigStatus,
   isSimulator,

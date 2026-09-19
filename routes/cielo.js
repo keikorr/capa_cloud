@@ -504,25 +504,48 @@ router.post('/cielo/webhook', (req, res) => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
+ * Credenciais Conecta efetivas de uma máquina, a partir do devno.
+ *
+ * Contraparte de resolveEcommerceCredentials() para o cartão presente. A resolução em si
+ * mora em services/cieloConecta.js porque routes/api.js também precisa dela para publicar
+ * os parâmetros no totem — duplicar a cadeia de fallback nos dois arquivos foi justamente
+ * o que fez o E-commerce divergir (o painel gravava num lugar e o pagamento lia outro).
+ *
+ * Um devno desconhecido resolve para a configuração global do .env, que é o comportamento
+ * anterior à parametrização por máquina.
+ */
+function resolveConectaFor(devno) {
+  const totem = devno ? store.getTotem(devno) : null;
+  return cieloConecta.resolveConectaCredentials(totem);
+}
+
+/**
  * GET /api/v1/payment/cielo/card/config
  * Retorna configurações do Pinpad (licença, empresa, porta e timeout) sem expor segredos.
  */
 router.get('/cielo/card/config', (req, res) => {
   try {
-    const configStatus = cieloConecta.getConfigStatus();
+    // `devno` é o que torna esta rota por máquina. Sem ele a resposta caía sempre na
+    // configuração global do .env, e o totem recebia a licença de pinpad de outro lojista.
+    const devno = req.query.devno || req.query.totemId;
+    const credentials = resolveConectaFor(devno);
+    const configStatus = cieloConecta.getConfigStatus(credentials);
+
     return res.json({
       code: 0,
       success: true,
       data: {
+        devno: devno || null,
         pinpad: {
-          license: cieloConfig.pinpad.license,
-          companyName: cieloConfig.pinpad.companyName,
-          comm: cieloConfig.pinpad.comm
+          license: credentials.pinpad.license,
+          companyName: credentials.pinpad.companyName,
+          comm: credentials.pinpad.comm
         },
-        environment: cieloConfig.environment,
+        environment: credentials.environment,
         simulator: configStatus.simulator,
         configured: configStatus.configured,
-        cardTimeoutSeconds: cieloConfig.cardTimeoutSeconds
+        missing: configStatus.missing,
+        cardTimeoutSeconds: credentials.cardTimeoutSeconds
       }
     });
   } catch (err) {
@@ -537,11 +560,12 @@ router.get('/cielo/card/config', (req, res) => {
 router.get('/cielo/card/initialization', async (req, res) => {
   try {
     const force = req.query.force === '1' || req.query.force === 'true';
-    const tables = await cieloConecta.getPinpadTables({ force });
+    const devno = req.query.devno || req.query.totemId;
+    const tables = await cieloConecta.getPinpadTables(resolveConectaFor(devno), { force });
     return res.json({
       code: 0,
       success: true,
-      data: tables
+      data: { devno: devno || null, ...tables }
     });
   } catch (err) {
     console.error('[CIELO CONECTA] Erro na baixa de parâmetros:', err.message);
@@ -567,10 +591,11 @@ router.post('/cielo/card/start', async (req, res) => {
   const payMethod = paymentMethod || 'CIELO_CREDITO';
   const appType = (payMethod === 'CIELO_DEBITO' || payMethod === 'debit') ? '02' : '01';
   const totem = store.getTotem(devno);
+  const credentials = cieloConecta.resolveConectaCredentials(totem);
 
   let initVer10 = '0000';
   try {
-    const tables = await cieloConecta.getPinpadTables();
+    const tables = await cieloConecta.getPinpadTables(credentials);
     if (tables && tables.initVer10) initVer10 = tables.initVer10;
   } catch (ignored) {}
 
@@ -590,7 +615,7 @@ router.post('/cielo/card/start', async (req, res) => {
       ctlsOn: '1',
       dateTime: cieloConecta.formatPaymentDateTime(),
       initVer: initVer10,
-      timeoutSeconds: cieloConfig.cardTimeoutSeconds || 90
+      timeoutSeconds: credentials.cardTimeoutSeconds || 90
     },
     createdAt: new Date().toISOString()
   };
@@ -617,8 +642,11 @@ router.post('/cielo/card/authorize', async (req, res) => {
     const effectiveAmount = order.amount || (amountCents ? amountCents / 100 : 17.00);
     const effectiveAppType = appType || order.pinpadCommand?.appType || (order.paymentMethod === 'CIELO_DEBITO' ? '02' : '01');
     const effectiveMerchantOrder = merchantOrderId || order.merchantOrderId || cieloConecta.generateMerchantOrderId();
+    // A máquina vem do corpo ou do pedido aberto em /card/start — a autorização precisa
+    // sair pelo credenciamento DELA, não pelo global do .env.
+    const effectiveDevno = devno || order.devno;
 
-    const authResult = await cieloConecta.authorizeCardSale({
+    const authResult = await cieloConecta.authorizeCardSale(resolveConectaFor(effectiveDevno), {
       amount: effectiveAmount,
       appType: effectiveAppType,
       card: card || {},
@@ -686,13 +714,16 @@ router.post('/cielo/card/finish', async (req, res) => {
   const { orderId, devno, finalResult, finishChipStatus, amountCents } = req.body;
   const order = store.getPendingOrder(orderId) || {};
   const totem = store.getTotem(devno || order.devno);
+  // Confirmação e desfazimento têm que sair pelo MESMO credenciamento que autorizou.
+  // Resolvido a partir do totem já carregado, sem nova ida ao store.
+  const credentials = cieloConecta.resolveConectaCredentials(totem);
 
   try {
     const isApproved = finalResult === 'APPROVED' || finalResult === '0' || finalResult === 0 || finalResult === 'SUCCESS';
 
     if (isApproved) {
       if (order.paymentId) {
-        await cieloConecta.confirmSale({
+        await cieloConecta.confirmSale(credentials, {
           paymentId: order.paymentId,
           amount: order.amount || (amountCents ? amountCents / 100 : 17.00),
           links: order.rawAuthResult?.links
@@ -752,7 +783,7 @@ router.post('/cielo/card/finish', async (req, res) => {
       });
     } else {
       if (order.paymentId) {
-        await cieloConecta.reverseSale({
+        await cieloConecta.reverseSale(credentials, {
           paymentId: order.paymentId,
           merchantOrderId: order.merchantOrderId,
           amount: order.amount,
@@ -782,7 +813,7 @@ router.post('/cielo/card/reversal', async (req, res) => {
   const order = store.getPendingOrder(orderId);
   if (order && order.paymentId) {
     try {
-      await cieloConecta.reverseSale({
+      await cieloConecta.reverseSale(resolveConectaFor(order.devno), {
         paymentId: order.paymentId,
         merchantOrderId: order.merchantOrderId,
         amount: order.amount,
@@ -833,7 +864,9 @@ setInterval(() => {
       ) {
         console.warn(`[CIELO CONECTA][WATCHDOG] Pedido ${order.orderId} aprovado há mais de ${CARD_FINISH_WATCHDOG_SECONDS}s sem confirmação local (/card/finish). Desfazendo automaticamente.`);
         store.updatePendingOrder(order.orderId, { status: 'REVERSED', financeConfirmed: true, reversalReason: 'WATCHDOG_FINISH_TIMEOUT' });
-        cieloConecta.reverseSale({
+        // Pelo credenciamento da máquina do pedido: um estorno automático saindo pela
+        // conta errada é o pior desfecho possível deste sweep.
+        cieloConecta.reverseSale(resolveConectaFor(order.devno), {
           paymentId: order.paymentId,
           merchantOrderId: order.merchantOrderId,
           amount: order.amount,

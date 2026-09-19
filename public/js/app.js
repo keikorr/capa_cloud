@@ -1463,6 +1463,7 @@ class CapaxeroDashboard {
           conectaClientSecret: val('cielo-conecta-client-secret'),
           conectaSubordinatedMerchantId: val('cielo-conecta-sub-merchant'),
           conectaTerminalId: val('cielo-conecta-terminal'),
+          conectaCardTimeoutSeconds: Number(val('cielo-conecta-card-timeout')) || 90,
           ecommerceEnvironment: val('cielo-ecom-env') || 'Sandbox',
           ecommerceMerchantId: val('cielo-ecom-merchant-id'),
           ecommerceMerchantKey: val('cielo-ecom-merchant-key'),
@@ -2970,6 +2971,7 @@ class CapaxeroDashboard {
     setVal('cielo-conecta-client-secret', cielo.conectaClientSecret || '');
     setVal('cielo-conecta-sub-merchant', cielo.conectaSubordinatedMerchantId || '');
     setVal('cielo-conecta-terminal', cielo.conectaTerminalId || '');
+    setVal('cielo-conecta-card-timeout', cielo.conectaCardTimeoutSeconds || 90);
 
     setVal('cielo-ecom-env', cielo.ecommerceEnvironment || 'Sandbox');
     setVal('cielo-ecom-merchant-id', cielo.ecommerceMerchantId || '');

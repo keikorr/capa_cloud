@@ -110,6 +110,73 @@ function validateEcommerceCredentials(cielo) {
   return null;
 }
 
+/**
+ * Confere o formato das credenciais Cielo Conecta (cartão presente) antes de gravar.
+ *
+ * Mesmo motivo do validador de E-commerce acima: um Client ID truncado só se manifesta na
+ * hora da venda, como um 401 da Cielo na frente do cliente, e nunca para quem cadastrou.
+ * O Client ID do Conecta é um GUID, igual ao Merchant ID — daí o regex compartilhado.
+ *
+ * Devolve null quando está tudo certo, ou a mensagem de erro.
+ */
+const CONECTA_ENVIRONMENTS = ['Sandbox', 'Homologacao', 'Producao'];
+
+function validateConectaCredentials(cielo) {
+  if (!cielo || typeof cielo !== 'object') return null;
+
+  const clientId = (cielo.conectaClientId || '').trim();
+  const clientSecret = (cielo.conectaClientSecret || '').trim();
+  const subMerchantId = (cielo.conectaSubordinatedMerchantId || '').trim();
+  const terminalId = (cielo.conectaTerminalId || '').trim();
+  const environment = (cielo.conectaEnvironment || '').trim();
+
+  if (environment && !CONECTA_ENVIRONMENTS.includes(environment)) {
+    return `Ambiente Cielo Conecta inválido: "${environment}". ` +
+      `Use ${CONECTA_ENVIRONMENTS.join(', ')}.`;
+  }
+
+  if (clientId && !CIELO_GUID_REGEX.test(clientId)) {
+    const digits = clientId.replace(/-/g, '').length;
+    return `Client ID do Cielo Conecta inválido: "${clientId}". ` +
+      `Deve ser um GUID no formato 8-4-4-4-12 (32 caracteres hexadecimais); ` +
+      `o valor informado tem ${digits}. Copie novamente do portal da Cielo.`;
+  }
+
+  if (clientId && !clientSecret) {
+    return 'Informe também o Client Secret do Cielo Conecta para esta máquina.';
+  }
+
+  if (clientSecret && !clientId) {
+    return 'Informe também o Client ID do Cielo Conecta para esta máquina.';
+  }
+
+  // Sem o Subordinated Merchant ID a Cielo recusa tanto a baixa de parâmetros quanto a
+  // autorização — ele vai no Payment de /1/physicalSales e na URL de /initialization.
+  if (clientId && !subMerchantId) {
+    return 'Informe o Subordinated Merchant ID do Cielo Conecta para esta máquina.';
+  }
+
+  // Terminal lógico: 8 dígitos numéricos (ex.: "00000001").
+  if (terminalId && !/^\d{8}$/.test(terminalId)) {
+    return `Terminal ID do Cielo Conecta inválido: "${terminalId}". ` +
+      'O terminal lógico tem 8 dígitos numéricos (ex.: 00000001).';
+  }
+
+  if (clientId && !terminalId) {
+    return 'Informe o Terminal ID do Cielo Conecta para esta máquina.';
+  }
+
+  const timeout = cielo.conectaCardTimeoutSeconds;
+  if (timeout !== undefined && timeout !== null && timeout !== '') {
+    const seconds = Number(timeout);
+    if (!Number.isFinite(seconds) || seconds < 15 || seconds > 300) {
+      return `Timeout do cartão inválido: "${timeout}". Informe um valor entre 15 e 300 segundos.`;
+    }
+  }
+
+  return null;
+}
+
 // Middleware auxiliar para extrair o usuário autenticado
 function extractUser(req) {
   const token = req.headers.authorization || req.query.token;
@@ -499,7 +566,8 @@ router.put('/admin/totems/:devno/config', (req, res) => {
   // Credencial E-commerce malformada era aceita sem reclamar e só falhava na hora da
   // cobrança, como um "MerchantId is required" da Cielo que ninguém via. Melhor recusar
   // aqui, com o operador ainda olhando para o campo.
-  const cieloError = validateEcommerceCredentials(configData.cielo);
+  const cieloError = validateEcommerceCredentials(configData.cielo)
+    || validateConectaCredentials(configData.cielo);
   if (cieloError) {
     return res.status(400).json({ success: false, message: cieloError });
   }

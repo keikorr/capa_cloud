@@ -18,6 +18,11 @@ module.exports = {
   environment: ENVIRONMENT,
   environmentHeaders: ENVIRONMENT_HEADERS[ENVIRONMENT] || ENVIRONMENT_HEADERS.Homologacao,
 
+  // O mapa inteiro, e não só a linha do ambiente global: com a parametrização por máquina
+  // cada totem escolhe o próprio ambiente no painel, então quem resolve as credenciais
+  // precisa indexar este mapa pelo ambiente DAQUELA máquina.
+  environmentHeadersByEnvironment: ENVIRONMENT_HEADERS,
+
   authUrl: env('CIELO_AUTH_URL', ''),
   baseUrl: env('CIELO_BASE_URL', ''),
   initUrl: env('CIELO_INIT_URL', ''),

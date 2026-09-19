@@ -16,6 +16,34 @@ const wsManager = require('../services/websocket');
 const { sanitizeCpf, isValidCpf, formatCpf, COUPON_CPF_ENABLED } = require('../services/cpf');
 const { normalizeMode, inferModeFromAmount } = require('../services/modes');
 const { getPublishedRelease } = require('../services/appRelease');
+const cieloConecta = require('../services/cieloConecta');
+
+/**
+ * Bloco de parametrização Cielo Conecta entregue ao totem.
+ *
+ * Usa a MESMA resolução que o servidor usa para autorizar em /cielo/card/authorize
+ * (services/cieloConecta.js), e não uma segunda cadeia de fallback escrita à mão. Foi
+ * justamente a duplicação dessa lógica que fez o E-commerce divergir: o painel gravava
+ * em `config.cielo.ecommerce*` e o pagamento lia `config.cieloMerchantId` da raiz.
+ *
+ * Como o caminho primário do cartão é o backend e o direto na Cielo é só o fallback do
+ * totem (mesmo desenho do PIX), os dois precisam falar com a Cielo pela mesma conta.
+ */
+function conectaConfigPayload(totem) {
+  const creds = cieloConecta.resolveConectaCredentials(totem);
+  return {
+    clientId: creds.clientId,
+    clientSecret: creds.clientSecret,
+    environment: creds.environment,
+    subordinatedMerchantId: creds.merchantId,
+    terminalId: creds.terminalId,
+    cardTimeoutSeconds: creds.cardTimeoutSeconds,
+    pinpadLicense: creds.pinpad.license,
+    pinpadCompany: creds.pinpad.companyName,
+    pinpadComm: creds.pinpad.comm,
+    isConfigured: creds.isConfigured
+  };
+}
 
 // Configuração do Storage para Vídeos de Higienização
 const videoStorage = multer.diskStorage({
@@ -196,6 +224,15 @@ router.get(['/totem/config/:devno', '/totems/:totemId/config'], (req, res) => {
           store.getSystemSettings().defaultCieloMerchantKey || "FMnlYedXdu5Xoa5n3hczfHh8yAMbYF7logQQ4qPL",
         environment: (c.cielo && c.cielo.ecommerceEnvironment) || 'Homologacao'
       },
+      // Credenciais Cielo Conecta (cartão presente) enviadas ao totem, na mesma lógica do
+      // cieloConfig acima. Antes o Conecta vivia de constantes compiladas no APK: trocar o
+      // credenciamento de uma máquina exigia recompilar e redistribuir o aplicativo, e o
+      // parque inteiro dividia o mesmo Client ID.
+      //
+      // Diferença deliberada em relação ao cieloConfig: aqui NÃO há default de sandbox
+      // embutido. Campo em branco significa "esta máquina não foi parametrizada", e o APK
+      // preserva o que já tem em vez de passar a transacionar numa conta de teste.
+      conectaConfig: conectaConfigPayload(totem),
       serverTime: Date.now()
     }
   });
