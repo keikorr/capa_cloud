@@ -207,11 +207,69 @@ function requireCrpAdmin(req, res) {
   return user;
 }
 
+const PERMISSION_LABELS = {
+  viewRevenue: 'ver faturamento',
+  remoteCommands: 'enviar comandos remotos',
+  configureMachine: 'configurar máquinas',
+  couponsMaintenance: 'gerenciar cupons e manutenção'
+};
+
+/**
+ * Guarda das ações que o dono pode liberar para funcionários. Exige usuário autenticado
+ * (401 sem token) — sem isso, um funcionário sem a permissão poderia simplesmente omitir o
+ * token e cair no idioma `user && ...`, que trata chamada anônima como liberada.
+ * Com `devno`, também confere se a máquina está entre as que o usuário enxerga.
+ * Devolve o usuário quando autorizado; caso contrário já responde 401/403 e devolve null.
+ */
+function requirePermission(req, res, perm, devno) {
+  const user = extractUser(req);
+  if (!user) {
+    res.status(401).json({ success: false, message: 'Autenticação necessária.' });
+    return null;
+  }
+  if (!store.hasPermission(user, perm)) {
+    res.status(403).json({ success: false, message: `Acesso negado. Seu perfil não tem permissão para ${PERMISSION_LABELS[perm] || perm}.` });
+    return null;
+  }
+  if (devno && !store.canUserSeeTotem(user, devno)) {
+    res.status(403).json({ success: false, message: 'Acesso negado a esta máquina.' });
+    return null;
+  }
+  return user;
+}
+
+/**
+ * Leitura de faturamento: funcionário sem "ver faturamento" recebe 403; dono, admin e
+ * chamadas sem token seguem como antes (o painel sempre manda token nessas rotas).
+ */
+function denyRevenueToEmployee(req, res) {
+  const user = extractUser(req);
+  if (user && !store.hasPermission(user, 'viewRevenue')) {
+    res.status(403).json({ success: false, message: 'Acesso negado. Seu perfil não tem permissão para ver faturamento.' });
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Ações que funcionário nunca faz (locais, realocação, criar/excluir máquina...).
+ * Não muda nada para donos e admin — só barra o perfil EMPLOYEE.
+ */
+function blockEmployee(req, res) {
+  const user = extractUser(req);
+  if (user && user.role === 'EMPLOYEE') {
+    res.status(403).json({ success: false, message: 'Acesso negado. Esta ação não está disponível para funcionários.' });
+    return true;
+  }
+  return false;
+}
+
 /**
  * GET /api/v1/admin/stats
  * Retorna as estatísticas consolidadas (filtradas por dono se for OWNER)
  */
 router.get('/admin/stats', (req, res) => {
+  if (denyRevenueToEmployee(req, res)) return;
   const user = extractUser(req);
   return res.json({
     success: true,
@@ -224,6 +282,7 @@ router.get('/admin/stats', (req, res) => {
  * Retorna o faturamento e ciclos vitais globais oficiais a partir do histórico do PostgreSQL
  */
 router.get('/admin/history-summary', async (req, res) => {
+  if (denyRevenueToEmployee(req, res)) return;
   const user = extractUser(req);
 
   // Em desenvolvimento local o armazenamento oficial é o JSON em memória/arquivo.
@@ -273,9 +332,13 @@ router.get('/admin/branches', (req, res) => {
  */
 router.get('/admin/depots', (req, res) => {
   const user = extractUser(req);
+  let depots = store.getDepotsList(user);
+  if (user && !store.hasPermission(user, 'viewRevenue')) {
+    depots = depots.map(d => ({ ...d, revenueToday: 0 }));
+  }
   return res.json({
     success: true,
-    data: store.getDepotsList(user)
+    data: depots
   });
 });
 
@@ -284,6 +347,7 @@ router.get('/admin/depots', (req, res) => {
  * Cadastra um novo ponto de instalação (local)
  */
 router.post('/admin/depots', (req, res) => {
+  if (blockEmployee(req, res)) return;
   const depot = store.addDepot(req.body || {});
   wsManager.broadcastDashboardUpdate();
   return res.json({ success: true, message: 'Local cadastrado com sucesso.', data: depot });
@@ -294,6 +358,7 @@ router.post('/admin/depots', (req, res) => {
  * Exclui um ponto de instalação
  */
 router.delete('/admin/depots/:depotno', (req, res) => {
+  if (blockEmployee(req, res)) return;
   const { depotno } = req.params;
 
   const depots = store.getDepotsList();
@@ -301,10 +366,12 @@ router.delete('/admin/depots/:depotno', (req, res) => {
   if (!depot) {
     return res.status(404).json({ success: false, message: 'Local não encontrado.' });
   }
-  if (depot.devno) {
+  if (depot.totemCount > 0) {
     return res.status(400).json({
       success: false,
-      message: 'Este local tem uma máquina alocada. Realoque a estação para outro local antes de excluir.'
+      message: depot.totemCount === 1
+        ? 'Este local tem uma máquina alocada. Realoque a estação para outro local antes de excluir.'
+        : `Este local tem ${depot.totemCount} máquinas alocadas. Realoque as estações para outro local antes de excluir.`
     });
   }
 
@@ -321,6 +388,7 @@ router.delete('/admin/depots/:depotno', (req, res) => {
  * Move um totem para um novo ponto de instalação (depot)
  */
 router.put('/admin/totems/:devno/relocate', (req, res) => {
+  if (blockEmployee(req, res)) return;
   const { devno } = req.params;
   const { depotno } = req.body;
 
@@ -469,10 +537,108 @@ router.delete('/admin/users/:id', (req, res) => {
 });
 
 /**
+ * Quem gerencia funcionários: o Super Admin (todos) e o dono de Máquina Própria (só os dele).
+ * Com `employee`, confere também se aquele funcionário é do dono que está pedindo.
+ * Devolve o usuário quando autorizado; caso contrário já responde e devolve null.
+ */
+function requireEmployeeManager(req, res, employee) {
+  const user = extractUser(req);
+  if (!user) {
+    res.status(401).json({ success: false, message: 'Autenticação necessária.' });
+    return null;
+  }
+  if (user.role === 'CRPADMIN') return user;
+
+  // Lê o cadastro atual (não o snapshot da sessão): o vínculo pode ter mudado agora há pouco
+  const fresh = store.getUserById(user.id);
+  if (!fresh || fresh.role !== 'OWNER' || fresh.franchiseType !== 'PROPRIA') {
+    res.status(403).json({ success: false, message: 'Apenas donos com vínculo de Máquina Própria podem gerenciar funcionários.' });
+    return null;
+  }
+  if (employee && employee.employerId !== user.id) {
+    res.status(404).json({ success: false, message: 'Funcionário não encontrado.' });
+    return null;
+  }
+  return user;
+}
+
+/**
+ * GET /api/v1/admin/employees
+ * Dono de Máquina Própria: os próprios funcionários. CRPADMIN: todos (?ownerId= filtra).
+ */
+router.get('/admin/employees', (req, res) => {
+  const user = requireEmployeeManager(req, res);
+  if (!user) return;
+  const ownerId = user.role === 'CRPADMIN' ? (req.query.ownerId || null) : user.id;
+  return res.json({ success: true, data: store.getEmployees(ownerId) });
+});
+
+/**
+ * POST /api/v1/admin/employees
+ * Cadastra um funcionário. O dono cria para si; o CRPADMIN informa `ownerId`.
+ */
+router.post('/admin/employees', (req, res) => {
+  const user = requireEmployeeManager(req, res);
+  if (!user) return;
+  const body = req.body || {};
+  const ownerId = user.role === 'CRPADMIN' ? body.ownerId : user.id;
+  if (!ownerId) {
+    return res.status(400).json({ success: false, message: 'Escolha o dono do funcionário.' });
+  }
+
+  try {
+    const employee = store.createEmployee(ownerId, body);
+    wsManager.broadcastDashboardUpdate();
+    return res.json({ success: true, message: 'Funcionário cadastrado com sucesso!', data: employee });
+  } catch (err) {
+    return res.status(400).json({ success: false, message: err.message });
+  }
+});
+
+/**
+ * PUT /api/v1/admin/employees/:id
+ * Edita dados, senha, máquinas liberadas, permissões e ativo/inativo.
+ */
+router.put('/admin/employees/:id', (req, res) => {
+  const employee = store.getEmployeeRaw(req.params.id);
+  if (!employee) {
+    return res.status(404).json({ success: false, message: 'Funcionário não encontrado.' });
+  }
+  if (!requireEmployeeManager(req, res, employee)) return;
+
+  try {
+    const updated = store.updateEmployee(employee.id, req.body || {});
+    // A sessão guarda máquinas e permissões: atualiza para valer já na próxima requisição
+    refreshSessionsForUser(employee.id, store.getEmployeeRaw(employee.id));
+    wsManager.broadcastDashboardUpdate();
+    return res.json({ success: true, message: 'Funcionário atualizado com sucesso.', data: updated });
+  } catch (err) {
+    return res.status(400).json({ success: false, message: err.message });
+  }
+});
+
+/**
+ * DELETE /api/v1/admin/employees/:id
+ */
+router.delete('/admin/employees/:id', (req, res) => {
+  const employee = store.getEmployeeRaw(req.params.id);
+  if (!employee) {
+    return res.status(404).json({ success: false, message: 'Funcionário não encontrado.' });
+  }
+  if (!requireEmployeeManager(req, res, employee)) return;
+
+  store.deleteEmployee(employee.id);
+  invalidateSessionsForUser(employee.id);
+  wsManager.broadcastDashboardUpdate();
+  return res.json({ success: true, message: 'Funcionário excluído com sucesso.' });
+});
+
+/**
  * GET /api/v1/admin/income-report
  * Relatório financeiro detalhado por local e últimos 7 dias (com RBAC)
  */
 router.get('/admin/income-report', (req, res) => {
+  if (denyRevenueToEmployee(req, res)) return;
   const user = extractUser(req);
   return res.json({
     success: true,
@@ -486,9 +652,14 @@ router.get('/admin/income-report', (req, res) => {
  */
 router.get('/admin/totems', (req, res) => {
   const user = extractUser(req);
+  let totems = store.getTotemsList(user);
+  // Funcionário sem "ver faturamento" enxerga o status, mas não os valores do dia
+  if (user && !store.hasPermission(user, 'viewRevenue')) {
+    totems = totems.map(t => ({ ...t, revenueToday: 0 }));
+  }
   return res.json({
     success: true,
-    data: store.getTotemsList(user)
+    data: totems
   });
 });
 
@@ -497,6 +668,7 @@ router.get('/admin/totems', (req, res) => {
  * Cadastra um novo totem/estação na plataforma
  */
 router.post('/admin/totems', (req, res) => {
+  if (blockEmployee(req, res)) return;
   const user = extractUser(req);
   const data = req.body || {};
 
@@ -529,6 +701,7 @@ router.post('/admin/totems', (req, res) => {
  * Exclui um totem registrado
  */
 router.delete('/admin/totems/:devno', (req, res) => {
+  if (blockEmployee(req, res)) return;
   const user = extractUser(req);
   const { devno } = req.params;
 
@@ -552,10 +725,11 @@ router.delete('/admin/totems/:devno', (req, res) => {
  * (Apenas CRPADMIN pode alterar Merchant ID e Merchant Key)
  */
 router.put('/admin/totems/:devno/config', (req, res) => {
-  const user = extractUser(req);
-  const userRole = user ? user.role : 'CRPADMIN';
-
   const { devno } = req.params;
+  const user = requirePermission(req, res, 'configureMachine', devno);
+  if (!user) return;
+  const userRole = user.role;
+
   const configData = req.body;
 
   const totem = store.getTotem(devno);
@@ -596,6 +770,7 @@ router.put('/admin/totems/:devno/config', (req, res) => {
  */
 router.post('/admin/totems/:devno/video', videoUpload.single('video'), (req, res) => {
   const { devno } = req.params;
+  if (!requirePermission(req, res, 'configureMachine', devno)) return;
   let videoUrl = null;
 
   if (req.file) {
@@ -640,6 +815,7 @@ router.post('/admin/totems/:devno/video', videoUpload.single('video'), (req, res
  */
 router.delete('/admin/totems/:devno/video', (req, res) => {
   const { devno } = req.params;
+  if (!requirePermission(req, res, 'configureMachine', devno)) return;
   const totem = store.getTotem(devno);
 
   if (!totem) {
@@ -673,6 +849,7 @@ router.delete('/admin/totems/:devno/video', (req, res) => {
  */
 router.post('/admin/remote-command', (req, res) => {
   const { devno, command, params } = req.body;
+  if (!requirePermission(req, res, 'remoteCommands', devno)) return;
 
   if (!devno || !command) {
     return res.status(400).json({
@@ -894,6 +1071,7 @@ router.post('/admin/totems/:devno/update-app', async (req, res) => {
  * Histórico de transações com filtros
  */
 router.get('/admin/transactions', (req, res) => {
+  if (denyRevenueToEmployee(req, res)) return;
   const user = extractUser(req);
   const limit = parseInt(req.query.limit) || 50;
   return res.json({
@@ -917,6 +1095,7 @@ function liveTransactionPayload(t) {
     modeLabel: t.modeLabel || t.mode || null,
     amount: Number(t.paymentMethod === 'Cupom / Gratuidade' ? 0 : (t.amount || 0)),
     paymentMethod: t.paymentMethod || null,
+    cardBrand: t.cardBrand || null,
     timestamp: t.timestamp || t.occurredAt,
     status: 'APPROVED'
   };
@@ -931,6 +1110,7 @@ function archivedTransactionPayload(t) {
     modeLabel: t.modeLabel,
     amount: Number(t.amountCents || 0) / 100,
     paymentMethod: t.paymentMethod,
+    cardBrand: t.cardBrand || null,
     timestamp: t.occurredAt,
     status: 'APPROVED'
   };
@@ -943,6 +1123,7 @@ function archivedTransactionPayload(t) {
  * gráficos; a chave estável impede duplicidade durante uma migração/reimportação.
  */
 router.get('/admin/dashboard-history', async (req, res) => {
+  if (denyRevenueToEmployee(req, res)) return;
   const user = extractUser(req);
   if (!user) {
     return res.status(401).json({ success: false, message: 'Sessão expirada. Entre novamente.' });
@@ -1040,6 +1221,7 @@ function classifyDbError(err) {
  * financeiro por máquina endereçável por um devno adivinhável. Esta expõe.
  */
 router.get('/admin/totems/:devno/history', async (req, res) => {
+  if (denyRevenueToEmployee(req, res)) return;
   const user = extractUser(req);
   const { devno } = req.params;
 
@@ -1164,6 +1346,7 @@ router.get('/admin/totems/:devno/history', async (req, res) => {
  */
 router.post('/admin/maintenance', (req, res) => {
   const { devno, issueType, priority, description, assignee } = req.body;
+  if (!requirePermission(req, res, 'couponsMaintenance', devno)) return;
 
   if (!devno) {
     return res.status(400).json({ success: false, message: 'Selecione a máquina.' });
@@ -1190,7 +1373,11 @@ router.post('/admin/maintenance', (req, res) => {
 router.post('/admin/maintenance/:id/comment', (req, res) => {
   const { id } = req.params;
   const { text } = req.body;
-  const user = extractUser(req);
+  const user = requirePermission(req, res, 'couponsMaintenance');
+  if (!user) return;
+  if (!store.getAlerts(false, user).some(a => a.id === id)) {
+    return res.status(404).json({ success: false, message: 'Ordem de manutenção não encontrada.' });
+  }
 
   const alert = store.addMaintenanceComment(id, {
     text,
@@ -1229,6 +1416,11 @@ router.get('/admin/alerts', (req, res) => {
  */
 router.post('/admin/alerts/:id/resolve', (req, res) => {
   const { id } = req.params;
+  const user = requirePermission(req, res, 'couponsMaintenance');
+  if (!user) return;
+  if (!store.getAlerts(false, user).some(a => a.id === id)) {
+    return res.status(404).json({ success: false, message: 'Alerta não encontrado.' });
+  }
   const alert = store.resolveAlert(id);
 
   if (!alert) {
@@ -1249,6 +1441,7 @@ router.post('/admin/alerts/:id/resolve', (req, res) => {
  * Esvazia todas as Ordens de Manutenção e restaura status das máquinas para IDLE
  */
 router.delete('/admin/maintenance/clear-all', (req, res) => {
+  if (blockEmployee(req, res)) return;
   const user = extractUser(req);
   store.clearAllMaintenanceOrders(user);
   wsManager.broadcastDashboardUpdate();
@@ -1275,6 +1468,7 @@ router.get('/admin/maintenance/weekly-route', (req, res) => {
  * Adiciona uma parada manual à Rota Semanal
  */
 router.post('/admin/maintenance/weekly-route', (req, res) => {
+  if (blockEmployee(req, res)) return;
   const stop = store.addWeeklyRouteStop(req.body);
   wsManager.broadcastDashboardUpdate();
   return res.json({
@@ -1289,6 +1483,7 @@ router.post('/admin/maintenance/weekly-route', (req, res) => {
  * Reordena as paradas da Rota Semanal
  */
 router.put('/admin/maintenance/weekly-route/reorder', (req, res) => {
+  if (blockEmployee(req, res)) return;
   const { orderedIds } = req.body;
   const route = store.updateWeeklyRouteOrder(orderedIds || []);
   wsManager.broadcastDashboardUpdate();
@@ -1304,6 +1499,7 @@ router.put('/admin/maintenance/weekly-route/reorder', (req, res) => {
  * Esvazia toda a Rota Semanal
  */
 router.delete('/admin/maintenance/weekly-route/clear-all', (req, res) => {
+  if (blockEmployee(req, res)) return;
   store.clearWeeklyRoute();
   wsManager.broadcastDashboardUpdate();
   return res.json({
@@ -1317,6 +1513,7 @@ router.delete('/admin/maintenance/weekly-route/clear-all', (req, res) => {
  * Remove uma parada da Rota Semanal
  */
 router.delete('/admin/maintenance/weekly-route/:id', (req, res) => {
+  if (blockEmployee(req, res)) return;
   const { id } = req.params;
   store.deleteWeeklyRouteStop(id);
   wsManager.broadcastDashboardUpdate();

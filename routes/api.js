@@ -17,6 +17,23 @@ const { sanitizeCpf, isValidCpf, formatCpf, COUPON_CPF_ENABLED } = require('../s
 const { normalizeMode, inferModeFromAmount } = require('../services/modes');
 const { getPublishedRelease } = require('../services/appRelease');
 const cieloConecta = require('../services/cieloConecta');
+const { getUserFromToken } = require('./auth');
+
+/**
+ * Estas rotas também são chamadas pelo totem (sem sessão do painel), então não dá para
+ * exigir login aqui. O que se garante: quando quem chama é um FUNCIONÁRIO logado no
+ * painel, ele precisa ter a permissão (e acesso à máquina, se houver devno).
+ * Devolve true quando já respondeu 403.
+ */
+function denyEmployeeWithout(req, res, perm, devno) {
+  const user = getUserFromToken(req.headers.authorization || req.query.token);
+  if (!user || user.role !== 'EMPLOYEE') return false;
+  if (!store.hasPermission(user, perm) || (devno && !store.canUserSeeTotem(user, devno))) {
+    res.status(403).json({ success: false, message: 'Acesso negado. Seu perfil não tem permissão para esta ação.' });
+    return true;
+  }
+  return false;
+}
 
 /**
  * Bloco de parametrização Cielo Conecta entregue ao totem.
@@ -244,6 +261,7 @@ router.get(['/totem/config/:devno', '/totems/:totemId/config'], (req, res) => {
  */
 router.post(['/totems/:totemId/video', '/totem/:devno/video', '/totem/video/:devno'], videoUpload.single('video'), (req, res) => {
   const devno = req.params.totemId || req.params.devno;
+  if (denyEmployeeWithout(req, res, 'configureMachine', devno)) return;
   if (!devno) {
     return res.status(400).json({ success: false, message: 'Código da máquina é obrigatório.' });
   }
@@ -288,6 +306,7 @@ router.post(['/totems/:totemId/video', '/totem/:devno/video', '/totem/video/:dev
  */
 router.delete(['/totems/:totemId/video', '/totem/:devno/video', '/totem/video/:devno'], (req, res) => {
   const devno = req.params.totemId || req.params.devno;
+  if (denyEmployeeWithout(req, res, 'configureMachine', devno)) return;
   const totem = store.getTotem(devno);
 
   if (totem && totem.config && totem.config.cleaningVideoUrl) {
@@ -318,6 +337,7 @@ router.delete(['/totems/:totemId/video', '/totem/:devno/video', '/totem/video/:d
  */
 router.put(['/totems/:totemId/config', '/totem/config/:devno'], (req, res) => {
   const devno = req.params.totemId || req.params.devno;
+  if (denyEmployeeWithout(req, res, 'configureMachine', devno)) return;
   const configData = req.body;
 
   const totem = store.getTotem(devno) || store.upsertTotem({ devno });
@@ -601,6 +621,7 @@ router.get('/coupons', (req, res) => {
  * Cria ou atualiza um cupom com definição de quantidade de usos
  */
 router.post('/coupons', (req, res) => {
+  if (denyEmployeeWithout(req, res, 'couponsMaintenance')) return;
   const {
     code, description, discountPercent, applicableMode,
     maxUsages, allowedTotems, maxUsagesPerCpf, requireCpf
@@ -641,6 +662,7 @@ router.post('/coupons', (req, res) => {
  * Edita um cupom existente preservando os usos e os CPFs já registrados
  */
 router.put('/coupons/:code', (req, res) => {
+  if (denyEmployeeWithout(req, res, 'couponsMaintenance')) return;
   const { code } = req.params;
   const existing = store.getCoupon(code);
 
@@ -685,6 +707,7 @@ router.put('/coupons/:code', (req, res) => {
  * Remove o registro de um CPF, liberando-o para utilizar o cupom novamente
  */
 router.delete('/coupons/:code/redemptions/:id', (req, res) => {
+  if (denyEmployeeWithout(req, res, 'couponsMaintenance')) return;
   const { code, id } = req.params;
   const updated = store.removeCouponRedemption(code, id);
 
@@ -712,6 +735,7 @@ router.delete('/coupons/:code/redemptions/:id', (req, res) => {
  * Exclui um cupom
  */
 router.delete('/coupons/:code', (req, res) => {
+  if (denyEmployeeWithout(req, res, 'couponsMaintenance')) return;
   const { code } = req.params;
   const deleted = store.deleteCoupon(code);
 
@@ -734,6 +758,7 @@ router.delete('/coupons/:code', (req, res) => {
  * Restaura contagem de usos de um cupom específico
  */
 router.post('/coupons/:code/reset', (req, res) => {
+  if (denyEmployeeWithout(req, res, 'couponsMaintenance')) return;
   const { code } = req.params;
   const reset = store.resetCoupon(code);
 
@@ -1067,6 +1092,7 @@ router.get('/coupons-redemptions', (req, res) => {
  * Restaura cupons de teste para não utilizados (para homologação)
  */
 router.post('/coupons/reset-test', (req, res) => {
+  if (denyEmployeeWithout(req, res, 'couponsMaintenance')) return;
   const { scope } = req.body;
   const resetCount = store.resetCoupons(scope || 'TEST_COUPONS_ONLY');
 

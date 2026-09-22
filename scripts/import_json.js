@@ -230,15 +230,24 @@ async function main() {
     relatorio.resumo.branches = branchesExplicitas.length + brannosSinteticos.length;
 
     // ── USERS ─────────────────────────────────────────────────────────────
-    for (const u of db.users) {
+    // Funcionários por último: employer_id referencia o dono, que precisa já existir
+    const usersOrdenados = [...db.users].sort((a, b) => (a.role === 'EMPLOYEE') - (b.role === 'EMPLOYEE'));
+    for (const u of usersOrdenados) {
       if (APPLY) {
+        const isEmployee = u.role === 'EMPLOYEE';
         await client.query(
           `INSERT INTO users (id, username, email, password_hash, role, cnpj, responsible_name,
-                               phone, company_name, franchise_type, created_at, updated_at)
-           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`,
+                               phone, company_name, franchise_type, created_at, updated_at,
+                               employer_id, all_machines, allowed_devnos, permissions, active)
+           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)`,
           [u.id, u.username, u.email, u.password_hash, u.role, u.cnpj || null, u.responsible_name,
-            u.phone || null, u.company_name || null, u.franchiseType || null,
-            u.created_at || new Date().toISOString(), u.updated_at || u.created_at || new Date().toISOString()]
+            u.phone || null, u.company_name || null, isEmployee ? null : (u.franchiseType || null),
+            u.created_at || new Date().toISOString(), u.updated_at || u.created_at || new Date().toISOString(),
+            isEmployee ? u.employerId : null,
+            u.allMachines !== false,
+            JSON.stringify(isEmployee ? (u.allowedDevnos || []) : []),
+            JSON.stringify(isEmployee ? (u.permissions || {}) : {}),
+            u.active !== false]
         );
       }
     }

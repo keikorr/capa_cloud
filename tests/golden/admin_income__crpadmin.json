@@ -12,7 +12,8 @@
           "depotno": "DEP-1",
           "devno": "CPX-002",
           "netRevenue": 0,
-          "revenue": 0
+          "revenue": 0,
+          "totemCount": 1
         },
         {
           "commissionAmount": 0,
@@ -20,9 +21,10 @@
           "cycles": 0,
           "depotna": "Ponto de Instalação",
           "depotno": "DEP-2",
-          "devno": "CPX-EXPEDICIONARIOS",
+          "devno": "",
           "netRevenue": 0,
-          "revenue": 0
+          "revenue": 0,
+          "totemCount": 0
         },
         {
           "commissionAmount": 0,
@@ -30,9 +32,10 @@
           "cycles": 0,
           "depotna": "Ponto de Instalação",
           "depotno": "DEP-3",
-          "devno": "",
+          "devno": "CPX-EXPEDICIONARIOS",
           "netRevenue": 0,
-          "revenue": 0
+          "revenue": 0,
+          "totemCount": 1
         },
         {
           "commissionAmount": 0,
@@ -42,7 +45,8 @@
           "depotno": "DEP-4",
           "devno": "",
           "netRevenue": 0,
-          "revenue": 0
+          "revenue": 0,
+          "totemCount": 0
         },
         {
           "commissionAmount": 0,
@@ -52,7 +56,8 @@
           "depotno": "DEP-5",
           "devno": "CPX-LAGOA",
           "netRevenue": 0,
-          "revenue": 0
+          "revenue": 0,
+          "totemCount": 1
         },
         {
           "commissionAmount": 0,
@@ -62,7 +67,8 @@
           "depotno": "DEP-6",
           "devno": "CPX-JANGU",
           "netRevenue": 0,
-          "revenue": 0
+          "revenue": 0,
+          "totemCount": 1
         },
         {
           "commissionAmount": 0,
@@ -72,7 +78,8 @@
           "depotno": "DEP-7",
           "devno": "",
           "netRevenue": 0,
-          "revenue": 0
+          "revenue": 0,
+          "totemCount": 0
         },
         {
           "commissionAmount": 0,
@@ -82,7 +89,8 @@
           "depotno": "DEP-8",
           "devno": "",
           "netRevenue": 0,
-          "revenue": 0
+          "revenue": 0,
+          "totemCount": 0
         },
         {
           "commissionAmount": 0,
@@ -92,7 +100,8 @@
           "depotno": "DEP-9",
           "devno": "",
           "netRevenue": 0,
-          "revenue": 0
+          "revenue": 0,
+          "totemCount": 0
         },
         {
           "commissionAmount": 0,
@@ -102,7 +111,8 @@
           "depotno": "DEP-10",
           "devno": "CPX-MESSEJANA",
           "netRevenue": 0,
-          "revenue": 0
+          "revenue": 0,
+          "totemCount": 1
         },
         {
           "commissionAmount": 0,
@@ -112,7 +122,8 @@
           "depotno": "DEP-11",
           "devno": "",
           "netRevenue": 0,
-          "revenue": 0
+          "revenue": 0,
+          "totemCount": 0
         },
         {
           "commissionAmount": 0,
@@ -122,7 +133,8 @@
           "depotno": "DEP-12",
           "devno": "",
           "netRevenue": 0,
-          "revenue": 0
+          "revenue": 0,
+          "totemCount": 0
         },
         {
           "commissionAmount": 0,
@@ -132,7 +144,8 @@
           "depotno": "DEP-13",
           "devno": "CPX-001",
           "netRevenue": 0,
-          "revenue": 0
+          "revenue": 0,
+          "totemCount": 1
         }
       ],
       "historicalRevenue": "<volatil>",

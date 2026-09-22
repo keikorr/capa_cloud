@@ -12,7 +12,8 @@
           "depotno": "DEP-1",
           "devno": "CPX-002",
           "netRevenue": 0,
-          "revenue": 0
+          "revenue": 0,
+          "totemCount": 1
         },
         {
           "commissionAmount": 0,
@@ -22,7 +23,8 @@
           "depotno": "DEP-13",
           "devno": "CPX-001",
           "netRevenue": 0,
-          "revenue": 0
+          "revenue": 0,
+          "totemCount": 1
         }
       ],
       "historicalRevenue": "<volatil>",

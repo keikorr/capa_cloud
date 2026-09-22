@@ -48,6 +48,14 @@ class StoreFacade {
   updateUserProfile(userId, updates) { return this.db.updateUserProfile(userId, updates); }
   getUsersList() { return this.db.getUsersList(); }
 
+  hasPermission(user, perm) { return this.db.hasPermission(user, perm); }
+  isEmployeeActive(employee) { return this.db.isEmployeeActive(employee); }
+  getEmployees(employerId) { return this.db.getEmployees(employerId); }
+  getEmployeeRaw(id) { return this.db.getEmployeeRaw(id); }
+  createEmployee(employerId, data) { return this.db.createEmployee(employerId, data); }
+  updateEmployee(id, data) { return this.db.updateEmployee(id, data); }
+  deleteEmployee(id) { return this.db.deleteEmployee(id); }
+
   getBranchesList() { return this.db.getBranchesList(); }
   addBranch(data) { return this.db.addBranch(data); }
 

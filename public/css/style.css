@@ -2089,6 +2089,21 @@ textarea:focus-visible,
 }
 .form-control:hover { box-shadow: inset 0 0 0 1px rgba(212,224,238,.24); }
 .form-control:focus { border-color: transparent; box-shadow: inset 0 0 0 1px var(--brand-yellow), 0 0 0 3px rgba(253,203,36,.13); }
+
+/* Lista suspensa nativa do <select> — sem isto, alguns navegadores/webviews ignoram
+   color-scheme:dark aqui e desenham o popup de opções em branco (texto claro em fundo
+   claro, quase ilegível), mesmo com o campo fechado já estilizado no tema escuro. */
+select.form-control { color: var(--text); }
+select.form-control option,
+select.form-control optgroup {
+  background-color: #12161d;
+  color: var(--text);
+}
+select.form-control option:checked,
+select.form-control option:hover {
+  background-color: var(--brand-yellow);
+  color: var(--bg);
+}
 label.field-label { margin-bottom: 7px; font-weight: 600; color: #aab5c3; }
 
 .kpi-grid { gap: 14px; }
@@ -2337,4 +2352,48 @@ label.field-label { margin-bottom: 7px; font-weight: 600; color: #aab5c3; }
   .station-cycle-chart { padding-inline: 12px; }
   .station-cycle-chart-canvas { overflow-x: auto; }
   .station-cycle-chart-canvas svg { min-width: 620px; }
+}
+
+/* ============================================================
+   FUNCIONÁRIOS — cadastro, permissões e modo sem faturamento
+   ============================================================ */
+body.no-revenue .revenue-only,
+body.no-revenue .totem-card-foot .rev { display: none !important; }
+
+.emp-choice {
+  display: flex; align-items: center; gap: 8px;
+  padding: 11px 14px; border-radius: 10px; cursor: pointer;
+  border: 1px solid var(--border-strong); background: rgba(255,255,255,.03);
+  font-size: 13px; color: #e7edf4;
+}
+.emp-choice input { accent-color: var(--brand-yellow); }
+
+.emp-machines {
+  margin-top: 10px; max-height: 180px; overflow-y: auto;
+  padding: 10px 12px; border-radius: 10px;
+  border: 1px solid var(--border-strong); background: rgba(4,7,11,.45);
+  display: flex; flex-direction: column; gap: 8px;
+}
+.emp-machines label { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: #d8e0e9; cursor: pointer; }
+.emp-machines input { accent-color: var(--brand-yellow); }
+
+.emp-perms { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.emp-perm {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 11px 13px; border-radius: 10px; cursor: pointer;
+  border: 1px solid var(--border-strong); background: rgba(255,255,255,.03);
+}
+.emp-perm input { margin-top: 2px; accent-color: var(--brand-yellow); flex-shrink: 0; }
+.emp-perm strong { display: block; font-size: 12.5px; color: #fff; }
+.emp-perm small { display: block; margin-top: 2px; font-size: 11px; color: #8a97a7; line-height: 1.35; }
+
+.perm-badge {
+  display: inline-block; margin: 2px 4px 2px 0; padding: 3px 8px; border-radius: 999px;
+  font-size: 10.5px; font-weight: 700; white-space: nowrap;
+  background: rgba(253,203,36,.12); color: var(--brand-yellow);
+}
+.perm-badge.none { background: rgba(255,255,255,.06); color: #8a97a7; }
+
+@media (max-width: 640px) {
+  .emp-perms { grid-template-columns: 1fr; }
 }

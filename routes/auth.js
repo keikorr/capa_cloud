@@ -25,6 +25,11 @@ function snapshotUser(user) {
     phone: user.phone,
     company_name: user.company_name,
     franchiseType: user.franchiseType,
+    // Funcionário: dono, máquinas liberadas e permissões — lidos pelo RBAC a cada requisição
+    employerId: user.employerId,
+    allMachines: user.allMachines,
+    allowedDevnos: user.allowedDevnos,
+    permissions: user.permissions,
     created_at: user.created_at,
     updated_at: user.updated_at
   };
@@ -58,6 +63,13 @@ function getUserFromToken(token) {
   const cleanToken = token.replace(/^Bearer\s+/i, '').trim();
   const session = activeSessions.get(cleanToken);
   if (!session) return null;
+
+  // Funcionário desativado, excluído ou cujo dono deixou de ser "Máquina Própria" perde o
+  // acesso na hora, mesmo com uma sessão ainda aberta.
+  if (session.user.role === 'EMPLOYEE' && !store.isEmployeeActive(store.getEmployeeRaw(session.user.id))) {
+    activeSessions.delete(cleanToken);
+    return null;
+  }
 
   // Cópia: evita que um consumidor mute o estado da sessão sem querer
   return { ...session.user };

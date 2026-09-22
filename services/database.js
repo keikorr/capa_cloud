@@ -20,6 +20,10 @@ const LEGACY_DB_FILE = process.env.CAPAXERO_DB_FILE
   ? `${process.env.CAPAXERO_DB_FILE}.legacy`
   : path.join(DATA_DIR, 'capaxero_db.json');
 
+// Funcionalidades que o dono libera (ou não) para cada funcionário. Ver o status das
+// máquinas liberadas é sempre permitido e por isso não aparece aqui.
+const EMPLOYEE_PERMISSIONS = ['viewRevenue', 'remoteCommands', 'configureMachine', 'couponsMaintenance'];
+
 // Função segura para hash de senhas usando scrypt
 function hashPassword(password) {
   const salt = crypto.randomBytes(16).toString('hex');
@@ -281,6 +285,8 @@ class RelationalDatabase {
 
     if (!user) return null;
     if (!verifyPassword(password, user.password_hash)) return null;
+    // Funcionário desativado, ou cujo dono deixou de ser "Máquina Própria", não entra mais
+    if (user.role === 'EMPLOYEE' && !this.isEmployeeActive(user)) return null;
 
     const { password_hash, ...safeUser } = user;
     return safeUser;
@@ -338,8 +344,14 @@ class RelationalDatabase {
       user.cnpj = updates.cnpj.trim();
     }
 
-    if (updates.franchiseType !== undefined) {
+    if (updates.franchiseType !== undefined && user.role !== 'EMPLOYEE') {
       user.franchiseType = updates.franchiseType === 'PROPRIA' ? 'PROPRIA' : 'FRANQUEADO';
+      // Só donos de máquina própria têm funcionários: ao virar franqueado, os acessos caem
+      if (user.franchiseType !== 'PROPRIA') {
+        this.tables.users.forEach(u => {
+          if (u.role === 'EMPLOYEE' && u.employerId === user.id) u.active = false;
+        });
+      }
     }
 
     if (updates.password && updates.password.trim().length > 0) {
@@ -353,14 +365,17 @@ class RelationalDatabase {
     return safeUser;
   }
 
+  // Donos e Super Admin. Funcionários ficam de fora: são listados na aba Funcionários
+  // (getEmployees) e não podem aparecer como opção de "dono" nos seletores de máquina.
   getUsersList() {
-    return this.tables.users.map(u => {
+    return this.tables.users.filter(u => u.role !== 'EMPLOYEE').map(u => {
       const assignedTotems = this.tables.totems.filter(t => t.owner_id === u.id || t.owner === u.responsible_name || t.owner === u.username);
       const { password_hash, ...safeUser } = u;
       return {
         ...safeUser,
         totemsCount: assignedTotems.length,
-        totems: assignedTotems.map(t => ({ devno: t.devno, name: t.name, status: t.status }))
+        totems: assignedTotems.map(t => ({ devno: t.devno, name: t.name, status: t.status })),
+        employeesCount: this.tables.users.filter(e => e.role === 'EMPLOYEE' && e.employerId === u.id).length
       };
     });
   }
@@ -371,7 +386,8 @@ class RelationalDatabase {
     if (user.role === 'CRPADMIN' || user.username.toUpperCase() === 'CRPADMIN') {
       throw new Error('O usuário Super Admin CRPADMIN não pode ser excluído.');
     }
-    this.tables.users = this.tables.users.filter(u => u.id !== userId);
+    // Os funcionários do dono saem junto com ele
+    this.tables.users = this.tables.users.filter(u => u.id !== userId && !(u.role === 'EMPLOYEE' && u.employerId === userId));
     // Remove vínculo dos totens que pertenciam a esse dono
     this.tables.totems.forEach(t => {
       if (t.owner_id === userId) {
@@ -396,7 +412,8 @@ class RelationalDatabase {
     if (!totem) throw new Error(`Totem ${devno} não encontrado.`);
 
     // Tenta encontrar usuário correspondente por id, username, responsible_name ou company_name
-    const targetUser = this.tables.users.find(u =>
+    // Funcionário nunca é dono de máquina
+    const targetUser = this.tables.users.filter(u => u.role !== 'EMPLOYEE').find(u =>
       u.id === targetUserOrId ||
       u.username.toLowerCase() === String(targetUserOrId).toLowerCase() ||
       (u.responsible_name && u.responsible_name.toLowerCase() === String(targetUserOrId).toLowerCase()) ||
@@ -420,10 +437,6 @@ class RelationalDatabase {
     if (!devno) return false;
     const initialLen = this.tables.totems.length;
     this.tables.totems = this.tables.totems.filter(t => t.devno !== devno);
-    // Desvincula dos depots
-    this.tables.depots.forEach(d => {
-      if (d.devno === devno) d.devno = '';
-    });
     this.save();
     return this.tables.totems.length < initialLen;
   }
@@ -436,8 +449,155 @@ class RelationalDatabase {
    */
   userOwnsTotem(userFilter, totem) {
     if (!userFilter || userFilter.role === 'CRPADMIN') return true;
+
+    // Funcionário: a máquina tem que ser do dono que o cadastrou E estar liberada para ele.
+    // Todas as consultas (totens, locais, vendas, alertas, stats) passam por aqui, então o
+    // funcionário fica restrito às máquinas liberadas sem precisar de filtro em cada rota.
+    if (userFilter.role === 'EMPLOYEE') {
+      const employer = this.tables.users.find(u => u.id === userFilter.employerId);
+      if (!employer || !this.userOwnsTotem(employer, totem)) return false;
+      return userFilter.allMachines === true ||
+        (Array.isArray(userFilter.allowedDevnos) && userFilter.allowedDevnos.includes(totem.devno));
+    }
+
     return totem.owner_id === userFilter.id ||
       (totem.owner && (totem.owner === userFilter.responsible_name || totem.owner === userFilter.username));
+  }
+
+  // ==========================================
+  // FUNCIONÁRIOS (cadastrados por donos de máquina própria)
+  // ==========================================
+
+  // Dono e Super Admin podem tudo nas máquinas que enxergam; o funcionário só o que foi liberado.
+  hasPermission(user, perm) {
+    if (!user) return false;
+    if (user.role !== 'EMPLOYEE') return true;
+    return Boolean(user.permissions && user.permissions[perm] === true);
+  }
+
+  isEmployeeActive(employee) {
+    if (!employee || employee.active === false) return false;
+    const employer = this.tables.users.find(u => u.id === employee.employerId);
+    return Boolean(employer && employer.role === 'OWNER' && employer.franchiseType === 'PROPRIA');
+  }
+
+  _publicEmployee(e) {
+    const { password_hash, ...safe } = e;
+    const employer = this.tables.users.find(u => u.id === e.employerId);
+    return {
+      ...safe,
+      employerName: employer ? (employer.responsible_name || employer.username) : '—',
+      active: this.isEmployeeActive(e)
+    };
+  }
+
+  _normalizeEmployeeAccess(employer, data, current = {}) {
+    const permissions = {};
+    EMPLOYEE_PERMISSIONS.forEach(p => {
+      const incoming = data.permissions ? data.permissions[p] : undefined;
+      permissions[p] = incoming !== undefined ? Boolean(incoming) : Boolean(current.permissions && current.permissions[p]);
+    });
+
+    const allMachines = data.allMachines !== undefined ? Boolean(data.allMachines) : current.allMachines !== false;
+    let allowedDevnos = Array.isArray(data.allowedDevnos) ? data.allowedDevnos : (current.allowedDevnos || []);
+    if (!allMachines) {
+      // Só pode liberar máquina que é do próprio dono
+      const ownDevnos = new Set(this.tables.totems.filter(t => this.userOwnsTotem(employer, t)).map(t => t.devno));
+      const invalid = allowedDevnos.filter(d => !ownDevnos.has(d));
+      if (invalid.length) throw new Error(`Máquina(s) que não pertencem a este dono: ${invalid.join(', ')}.`);
+      if (allowedDevnos.length === 0) throw new Error('Escolha ao menos uma máquina para o funcionário.');
+    } else {
+      allowedDevnos = [];
+    }
+    return { permissions, allMachines, allowedDevnos };
+  }
+
+  getEmployees(employerId = null) {
+    return this.tables.users
+      .filter(u => u.role === 'EMPLOYEE' && (!employerId || u.employerId === employerId))
+      .map(u => this._publicEmployee(u));
+  }
+
+  getEmployeeRaw(id) {
+    return this.tables.users.find(u => u.id === id && u.role === 'EMPLOYEE') || null;
+  }
+
+  createEmployee(employerId, data = {}) {
+    const employer = this.tables.users.find(u => u.id === employerId);
+    if (!employer || employer.role !== 'OWNER') throw new Error('Dono não encontrado.');
+    if (employer.franchiseType !== 'PROPRIA') {
+      throw new Error('Apenas donos com vínculo de Máquina Própria podem cadastrar funcionários.');
+    }
+
+    const cleanEmail = (data.email || '').trim().toLowerCase();
+    if (!cleanEmail) throw new Error('E-mail é obrigatório.');
+    if (!data.responsible_name || !data.responsible_name.trim()) throw new Error('Nome do funcionário é obrigatório.');
+    if (!data.password || data.password.length < 4) throw new Error('Senha deve ter pelo menos 4 caracteres.');
+    if (this.tables.users.some(u => u.email.toLowerCase() === cleanEmail)) throw new Error('Este e-mail já está cadastrado.');
+
+    const username = (data.username || cleanEmail).trim();
+    if (this.tables.users.some(u => u.username.toLowerCase() === username.toLowerCase())) {
+      throw new Error('Este usuário já está cadastrado.');
+    }
+
+    const access = this._normalizeEmployeeAccess(employer, data);
+    const employee = {
+      id: ids.newUserId(),
+      role: 'EMPLOYEE',
+      username,
+      email: cleanEmail,
+      password_hash: hashPassword(data.password),
+      responsible_name: data.responsible_name.trim(),
+      phone: (data.phone || '').trim(),
+      company_name: employer.company_name || '',
+      employerId: employer.id,
+      ...access,
+      active: true,
+      created_at: new Date().toISOString()
+    };
+
+    this.tables.users.push(employee);
+    this.save();
+    return this._publicEmployee(employee);
+  }
+
+  updateEmployee(employeeId, data = {}) {
+    const employee = this.getEmployeeRaw(employeeId);
+    if (!employee) throw new Error('Funcionário não encontrado.');
+    const employer = this.tables.users.find(u => u.id === employee.employerId);
+    if (!employer) throw new Error('Dono do funcionário não encontrado.');
+
+    if (data.email !== undefined) {
+      const cleanEmail = data.email.trim().toLowerCase();
+      if (!cleanEmail) throw new Error('E-mail é obrigatório.');
+      if (this.tables.users.some(u => u.id !== employeeId && u.email.toLowerCase() === cleanEmail)) {
+        throw new Error('Já existe outro usuário cadastrado com este e-mail.');
+      }
+      employee.email = cleanEmail;
+    }
+    if (data.responsible_name !== undefined) {
+      if (!data.responsible_name.trim()) throw new Error('Nome do funcionário é obrigatório.');
+      employee.responsible_name = data.responsible_name.trim();
+    }
+    if (data.phone !== undefined) employee.phone = data.phone.trim();
+    if (data.password && data.password.trim()) {
+      if (data.password.trim().length < 4) throw new Error('Senha deve ter pelo menos 4 caracteres.');
+      employee.password_hash = hashPassword(data.password.trim());
+    }
+    if (data.active !== undefined) employee.active = Boolean(data.active);
+
+    Object.assign(employee, this._normalizeEmployeeAccess(employer, data, employee));
+    employee.updated_at = new Date().toISOString();
+    this.save();
+    return this._publicEmployee(employee);
+  }
+
+  deleteEmployee(employeeId) {
+    const before = this.tables.users.length;
+    this.tables.users = this.tables.users.filter(u => !(u.id === employeeId && u.role === 'EMPLOYEE'));
+    if (this.tables.users.length === before) return false;
+    this.save();
+    return true;
   }
 
   /**
@@ -684,13 +844,12 @@ class RelationalDatabase {
     return totem;
   }
 
+  // Realoca um totem para outro local. Não mexe em nenhum campo do depot de destino: várias
+  // máquinas podem compartilhar o mesmo depotno (2 ou mais totens no mesmo local) — quem
+  // sabe "onde a máquina está" é sempre totem.depotno, nunca um devno único gravado no depot.
   relocateTotem(devno, newDepotno) {
-    const oldDepot = this.tables.depots.find(d => d.devno === devno);
-    if (oldDepot) oldDepot.devno = "";
-
     const newDepot = this.tables.depots.find(d => d.depotno === newDepotno);
     if (!newDepot) return null;
-    newDepot.devno = devno;
 
     const totem = this._findTotemRaw(devno) || this.upsertTotem({ devno });
     totem.depotno = newDepot.depotno;
@@ -705,6 +864,14 @@ class RelationalDatabase {
   // DEPOTS & FILIAIS
   // ==========================================
 
+  // Um local (depot) pode ter 2 ou mais máquinas alocadas ao mesmo tempo — a fonte única de
+  // verdade de "quais totens estão neste local" é totem.depotno, nunca um campo devno único
+  // dentro do depot (esse campo era sobrescrito silenciosamente a cada nova alocação e só
+  // suportava 1 máquina por ponto de instalação).
+  getTotemsAtDepot(depotno) {
+    return this.tables.totems.filter(t => t.depotno === depotno);
+  }
+
   getDepotsList(userFilter = null) {
     let depots = this.tables.depots;
 
@@ -713,19 +880,36 @@ class RelationalDatabase {
     // franqueados. Reusa o mesmo filtro de propriedade do getTotemsList para não haver dois
     // critérios de RBAC divergentes.
     if (userFilter && userFilter.role !== 'CRPADMIN') {
-      const ownedDevnos = new Set(this.getTotemsList(userFilter).map(t => t.devno));
-      depots = depots.filter(d => d.devno && ownedDevnos.has(d.devno));
+      depots = depots.filter(d => this.getTotemsAtDepot(d.depotno).some(t => this.userOwnsTotem(userFilter, t)));
     }
 
     return depots.map(d => {
-      const totem = this.getTotem(d.devno);
-      const { revenueToday, cyclesToday } = totem ? this.getTodayMetrics(totem.devno) : { revenueToday: 0, cyclesToday: 0 };
+      const totemsHere = this.getTotemsAtDepot(d.depotno);
+      const visibleTotems = (userFilter && userFilter.role !== 'CRPADMIN')
+        ? totemsHere.filter(t => this.userOwnsTotem(userFilter, t))
+        : totemsHere;
+
+      let revenueToday = 0;
+      let cyclesToday = 0;
+      let onlineCount = 0;
+      visibleTotems.forEach(t => {
+        const metrics = this.getTodayMetrics(t.devno);
+        revenueToday += metrics.revenueToday;
+        cyclesToday += metrics.cyclesToday;
+        if (t.status !== 'OFFLINE') onlineCount++;
+      });
+
       return {
         ...d,
-        totemStatus: totem ? totem.status : 'OFFLINE',
+        // devno é mantido só por compatibilidade com telas antigas que assumiam 1 máquina
+        // por local (aponta para a primeira máquina alocada); devnos traz a lista completa.
+        devno: visibleTotems[0]?.devno || '',
+        devnos: visibleTotems.map(t => t.devno),
+        totemCount: visibleTotems.length,
+        totemStatus: visibleTotems.length === 0 ? '' : (onlineCount > 0 ? 'IDLE' : 'OFFLINE'),
+        totemOwner: visibleTotems[0] ? (visibleTotems[0].owner || visibleTotems[0].owner_id) : '',
         revenueToday,
-        cyclesToday,
-        totemOwner: totem ? (totem.owner || totem.owner_id) : ''
+        cyclesToday
       };
     });
   }
@@ -779,7 +963,7 @@ class RelationalDatabase {
   }
 
   getOwnersList() {
-    return this.tables.users.map(u => ({
+    return this.tables.users.filter(u => u.role !== 'EMPLOYEE').map(u => ({
       id: u.id,
       name: u.responsible_name || u.username,
       company: u.company_name,
@@ -834,6 +1018,26 @@ class RelationalDatabase {
     if (totem && newTx.status === "APPROVED") {
       totem.totalCyclesToday = (totem.totalCyclesToday || 0) + 1;
       totem.revenueToday = (totem.revenueToday || 0) + Number(newTx.paymentMethod === 'Cupom / Gratuidade' ? 0 : (newTx.amount || 0));
+
+      // Contador vitalício de ciclos da máquina — dispara um alerta de manutenção
+      // preventiva a cada 100 ciclos completados (100, 200, 300...), mesmo que o
+      // alerta do marco anterior ainda não tenha sido resolvido.
+      totem.lifetimeCycles = (totem.lifetimeCycles || 0) + 1;
+      const lastAlertedThreshold = totem.lastCycleMaintenanceThreshold || 0;
+      const currentThreshold = Math.floor(totem.lifetimeCycles / 100) * 100;
+      if (currentThreshold > lastAlertedThreshold) {
+        totem.lastCycleMaintenanceThreshold = currentThreshold;
+        this.addAlert({
+          devno: totem.devno,
+          totemName: totem.name,
+          type: 'MAINTENANCE',
+          severity: 'Média',
+          priority: 'Média',
+          issueType: 'Limpeza',
+          assignee: '',
+          message: `Manutenção preventiva recomendada: a máquina ${totem.name || totem.devno} ultrapassou ${currentThreshold} ciclos de uso (total acumulado: ${totem.lifetimeCycles}).`
+        });
+      }
     }
 
     this.save();
@@ -1153,15 +1357,17 @@ class RelationalDatabase {
   }
 
   getIncomeReport(userFilter = null) {
-    const totemsList = this.getTotemsList(userFilter);
+    // getDepotsList já soma revenueToday/cyclesToday de todas as máquinas alocadas no local
+    // (um local pode ter 2 ou mais totens) e já aplica o RBAC de propriedade — não há mais
+    // necessidade de refiltrar por um único devno por depot aqui.
     const depotsList = this.getDepotsList(userFilter);
-    const ownedDevnos = new Set(totemsList.map(t => t.devno));
 
+    // Admin vê todos os locais (inclusive vazios), como antes; dono só os que têm máquina dele
     const depotStats = depotsList
-      .filter(dep => userFilter && userFilter.role !== 'CRPADMIN' ? ownedDevnos.has(dep.devno) : true)
+      .filter(dep => (userFilter && userFilter.role !== 'CRPADMIN') ? dep.totemCount > 0 : true)
       .map(dep => {
-        const totem = this.getTotem(dep.devno);
-        const { revenueToday: revenue, cyclesToday: cycles } = totem ? this.getTodayMetrics(totem.devno) : { revenueToday: 0, cyclesToday: 0 };
+        const revenue = dep.revenueToday;
+        const cycles = dep.cyclesToday;
         const commission = (revenue * dep.commissionPercent) / 100;
         const netRevenue = revenue - commission;
 
@@ -1169,6 +1375,7 @@ class RelationalDatabase {
           depotno: dep.depotno,
           depotna: dep.depotna,
           devno: dep.devno,
+          totemCount: dep.totemCount,
           cycles,
           revenue,
           commissionPercent: dep.commissionPercent,

@@ -8,6 +8,19 @@ function fmtBRL(n) {
   return 'R$ ' + Number(n || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
+// Funcionalidades que o dono libera para cada funcionário (mesmas chaves do backend)
+const EMPLOYEE_PERMISSIONS = ['viewRevenue', 'remoteCommands', 'configureMachine', 'couponsMaintenance'];
+const EMPLOYEE_PERMISSION_LABELS = {
+  viewRevenue: 'Faturamento',
+  remoteCommands: 'Comandos remotos',
+  configureMachine: 'Configurar',
+  couponsMaintenance: 'Cupons e manutenção'
+};
+
+function escHtml(v) {
+  return String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
 function maskCNPJ(val) {
   return (val || '')
     .replace(/\D/g, '')
@@ -108,6 +121,7 @@ class CapaxeroDashboard {
     this.ownershipFilter = 'all';
     this.selectedOwner = 'all';
     this.selectedMachine = 'all';
+    this.selectedLocation = 'all';
     this.periodoKey = '7d';
     const now = new Date();
     this.selectedMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
@@ -308,11 +322,30 @@ class CapaxeroDashboard {
     const ownershipBar = document.getElementById('ownership-bar');
 
     const displayName = this.currentUser.responsible_name || this.currentUser.username;
+    const isEmployee = this.isEmployee();
     if (nameEl) nameEl.textContent = displayName;
-    if (roleEl) roleEl.textContent = isAdmin ? 'ADMIN' : 'DONO';
+    if (roleEl) roleEl.textContent = isAdmin ? 'ADMIN' : (isEmployee ? 'FUNCIONÁRIO' : 'DONO');
     if (pmName) pmName.textContent = displayName;
     if (pmEmail) pmEmail.textContent = this.currentUser.email || '--';
-    if (pmRole) pmRole.innerHTML = isAdmin ? `${ICONS.lock} ADMIN — total` : `${ICONS.user} Dono da Máquina`;
+    if (pmRole) {
+      pmRole.innerHTML = isAdmin
+        ? `${ICONS.lock} ADMIN — total`
+        : (isEmployee ? `${ICONS.user} Funcionário` : `${ICONS.user} Dono da Máquina`);
+    }
+
+    // Funcionário sem "ver faturamento": some com valores em R$ via CSS (body.no-revenue)
+    document.body.classList.toggle('no-revenue', !this.can('viewRevenue'));
+
+    // Abas que dependem de permissão
+    const toggleTab = (el, show) => {
+      if (!el) return;
+      if (show) el.style.removeProperty('display');
+      else el.style.setProperty('display', 'none', 'important');
+    };
+    toggleTab(document.querySelector('.nav-tab-btn[data-page="dashboard"]'), this.can('viewRevenue'));
+    toggleTab(document.getElementById('tab-coupons'), this.can('couponsMaintenance'));
+    toggleTab(document.getElementById('tab-funcionarios'), this.canManageEmployees());
+    this.applyPermissionUI();
 
     // Filtro por vínculo (ownership bar) - exclusivo para conta de ADMIN
     if (ownershipBar) {
@@ -371,6 +404,9 @@ class CapaxeroDashboard {
     if (modalAdminOwnerCard) {
       modalAdminOwnerCard.style.display = isAdmin ? 'block' : 'none';
     }
+
+    // Se a aba aberta deixou de ser permitida (troca de conta), volta para Estações
+    if (this.activeTab && !this.isPageAllowed(this.activeTab)) this.switchPage('estacoes');
   }
 
   /* ============================================================
@@ -591,7 +627,16 @@ class CapaxeroDashboard {
       });
     }
 
-    // Filtros por Dono e Máquina no Dashboard
+    // Filtros por Local, Dono e Máquina no Dashboard
+    const selDashLocation = document.getElementById('dash-location-filter');
+    if (selDashLocation) {
+      selDashLocation.addEventListener('change', (e) => {
+        this.selectedLocation = e.target.value;
+        this.populateSelectors();
+        this.renderDashboard();
+      });
+    }
+
     const selDashOwner = document.getElementById('dash-owner-filter');
     if (selDashOwner) {
       selDashOwner.addEventListener('change', (e) => {
@@ -664,17 +709,62 @@ class CapaxeroDashboard {
     if (this.selectedOwner && this.selectedOwner !== 'all') {
       list = list.filter(s => s.raw?.owner_id === this.selectedOwner || s.dono === this.selectedOwner || s.raw?.owner === this.selectedOwner);
     }
+    if (this.selectedLocation && this.selectedLocation !== 'all') {
+      list = list.filter(s => s.raw?.depotno === this.selectedLocation);
+    }
     if (this.selectedMachine && this.selectedMachine !== 'all') {
       list = list.filter(s => s.devno === this.selectedMachine);
     }
     return list;
   }
 
+  // --- Perfis: CRPADMIN (tudo), OWNER (as próprias máquinas) e EMPLOYEE (o que o dono liberou) ---
+  isEmployee() {
+    return this.currentUser?.role === 'EMPLOYEE';
+  }
+
+  // Dono e admin podem tudo nas máquinas que enxergam; o funcionário só o que foi liberado.
+  // O backend confere de novo — isto aqui só evita mostrar botão que daria 403.
+  can(perm) {
+    if (!this.currentUser) return false;
+    if (this.currentUser.role !== 'EMPLOYEE') return true;
+    return this.currentUser.permissions?.[perm] === true;
+  }
+
+  canManageEmployees() {
+    const u = this.currentUser;
+    return Boolean(u && (u.role === 'CRPADMIN' || (u.role === 'OWNER' && u.franchiseType === 'PROPRIA')));
+  }
+
+  isPageAllowed(pageId) {
+    const isAdmin = this.currentUser?.role === 'CRPADMIN';
+    if (pageId === 'cadastros' || pageId === 'manutencao') return isAdmin;
+    if (pageId === 'funcionarios') return this.canManageEmployees();
+    if (pageId === 'dashboard') return this.can('viewRevenue');
+    if (pageId === 'coupons') return this.can('couponsMaintenance');
+    return true;
+  }
+
+  // Botões da estação que dependem de permissão (o modal da estação é reaproveitado entre
+  // máquinas, então isso roda no login e a cada abertura do modal).
+  applyPermissionUI() {
+    const toggle = (el, show) => {
+      if (!el) return;
+      if (show) el.style.removeProperty('display');
+      else el.style.setProperty('display', 'none', 'important');
+    };
+    toggle(document.getElementById('btn-open-config'), this.can('configureMachine'));
+    toggle(document.getElementById('btn-act-open-om'), this.can('couponsMaintenance'));
+    toggle(document.getElementById('btn-delete-totem'), !this.isEmployee());
+    ['btn-act-unlock', 'btn-act-mist', 'btn-act-purge', 'btn-act-test'].forEach(id => {
+      toggle(document.getElementById(id), this.can('remoteCommands'));
+    });
+  }
+
   switchPage(pageId) {
     if (!this.currentUser) return;
-    const isAdmin = this.currentUser.role === 'CRPADMIN';
-    if (!isAdmin && (pageId === 'cadastros' || pageId === 'manutencao')) {
-      return; // Bloqueia navegação para abas restritas se não for admin
+    if (!this.isPageAllowed(pageId)) {
+      return; // Bloqueia navegação para abas que o perfil não pode ver
     }
 
     this.activeTab = pageId;
@@ -692,6 +782,7 @@ class CapaxeroDashboard {
     else if (pageId === 'dashboard') this.renderDashboard();
     else if (pageId === 'coupons') this.renderCoupons();
     else if (pageId === 'cadastros') this.renderCadastros();
+    else if (pageId === 'funcionarios') this.renderFuncionarios();
   }
 
   attachGlobalControls() {
@@ -922,6 +1013,89 @@ class CapaxeroDashboard {
     const editOwnerCancelBtn = document.getElementById('edit-owner-cancel');
     if (editOwnerCancelBtn) {
       editOwnerCancelBtn.addEventListener('click', () => document.getElementById('edit-owner-modal').classList.remove('open'));
+    }
+
+    // Funcionários
+    const btnNewEmployee = document.getElementById('btn-open-new-employee');
+    if (btnNewEmployee) btnNewEmployee.addEventListener('click', () => this.openEmployeeModal());
+
+    const employeeCancelBtn = document.getElementById('employee-cancel');
+    if (employeeCancelBtn) {
+      employeeCancelBtn.addEventListener('click', () => document.getElementById('employee-modal').classList.remove('open'));
+    }
+
+    const funcOwnerFilter = document.getElementById('func-owner-filter');
+    if (funcOwnerFilter) {
+      funcOwnerFilter.addEventListener('change', () => this.renderFuncionarios());
+    }
+
+    document.querySelectorAll('input[name="emp-scope"]').forEach(r => {
+      r.addEventListener('change', () => {
+        const box = document.getElementById('emp-machines');
+        if (box) box.style.display = document.getElementById('emp-scope-some').checked ? 'flex' : 'none';
+      });
+    });
+
+    const empOwnerSel = document.getElementById('emp-owner');
+    if (empOwnerSel) {
+      // Trocar o dono (visão do admin) troca a lista de máquinas que podem ser liberadas
+      empOwnerSel.addEventListener('change', () => this.renderEmployeeMachines(empOwnerSel.value, []));
+    }
+
+    const formEmployee = document.getElementById('form-employee');
+    if (formEmployee) {
+      formEmployee.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('emp-id').value;
+        const allMachines = document.getElementById('emp-scope-all').checked;
+        const allowedDevnos = Array.from(document.querySelectorAll('#emp-machines input[type="checkbox"]:checked')).map(c => c.value);
+
+        if (!allMachines && allowedDevnos.length === 0) {
+          this.showToast('Escolha ao menos uma máquina para o funcionário.', 'err');
+          return;
+        }
+
+        const payload = {
+          responsible_name: document.getElementById('emp-name').value.trim(),
+          email: document.getElementById('emp-email').value.trim(),
+          phone: document.getElementById('emp-phone').value.trim(),
+          allMachines,
+          allowedDevnos,
+          permissions: {}
+        };
+        EMPLOYEE_PERMISSIONS.forEach(p => {
+          payload.permissions[p] = document.getElementById(`emp-perm-${p}`).checked;
+        });
+        const password = document.getElementById('emp-password').value;
+        if (password) payload.password = password;
+        if (!id && !password) {
+          this.showToast('Defina uma senha para o funcionário.', 'err');
+          return;
+        }
+        if (id) payload.active = document.getElementById('emp-active').checked;
+        if (!id && this.currentUser?.role === 'CRPADMIN') {
+          payload.ownerId = document.getElementById('emp-owner').value;
+        }
+
+        try {
+          const res = await fetch(id ? `/api/v1/admin/employees/${encodeURIComponent(id)}` : '/api/v1/admin/employees', {
+            method: id ? 'PUT' : 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.token}` },
+            body: JSON.stringify(payload)
+          }).then(r => r.json());
+
+          if (res.success) {
+            this.showToast(res.message || 'Funcionário salvo.', 'ok');
+            document.getElementById('employee-modal').classList.remove('open');
+            formEmployee.reset();
+            await this.fetchBackendData();
+          } else {
+            this.showToast(res.message || 'Erro ao salvar funcionário.', 'err');
+          }
+        } catch (_) {
+          this.showToast('Falha na comunicação com o servidor.', 'err');
+        }
+      });
     }
 
     // Form Quick Transfer Owner
@@ -2109,6 +2283,14 @@ class CapaxeroDashboard {
         this.weeklyRoute = resWeeklyRoute.data;
       }
 
+      // Funcionários: só quem gerencia (admin e dono de máquina própria) busca a lista
+      if (this.canManageEmployees()) {
+        const resEmployees = await fetch('/api/v1/admin/employees', { headers }).then(r => r.json()).catch(() => ({ success: false }));
+        if (resEmployees.success && Array.isArray(resEmployees.data)) {
+          this.state.employees = resEmployees.data;
+        }
+      }
+
       this.renderAll();
     } catch (_) {}
   }
@@ -2157,6 +2339,9 @@ class CapaxeroDashboard {
     this.renderCoupons();
     if (this.currentUser?.role === 'CRPADMIN') {
       this.renderCadastros();
+    }
+    if (this.canManageEmployees()) {
+      this.renderFuncionarios();
     }
     this.populateSelectors();
   }
@@ -2218,12 +2403,27 @@ class CapaxeroDashboard {
       setOptions(selDashOwner, opts.join(''));
     }
 
+    const selDashLocation = document.getElementById('dash-location-filter');
+    if (selDashLocation) {
+      const locList = this.locais || [];
+      const opts = ['<option value="all">Todos os locais</option>'];
+      locList.forEach(l => opts.push(`<option value="${l.depotno}">${l.name || l.depotno}</option>`));
+      setOptions(selDashLocation, opts.join(''));
+      if (this.selectedLocation !== 'all' && !locList.some(l => l.depotno === this.selectedLocation)) {
+        this.selectedLocation = 'all';
+        selDashLocation.value = 'all';
+      }
+    }
+
     const selDashMachine = document.getElementById('dash-machine-filter');
     if (selDashMachine) {
       const opts = ['<option value="all">Todas as máquinas</option>'];
       let stList = this.stations || [];
       if (this.selectedOwner && this.selectedOwner !== 'all') {
         stList = stList.filter(s => s.raw?.owner_id === this.selectedOwner || s.dono === this.selectedOwner || s.raw?.owner === this.selectedOwner);
+      }
+      if (this.selectedLocation && this.selectedLocation !== 'all') {
+        stList = stList.filter(s => s.raw?.depotno === this.selectedLocation);
       }
       stList.forEach(s => {
         const label = s.nome ? `${s.nome} (${s.devno})` : s.devno;
@@ -2408,6 +2608,7 @@ class CapaxeroDashboard {
 
     this.renderStationTelemetry(s);
     this.fillStationForms(s);
+    this.applyPermissionUI();
     this.openModal('detail-modal');
   }
 
@@ -2993,9 +3194,13 @@ class CapaxeroDashboard {
     const isAdmin = this.currentUser?.role === 'CRPADMIN';
     const q = this.searchTerm;
     const list = this.locais.filter(l => {
-      if (l.devno && this.ownershipFilter !== 'all') {
-        const station = this.stations.find(s => s.devno === l.devno);
-        if (station && !this.matchesOwnershipFilter(station.raw?.owner_id || station.dono)) return false;
+      const devnosAqui = Array.isArray(l.devnos) ? l.devnos : (l.devno ? [l.devno] : []);
+      if (devnosAqui.length > 0 && this.ownershipFilter !== 'all') {
+        const algumBate = devnosAqui.some(devno => {
+          const station = this.stations.find(s => s.devno === devno);
+          return station && this.matchesOwnershipFilter(station.raw?.owner_id || station.dono);
+        });
+        if (!algumBate) return false;
       }
       if (!q) return true;
       return (l.name || '').toLowerCase().includes(q) ||
@@ -3020,7 +3225,7 @@ class CapaxeroDashboard {
             <td style="font-weight:600; color:#fff;">${locName}</td>
             <td class="muted">${l.address || '—'}</td>
             <td class="mono">${l.totemCount ? `${l.totemCount} totem(s)` : '—'}</td>
-            <td class="mono green">${fmtBRL(l.revenueToday || 0)}</td>
+            <td class="mono green">${this.can('viewRevenue') ? fmtBRL(l.revenueToday || 0) : '—'}</td>
             <td><span class="status-chip active">Ativo</span></td>
             ${isAdmin ? `
             <td style="text-align:right; white-space:nowrap;">
@@ -3181,20 +3386,31 @@ class CapaxeroDashboard {
 
     const withCoords = (this.locais || []).filter(l => {
       if (l.lat === undefined || l.lat === null || l.lng === undefined || l.lng === null) return false;
-      if (l.devno && this.ownershipFilter !== 'all') {
-        const station = this.stations.find(s => s.devno === l.devno);
-        if (station && !this.matchesOwnershipFilter(station.raw?.owner_id || station.dono)) return false;
+      const devnosAqui = Array.isArray(l.devnos) ? l.devnos : (l.devno ? [l.devno] : []);
+      if (devnosAqui.length > 0 && this.ownershipFilter !== 'all') {
+        const algumBate = devnosAqui.some(devno => {
+          const station = this.stations.find(s => s.devno === devno);
+          return station && this.matchesOwnershipFilter(station.raw?.owner_id || station.dono);
+        });
+        if (!algumBate) return false;
       }
       return true;
     });
 
     withCoords.forEach(l => {
-      const hasTotem = Boolean(l.devno);
-      const station = hasTotem ? this.stations.find(s => s.devno === l.devno) : null;
-      const currentStatus = station ? station.status : (l.totemStatus || 'OFFLINE');
+      // Um local pode ter 2 ou mais máquinas alocadas — o pino resume o status de todas elas.
+      const devnosAqui = Array.isArray(l.devnos) ? l.devnos : (l.devno ? [l.devno] : []);
+      const stationsAqui = devnosAqui.map(devno => this.stations.find(s => s.devno === devno)).filter(Boolean);
+      const hasTotem = stationsAqui.length > 0;
+      const anyOnline = stationsAqui.some(s => s.status !== 'OFFLINE');
+      const anyCleaning = stationsAqui.some(s => s.status === 'CLEANING');
+      const currentStatus = hasTotem ? (anyCleaning ? 'CLEANING' : (anyOnline ? 'IDLE' : 'OFFLINE')) : (l.totemStatus || 'OFFLINE');
       const statusMeta = hasTotem ? (this.meta[currentStatus] || this.meta.OFFLINE) : null;
       const pinColor = statusMeta ? statusMeta.color : '#FDCB24';
-      const isCleaning = hasTotem && currentStatus === 'CLEANING';
+      const isCleaning = anyCleaning;
+      const machinesLabel = stationsAqui.length > 1
+        ? `${stationsAqui.length} máquinas (${stationsAqui.map(s => this.meta[s.status]?.label || s.status).join(', ')})`
+        : (statusMeta ? statusMeta.label : '');
 
       const icon = L.divIcon({
         className: '',
@@ -3206,7 +3422,7 @@ class CapaxeroDashboard {
       marker.bindPopup(`
         <div class="cpx-popup-title">${l.name || l.depotno}</div>
         <div class="cpx-popup-row">${l.address || 'Endereço não informado'}</div>
-        <div class="cpx-popup-row">${hasTotem ? `<span style="color:${pinColor};">${statusMeta.label}</span>` : 'sem totem vinculado'}</div>
+        <div class="cpx-popup-row">${hasTotem ? `<span style="color:${pinColor};">${machinesLabel}</span>` : 'sem totem vinculado'}</div>
       `, { className: 'cpx-leaflet-popup' });
     });
 
@@ -3696,6 +3912,115 @@ class CapaxeroDashboard {
       }).join('');
     }
 
+    // 4B. Formas de Pagamento — rosca proporcional ao faturamento (cupons/gratuidades ficam de fora)
+    const elPayPie = document.getElementById('dash-payment-pie');
+    const elPayLegend = document.getElementById('dash-payment-legend');
+    if (elPayPie && elPayLegend) {
+      const classifyPayment = (pm) => {
+        const s = String(pm || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase();
+        if (s.includes('PIX')) return 'pix';
+        if (s.includes('DEBIT')) return 'debito';
+        if (s.includes('CRED')) return 'credito';
+        return null;
+      };
+      const payCats = [
+        { key: 'pix', label: 'Pix', color: '#00C566', fat: 0, count: 0 },
+        { key: 'credito', label: 'Crédito', color: '#FDCB24', fat: 0, count: 0 },
+        { key: 'debito', label: 'Débito', color: '#5587B3', fat: 0, count: 0 }
+      ];
+      txsPeriod.forEach(t => {
+        const cat = payCats.find(c => c.key === classifyPayment(t.paymentMethod));
+        if (!cat) return;
+        cat.fat += Number(t.amount) || 0;
+        cat.count += 1;
+      });
+      const payTotal = payCats.reduce((acc, c) => acc + c.fat, 0);
+      const payCount = payCats.reduce((acc, c) => acc + c.count, 0);
+
+      const elPayTotal = document.getElementById('dash-payment-total');
+      if (elPayTotal) elPayTotal.textContent = `${fmtBRL(payTotal)} no período`;
+
+      const cx = 100, cy = 100, r = 78, sw = 26;
+      const center = `
+        <text x="${cx}" y="${cy - 4}" text-anchor="middle" fill="#fff" style="font-family:var(--font-mono); font-size:22px; font-weight:700;">${payCount}</text>
+        <text x="${cx}" y="${cy + 16}" text-anchor="middle" fill="#8a97a7" style="font-size:10.5px;">${payCount === 1 ? 'pagamento' : 'pagamentos'}</text>`;
+
+      if (payTotal <= 0) {
+        elPayPie.innerHTML = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="${sw}"></circle>${center}`;
+        elPayLegend.innerHTML = `<div style="color:#8a97a7; font-size:12.5px;">Nenhum pagamento no período selecionado.</div>`;
+      } else {
+        const pt = (a) => `${(cx + r * Math.cos(a)).toFixed(2)},${(cy + r * Math.sin(a)).toFixed(2)}`;
+        let angle = -Math.PI / 2;
+        const slices = payCats.filter(c => c.fat > 0).map(c => {
+          const frac = c.fat / payTotal;
+          const tip = `<title>${c.label}: ${fmtBRL(c.fat)} (${Math.round(frac * 100)}%)</title>`;
+          if (frac >= 0.9999) {
+            return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${c.color}" stroke-width="${sw}">${tip}</circle>`;
+          }
+          const a0 = angle, a1 = angle + frac * Math.PI * 2;
+          angle = a1;
+          const large = a1 - a0 > Math.PI ? 1 : 0;
+          return `<path d="M${pt(a0)} A${r},${r} 0 ${large} 1 ${pt(a1)}" fill="none" stroke="${c.color}" stroke-width="${sw}">${tip}</path>`;
+        });
+        elPayPie.innerHTML = slices.join('') + center;
+
+        elPayLegend.innerHTML = payCats.map(c => {
+          const pct = Math.round((c.fat / payTotal) * 100);
+          return `
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; font-size:12.5px; margin-bottom:5px;">
+                <span style="display:flex; align-items:center; gap:8px; color:#c8d2de; font-weight:600;"><i style="width:10px; height:10px; border-radius:3px; background:${c.color}; display:block;"></i>${c.label}</span>
+                <span style="font-family:var(--font-mono); color:#fff; font-weight:700;">${fmtBRL(c.fat)} <span style="font-size:11px; color:#8a97a7;">(${pct}%)</span></span>
+              </div>
+              <div style="font-size:11px; color:#6d7a8a;">${c.count} ${c.count === 1 ? 'transação' : 'transações'}</div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    // 4C. Vendas por Bandeira do Cartão — só conta vendas em cartão (crédito/débito
+    // presencial via Cielo Conecta); Pix não tem bandeira e fica de fora naturalmente,
+    // já que cardBrand só é gravado nesse fluxo.
+    const elBrandRank = document.getElementById('dash-ranking-bandeiras');
+    const elBrandTotal = document.getElementById('dash-brand-total');
+    if (elBrandRank) {
+      const brandPalette = ['#00C566', '#FDCB24', '#5587B3', '#FF6B7F', '#9b7fdd', '#7fb2dd'];
+      const brandMap = {};
+      txsPeriod.forEach(t => {
+        const brand = String(t.cardBrand || '').trim();
+        if (!brand) return;
+        if (!brandMap[brand]) brandMap[brand] = { name: brand, count: 0, fat: 0 };
+        brandMap[brand].count += 1;
+        brandMap[brand].fat += Number(t.amount) || 0;
+      });
+      const brandArr = Object.values(brandMap).sort((a, b) => b.count - a.count);
+      const totalBrandSales = brandArr.reduce((acc, b) => acc + b.count, 0);
+
+      if (elBrandTotal) elBrandTotal.textContent = `${totalBrandSales} ${totalBrandSales === 1 ? 'venda no cartão' : 'vendas no cartão'}`;
+
+      if (brandArr.length === 0) {
+        elBrandRank.innerHTML = `<div style="color:#8a97a7; font-size:12.5px; padding:12px; text-align:center;">Nenhuma venda no cartão com bandeira identificada no período selecionado.</div>`;
+      } else {
+        const maxCount = brandArr[0].count || 1;
+        elBrandRank.innerHTML = brandArr.map((b, idx) => {
+          const color = brandPalette[idx % brandPalette.length];
+          return `
+          <div class="rank-item">
+            <div class="rank-row">
+              <span class="rank-idx" style="background:${color}22; color:${color};">${idx + 1}</span>
+              <span class="rank-name">${b.name}</span>
+              <span class="rank-val">${b.count} ${b.count === 1 ? 'venda' : 'vendas'} · ${fmtBRL(b.fat)}</span>
+            </div>
+            <div class="rank-bar-bg">
+              <div class="rank-bar-fill" style="width:${Math.max(6, Math.round((b.count / maxCount) * 100))}%; background:${color};"></div>
+            </div>
+          </div>
+        `;
+        }).join('');
+      }
+    }
+
     // 5. Tabela de OMs
     const elOMs = document.getElementById('dash-oms-tbody');
     if (elOMs) {
@@ -3976,7 +4301,7 @@ class CapaxeroDashboard {
       return (u.franchiseType === 'PROPRIA' ? 'PROPRIA' : 'FRANQUEADO') === this.ownershipFilter;
     });
     if (list.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:20px; color:#8a97a7;">Nenhum usuário cadastrado.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:20px; color:#8a97a7;">Nenhum usuário cadastrado.</td></tr>`;
       return;
     }
 
@@ -3995,6 +4320,7 @@ class CapaxeroDashboard {
         <td><span class="user-badge-role ${u.role === 'CRPADMIN' ? 'crpadmin' : 'owner'}">${u.role}</span></td>
         <td>${vinculoBadge}</td>
         <td class="mono accent">${this.stations.filter(s => s.dono === (u.responsible_name || u.username)).length} máquina(s)</td>
+        <td class="mono">${u.role === 'CRPADMIN' ? '<span class="muted">—</span>' : (u.employeesCount || 0)}</td>
         <td style="text-align:right; white-space:nowrap;">
           <span style="color:#00C566; font-size:11px; font-weight:700; margin-right:10px;">● Ativo</span>
           ${u.role === 'CRPADMIN' ? '' : `<button class="btn btn-blue" style="padding:6px 12px; font-size:11.5px;" onclick="window.app.openEditOwnerModal('${u.id}')">Editar</button>`}
@@ -4002,6 +4328,172 @@ class CapaxeroDashboard {
       </tr>
     `;
     }).join('');
+  }
+
+  // --- FUNCIONÁRIOS (dono de Máquina Própria vê os dele; CRPADMIN vê todos) ---
+  getPropriaOwners() {
+    return (this.state.users || []).filter(u => u.role === 'OWNER' && u.franchiseType === 'PROPRIA');
+  }
+
+  // Máquinas de um dono, pela mesma regra de propriedade do backend (id ou nome legado)
+  getOwnerStations(ownerId) {
+    const owner = ownerId === this.currentUser?.id
+      ? this.currentUser
+      : (this.state.users || []).find(u => u.id === ownerId);
+    return (this.stations || []).filter(s =>
+      s.raw?.owner_id === ownerId ||
+      (owner && (s.raw?.owner === owner.responsible_name || s.raw?.owner === owner.username))
+    );
+  }
+
+  renderFuncionarios() {
+    if (!this.canManageEmployees()) return;
+    const tbody = document.getElementById('funcionarios-tbody');
+    if (!tbody) return;
+    const isAdmin = this.currentUser.role === 'CRPADMIN';
+
+    document.querySelectorAll('.func-owner-col').forEach(el => { el.style.display = isAdmin ? '' : 'none'; });
+    const subtitle = document.getElementById('funcionarios-subtitle');
+    if (subtitle) {
+      subtitle.textContent = isAdmin
+        ? 'Funcionários de todos os donos de máquina própria da rede'
+        : 'Acessos da sua equipe às suas máquinas, com as funcionalidades que cada um pode usar';
+    }
+
+    const filterSel = document.getElementById('func-owner-filter');
+    if (filterSel) {
+      filterSel.style.display = isAdmin ? 'inline-block' : 'none';
+      if (isAdmin) {
+        const html = ['<option value="all">Todos os donos</option>']
+          .concat(this.getPropriaOwners().map(o => `<option value="${escHtml(o.id)}">${escHtml(o.responsible_name || o.username)}</option>`))
+          .join('');
+        if (filterSel.innerHTML !== html) {
+          const previous = filterSel.value;
+          filterSel.innerHTML = html;
+          if (Array.from(filterSel.options).some(o => o.value === previous)) filterSel.value = previous;
+        }
+      }
+    }
+
+    const ownerFilter = isAdmin && filterSel ? filterSel.value : 'all';
+    const list = (this.state.employees || []).filter(e => ownerFilter === 'all' || e.employerId === ownerFilter);
+    const cols = isAdmin ? 8 : 7;
+
+    if (list.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="${cols}" style="text-align:center; padding:24px; color:#8a97a7;">Nenhum funcionário cadastrado. Clique em "+ Cadastrar Funcionário" para dar acesso à sua equipe.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = list.map(e => {
+      const allowed = e.allowedDevnos || [];
+      const machineNames = allowed.map(d => this.stations.find(s => s.devno === d)?.nome || d);
+      const machinesCell = e.allMachines
+        ? '<span class="perm-badge">Todas</span>'
+        : `<span title="${escHtml(machineNames.join(', '))}">${allowed.length} máquina${allowed.length === 1 ? '' : 's'}</span>`;
+      const perms = EMPLOYEE_PERMISSIONS.filter(p => e.permissions?.[p])
+        .map(p => `<span class="perm-badge">${EMPLOYEE_PERMISSION_LABELS[p]}</span>`).join('')
+        || '<span class="perm-badge none">Só visualizar</span>';
+      const status = e.active
+        ? '<span style="color:#00C566; font-size:11px; font-weight:700;">● Ativo</span>'
+        : '<span style="color:#FF6B7F; font-size:11px; font-weight:700;">● Bloqueado</span>';
+      const nameArg = escHtml(e.responsible_name).replace(/\\/g, '\\\\').replace(/&#39;/g, "\\'");
+      return `
+      <tr>
+        <td style="font-weight:700; color:#fff;">${escHtml(e.responsible_name)}</td>
+        ${isAdmin ? `<td class="muted">${escHtml(e.employerName)}</td>` : ''}
+        <td class="muted">${escHtml(e.email)}</td>
+        <td class="muted">${escHtml(e.phone) || '—'}</td>
+        <td class="mono">${machinesCell}</td>
+        <td>${perms}</td>
+        <td>${status}</td>
+        <td style="text-align:right; white-space:nowrap;">
+          <button class="btn btn-blue" style="padding:6px 12px; font-size:11.5px;" onclick="window.app.openEmployeeModal('${escHtml(e.id)}')">Editar</button>
+          <button class="btn btn-danger" style="padding:6px 12px; font-size:11.5px; margin-left:6px;" onclick="window.app.deleteEmployee('${escHtml(e.id)}', '${nameArg}')">Excluir</button>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  renderEmployeeMachines(ownerId, checkedDevnos = []) {
+    const box = document.getElementById('emp-machines');
+    if (!box) return;
+    const stations = ownerId ? this.getOwnerStations(ownerId) : [];
+    if (stations.length === 0) {
+      box.innerHTML = '<div style="font-size:12px; color:#8a97a7;">Este dono ainda não tem máquinas.</div>';
+      return;
+    }
+    const checked = new Set(checkedDevnos);
+    box.innerHTML = stations.map(s => `
+      <label><input type="checkbox" value="${escHtml(s.devno)}" ${checked.has(s.devno) ? 'checked' : ''}> ${escHtml(s.nome)} <span class="muted" style="font-size:11px;">(${escHtml(s.devno)}) — ${escHtml(s.local)}</span></label>
+    `).join('');
+  }
+
+  openEmployeeModal(employeeId = null) {
+    const isAdmin = this.currentUser?.role === 'CRPADMIN';
+    const emp = employeeId ? (this.state.employees || []).find(e => e.id === employeeId) : null;
+    if (employeeId && !emp) return;
+
+    if (!emp && isAdmin && this.getPropriaOwners().length === 0) {
+      this.showToast('Nenhum dono com vínculo de Máquina Própria cadastrado ainda.', 'err');
+      return;
+    }
+
+    document.getElementById('form-employee').reset();
+    document.getElementById('employee-modal-title').textContent = emp ? 'EDITAR FUNCIONÁRIO' : 'CADASTRAR FUNCIONÁRIO';
+    document.getElementById('emp-id').value = emp ? emp.id : '';
+    document.getElementById('emp-name').value = emp ? emp.responsible_name || '' : '';
+    document.getElementById('emp-email').value = emp ? emp.email || '' : '';
+    document.getElementById('emp-phone').value = emp ? emp.phone || '' : '';
+    document.getElementById('emp-password-label').textContent = emp ? 'Nova senha (opcional)' : 'Senha *';
+    document.getElementById('emp-password').placeholder = emp ? 'Deixe em branco para manter a senha atual' : 'Mínimo de 4 caracteres';
+
+    // Dono: o admin escolhe ao cadastrar; na edição o dono fica fixo
+    const ownerGroup = document.getElementById('emp-owner-group');
+    const ownerSel = document.getElementById('emp-owner');
+    let ownerId = emp ? emp.employerId : this.currentUser.id;
+    if (isAdmin && !emp) {
+      const owners = this.getPropriaOwners();
+      ownerSel.innerHTML = owners.map(o => `<option value="${escHtml(o.id)}">${escHtml(o.responsible_name || o.username)}${o.company_name ? ` — ${escHtml(o.company_name)}` : ''}</option>`).join('');
+      const filterSel = document.getElementById('func-owner-filter');
+      if (filterSel && filterSel.value !== 'all') ownerSel.value = filterSel.value;
+      ownerId = ownerSel.value;
+      ownerGroup.style.display = '';
+    } else {
+      ownerGroup.style.display = 'none';
+    }
+
+    const allMachines = emp ? emp.allMachines !== false : true;
+    document.getElementById('emp-scope-all').checked = allMachines;
+    document.getElementById('emp-scope-some').checked = !allMachines;
+    document.getElementById('emp-machines').style.display = allMachines ? 'none' : 'flex';
+    this.renderEmployeeMachines(ownerId, emp ? emp.allowedDevnos || [] : []);
+
+    EMPLOYEE_PERMISSIONS.forEach(p => {
+      document.getElementById(`emp-perm-${p}`).checked = Boolean(emp?.permissions?.[p]);
+    });
+
+    document.getElementById('emp-active-group').style.display = emp ? '' : 'none';
+    document.getElementById('emp-active').checked = emp ? emp.active !== false : true;
+
+    this.openModal('employee-modal');
+  }
+
+  async deleteEmployee(employeeId, name) {
+    if (!confirm(`Excluir o acesso de "${name}"? Ele não conseguirá mais entrar no painel.`)) return;
+    try {
+      const res = await fetch(`/api/v1/admin/employees/${encodeURIComponent(employeeId)}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${this.token}` }
+      }).then(r => r.json());
+      if (res.success) {
+        this.showToast(`Funcionário "${name}" excluído.`);
+        await this.fetchBackendData();
+      } else {
+        this.showToast(res.message || 'Erro ao excluir funcionário.', 'err');
+      }
+    } catch (_) {
+      this.showToast('Falha na comunicação com o servidor.', 'err');
+    }
   }
 
   openEditOwnerModal(userId) {
@@ -4311,7 +4803,7 @@ class CapaxeroDashboard {
     try {
       const res = await fetch(
         `/api/v1/coupons/${encodeURIComponent(this.selectedCouponCode)}/redemptions/${encodeURIComponent(redemptionId)}`,
-        { method: 'DELETE' }
+        { method: 'DELETE', headers: { 'Authorization': `Bearer ${this.token}` } }
       ).then(r => r.json());
 
       if (res.success) {
@@ -4352,7 +4844,7 @@ class CapaxeroDashboard {
     try {
       const res = await fetch(`/api/v1/coupons/${encodeURIComponent(this.selectedCouponCode)}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.token}` },
         body: JSON.stringify({
           description, discountPercent, maxUsages,
           maxUsagesPerCpf, requireCpf, applicableMode, allowedTotems
@@ -4425,7 +4917,7 @@ class CapaxeroDashboard {
     try {
       const res = await fetch('/api/v1/coupons', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.token}` },
         body: JSON.stringify({ code, description, discountPercent, maxUsages, maxUsagesPerCpf, requireCpf, applicableMode, allowedTotems })
       }).then(r => r.json());
 
@@ -4445,7 +4937,7 @@ class CapaxeroDashboard {
 
   async resetCoupon(code) {
     try {
-      const res = await fetch(`/api/v1/coupons/${encodeURIComponent(code)}/reset`, { method: 'POST' }).then(r => r.json());
+      const res = await fetch(`/api/v1/coupons/${encodeURIComponent(code)}/reset`, { method: 'POST', headers: { 'Authorization': `Bearer ${this.token}` } }).then(r => r.json());
       if (res.success) {
         this.showToast(`Cupom ${code} resetado para disponível.`);
         await this.fetchBackendData();
@@ -4457,7 +4949,7 @@ class CapaxeroDashboard {
     try {
       const res = await fetch('/api/v1/coupons/reset-test', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.token}` },
         body: JSON.stringify({ scope: 'ALL_COUPONS' })
       }).then(r => r.json());
       if (res.success) {
@@ -4470,7 +4962,7 @@ class CapaxeroDashboard {
   async deleteCoupon(code) {
     if (!confirm(`Deseja realmente excluir o cupom promocional "${code}"?`)) return;
     try {
-      const res = await fetch(`/api/v1/coupons/${encodeURIComponent(code)}`, { method: 'DELETE' }).then(r => r.json());
+      const res = await fetch(`/api/v1/coupons/${encodeURIComponent(code)}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${this.token}` } }).then(r => r.json());
       if (res.success) {
         this.showToast(`Cupom ${code} excluído.`);
         await this.fetchBackendData();

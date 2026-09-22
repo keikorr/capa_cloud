@@ -70,6 +70,7 @@
       <button class="nav-tab-btn" data-page="dashboard"><svg class="i" viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M22 19V2"/></svg><span>Dashboard</span></button>
       <button class="nav-tab-btn" data-page="coupons" id="tab-coupons"><svg class="i" viewBox="0 0 24 24"><path d="M3 8a2 2 0 012-2h14a2 2 0 012 2v2a2 2 0 000 4v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2a2 2 0 000-4V8z"/><path d="M10 6v12" stroke-dasharray="2 2"/></svg><span>Cupons &amp; Vouchers</span></button>
       <button class="nav-tab-btn admin-only" data-page="cadastros" id="tab-cadastros" style="display:none !important;"><svg class="i" viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0114 0M17 8h5M19.5 5.5v5"/></svg><span>Cadastros</span></button>
+      <button class="nav-tab-btn" data-page="funcionarios" id="tab-funcionarios" style="display:none !important;"><svg class="i" viewBox="0 0 24 24"><circle cx="9" cy="7" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0113 0"/><path d="M16 11l2 2 4-4"/></svg><span>Funcionários</span></button>
     </nav>
 
     <div class="navbar-search">
@@ -147,7 +148,7 @@
 
       <!-- 4 KPI Cards com barra lateral colorida -->
       <div class="kpi-grid">
-        <div class="kpi-card" style="--accent: #00C566;">
+        <div class="kpi-card revenue-only" style="--accent: #00C566;">
           <div class="kpi-label">Faturamento geral · hoje</div>
           <div class="kpi-value" id="kpi-revenue" style="color: #00C566;">R$ 0,00</div>
           <div class="kpi-sub" id="kpi-revenue-sub">acumulado hoje</div>
@@ -347,6 +348,9 @@
           <p>Consolidado da rede — <span id="dash-periodo-label" style="color:#FDCB24; font-weight:600;">últimos 7 dias</span></p>
         </div>
         <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <select class="form-control" id="dash-location-filter" style="width:auto; min-width:160px; padding:7px 12px; font-weight:600; font-size:12.5px; border-radius:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border); color:var(--text);">
+            <option value="all">Todos os locais</option>
+          </select>
           <select class="form-control" id="dash-owner-filter" style="width:auto; min-width:160px; padding:7px 12px; font-weight:600; font-size:12.5px; border-radius:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border); color:var(--text);">
             <option value="all">Todos os donos</option>
           </select>
@@ -461,8 +465,8 @@
         </div>
       </div>
 
-      <!-- Ciclos por Plano -->
-      <div style="margin-bottom:18px;">
+      <!-- Ciclos por Plano & Formas de Pagamento -->
+      <div class="dash-two-col" style="margin-bottom:18px;">
         <div class="chart-card">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:10px;">
             <h2>Ciclos por plano</h2>
@@ -473,6 +477,28 @@
             </div>
           </div>
           <div style="display:flex; align-items:flex-end; gap:14px; height:200px;" id="dash-ciclos-plano-bars"></div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-head">
+            <h2>Formas de pagamento</h2>
+            <span class="total" id="dash-payment-total">R$ 0,00 no período</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:24px; flex-wrap:wrap; margin-top:18px;">
+            <svg viewBox="0 0 200 200" style="width:160px; height:160px; flex-shrink:0;" id="dash-payment-pie"></svg>
+            <div id="dash-payment-legend" style="flex:1; min-width:180px; display:flex; flex-direction:column; gap:14px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vendas por Bandeira do Cartão -->
+      <div style="margin-bottom:18px;">
+        <div class="chart-card">
+          <div class="chart-head">
+            <h2>Vendas por bandeira do cartão</h2>
+            <span class="total" id="dash-brand-total">0 vendas no cartão</span>
+          </div>
+          <div id="dash-ranking-bandeiras" style="display:flex; flex-direction:column; gap:13px; margin-top:18px;"></div>
         </div>
       </div>
 
@@ -514,7 +540,7 @@
           </div>
         </div>
 
-        <div class="chart-card">
+        <div class="chart-card" style="display:flex; flex-direction:column;">
           <h2 style="font-size:12.5px; margin-bottom:4px;">Mapa de calor — horários de pico</h2>
           <p id="dash-heatmap-caption" style="margin:0 0 16px; font-size:11.5px; color:#8a97a7;">Calculando…</p>
           <div style="overflow-x:auto;">
@@ -523,7 +549,7 @@
               <tbody id="dash-heatmap-body"></tbody>
             </table>
           </div>
-          <div style="display:flex; align-items:center; gap:8px; margin-top:16px; font-size:10.5px; color:#6d7a8a;">
+          <div style="display:flex; align-items:center; gap:8px; margin-top:auto; padding-top:16px; font-size:10.5px; color:#6d7a8a;">
             <span>Menos movimento</span>
             <div style="flex:1; height:6px; border-radius:999px; background:linear-gradient(90deg,rgba(0,197,102,.08),#00C566);"></div>
             <span>Mais movimento</span>
@@ -582,10 +608,51 @@
                 <th>Nível</th>
                 <th>Vínculo</th>
                 <th>Máquinas Atribuídas</th>
+                <th>Funcionários</th>
                 <th style="text-align:right;">Ações</th>
               </tr>
             </thead>
             <tbody id="cadastros-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ============================================================
+       PÁGINA — FUNCIONÁRIOS (dono de Máquina Própria e CRPADMIN)
+       ============================================================ -->
+  <main class="page" id="page-funcionarios">
+    <div class="cpx-fade-up">
+      <div class="page-head">
+        <div>
+          <h1>FUNCIONÁRIOS</h1>
+          <p id="funcionarios-subtitle">Acessos da sua equipe às suas máquinas, com as funcionalidades que cada um pode usar</p>
+        </div>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <select class="form-control" id="func-owner-filter" style="display:none; width:auto; min-width:180px; padding:7px 12px; font-weight:600; font-size:12.5px; border-radius:10px;">
+            <option value="all">Todos os donos</option>
+          </select>
+          <button class="btn btn-primary" id="btn-open-new-employee" style="background:var(--brand-yellow); color:#000; font-weight:800;">+ Cadastrar Funcionário</button>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Funcionário</th>
+                <th class="func-owner-col" style="display:none;">Dono</th>
+                <th>E-mail / Login</th>
+                <th>Telefone</th>
+                <th>Máquinas</th>
+                <th>Permissões</th>
+                <th>Status</th>
+                <th style="text-align:right;">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="funcionarios-tbody"></tbody>
           </table>
         </div>
       </div>
@@ -654,7 +721,7 @@
             <svg class="i" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
             Visão geral
           </button>
-          <button class="modal-tab" data-station-tab="history">
+          <button class="modal-tab revenue-only" data-station-tab="history">
             <svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
             Histórico de vendas
           </button>
@@ -693,7 +760,7 @@
             <div class="lbl">Trava da porta</div>
             <div class="val" id="modal-stat-door" style="color:#FF9100;">Travada</div>
           </div>
-          <div class="info-box">
+          <div class="info-box revenue-only">
             <div class="lbl">Faturamento (hoje)</div>
             <div class="val mono" id="modal-stat-rev" style="color:#00C566;">R$ 612,00</div>
           </div>
@@ -1660,6 +1727,72 @@
         <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:20px;">
           <button type="button" class="btn btn-outline" id="edit-owner-cancel">Cancelar</button>
           <button type="submit" class="btn btn-primary" style="background:var(--brand-yellow); color:#000; font-weight:800;">Salvar Alterações</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL — Cadastrar / Editar Funcionário
+       ============================================================ -->
+  <div class="modal-overlay" id="employee-modal">
+    <div class="modal-box compact" style="width:min(600px,96vw);">
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:18px;">
+        <h2 id="employee-modal-title" style="font-family: var(--font-display); font-weight: 900; font-size: 20px; margin:0; color:var(--brand-yellow);">CADASTRAR FUNCIONÁRIO</h2>
+        <button class="modal-close" id="employee-close" style="margin-left:auto;">✕</button>
+      </div>
+      <form id="form-employee">
+        <input type="hidden" id="emp-id">
+        <div class="form-group" id="emp-owner-group" style="display:none;">
+          <label class="field-label">Dono (Máquina Própria) *</label>
+          <select class="form-control" id="emp-owner"></select>
+        </div>
+        <div class="form-group">
+          <label class="field-label">Nome do funcionário *</label>
+          <input type="text" class="form-control" id="emp-name" placeholder="Ex: Carlos Souza" required>
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+          <div class="form-group">
+            <label class="field-label">E-mail (login) *</label>
+            <input type="email" class="form-control" id="emp-email" placeholder="funcionario@empresa.com" required autocomplete="off">
+          </div>
+          <div class="form-group">
+            <label class="field-label">Telefone / WhatsApp</label>
+            <input type="text" class="form-control" id="emp-phone" placeholder="(11) 99999-9999" maxlength="15">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="field-label" id="emp-password-label">Senha *</label>
+          <input type="password" class="form-control" id="emp-password" placeholder="Mínimo de 4 caracteres" minlength="4" autocomplete="new-password">
+        </div>
+
+        <div class="form-group">
+          <label class="field-label">Máquinas que ele pode ver *</label>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+            <label class="emp-choice"><input type="radio" name="emp-scope" id="emp-scope-all" value="all" checked> Todas as máquinas do dono</label>
+            <label class="emp-choice"><input type="radio" name="emp-scope" id="emp-scope-some" value="some"> Escolher máquinas</label>
+          </div>
+          <div id="emp-machines" class="emp-machines" style="display:none;"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="field-label">Funcionalidades liberadas</label>
+          <p style="margin:0 0 10px; font-size:11.5px; color:#8a97a7;">Ver o status das máquinas liberadas é sempre permitido.</p>
+          <div class="emp-perms">
+            <label class="emp-perm"><input type="checkbox" id="emp-perm-viewRevenue"><span><strong>Ver faturamento e Dashboard</strong><small>Valores em R$, Dashboard Geral e histórico de vendas</small></span></label>
+            <label class="emp-perm"><input type="checkbox" id="emp-perm-remoteCommands"><span><strong>Comandos remotos</strong><small>Destravar porta, iniciar ciclo e outros comandos à distância</small></span></label>
+            <label class="emp-perm"><input type="checkbox" id="emp-perm-configureMachine"><span><strong>Configurar máquina</strong><small>Preços, tempos das etapas, pagamentos e vídeo</small></span></label>
+            <label class="emp-perm"><input type="checkbox" id="emp-perm-couponsMaintenance"><span><strong>Cupons e manutenção</strong><small>Criar e editar cupons, abrir e comentar ordens de manutenção</small></span></label>
+          </div>
+        </div>
+
+        <div class="form-group" id="emp-active-group" style="display:none;">
+          <label class="emp-perm" style="margin:0;"><input type="checkbox" id="emp-active"><span><strong>Acesso ativo</strong><small>Desmarque para bloquear o login sem excluir o cadastro</small></span></label>
+        </div>
+
+        <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:20px;">
+          <button type="button" class="btn btn-outline" id="employee-cancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary" style="background:var(--brand-yellow); color:#000; font-weight:800;">Salvar</button>
         </div>
       </form>
     </div>
