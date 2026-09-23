@@ -2397,3 +2397,40 @@ body.no-revenue .totem-card-foot .rev { display: none !important; }
 @media (max-width: 640px) {
   .emp-perms { grid-template-columns: 1fr; }
 }
+
+/* ============================================================
+   RESPONSIVIDADE — modal da estação e bloco de vídeo
+   ============================================================ */
+
+/* O bloco do vídeo tinha duas colunas fixas (prévia + envio): entre o tablet e o
+   desktop pequeno a coluna da direita não cabia e vazava para fora do modal. */
+.video-config-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  align-items: center;
+}
+.video-config-grid > * { min-width: 0; }
+
+/* Nenhum modal pode ficar mais largo que a tela: quando isso acontece, o conteúdo
+   sobra para os dois lados e a parte da esquerda fica inalcançável. */
+.modal-box { max-width: 100%; }
+/* Se ainda assim algo ficar largo demais, o overlay rola em vez de esconder a borda. */
+.modal-overlay { overflow: auto; }
+.modal-body, .modal-box.compact { min-width: 0; }
+.modal-body img, .modal-body video { max-width: 100%; }
+
+/* Faixa intermediária (tablet deitado / janela estreita no desktop) */
+@media (max-width: 1024px) {
+  .modal-overlay { padding: 16px; }
+  .info-grid-3 { grid-template-columns: 1fr 1fr; }
+  .payment-methods-grid { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 860px) {
+  .info-grid-3, .info-grid-2 { grid-template-columns: 1fr; }
+  .stock-card { grid-template-columns: auto minmax(0, 1fr); row-gap: 10px; }
+  .stock-card .stock-refresh-btn { grid-column: 1 / -1; justify-content: center; }
+  .admin-form-row { flex-direction: column; align-items: stretch; }
+  .admin-form-row .btn { width: 100%; justify-content: center; }
+}
