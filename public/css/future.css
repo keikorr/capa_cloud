@@ -718,6 +718,33 @@ input[type='checkbox'], input[type='radio'] { accent-color: var(--brand-gold); }
   .nav-tab-btn .i { width: 16px; height: 16px; }
 }
 
+/* Modais acima da navbar (z-index 1000) — senão a barra inferior cobre o botão Salvar no celular */
+.modal-overlay { z-index: 1100; }
+
+@media (max-width: 820px) {
+  .modal-overlay { overscroll-behavior: contain; }
+  .modal-box { max-height: 92dvh; -webkit-overflow-scrolling: touch; }
+  .modal-box .modal-body { padding-bottom: calc(24px + env(safe-area-inset-bottom)) !important; }
+  .modal-box .plans-config-grid,
+  .modal-box .plan-fields,
+  .modal-box .two-col { grid-template-columns: minmax(0, 1fr) !important; }
+  .modal-box .plan-fields { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .modal-box form > div[style*="grid-template-columns"] { grid-template-columns: minmax(0, 1fr) !important; }
+  .modal-box input, .modal-box select, .modal-box textarea { max-width: 100%; min-width: 0; font-size: 16px; }
+  .modal-box .modal-actions-sticky {
+    position: sticky; bottom: calc(-24px - env(safe-area-inset-bottom));
+    margin: 18px -18px calc(-24px - env(safe-area-inset-bottom)) !important;
+    padding: 12px 18px calc(12px + env(safe-area-inset-bottom));
+    background: #10120e; border-top: 1px solid var(--border-soft);
+    z-index: 3;
+  }
+  .modal-box .modal-actions-sticky .btn { flex: 1; justify-content: center; }
+}
+
+@media (max-width: 420px) {
+  .modal-box .plan-fields { grid-template-columns: minmax(0, 1fr) !important; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
